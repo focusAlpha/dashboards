@@ -211,7 +211,7 @@ td .nm{color:var(--muted);font-size:11.5px}
       <span>row data <b id="stRef">—</b></span>
       <span>events axis <b id="stEv">—</b></span>
       <span>universe <b id="stUni">—</b> companies</span>
-      <button class="fa-own" id="ownBtn" type="button">Build my own <span class="arw">→</span></button><button class="dark-toggle" id="themeBtn" title="Toggle theme">Theme</button>
+      <a class="fa-gh" href="https://github.com/focusAlpha/dashboards/tree/main/screener-dashboard" target="_blank" rel="noopener" title="This page's source on GitHub (MIT)">Source on GitHub</a><button class="fa-own" id="ownBtn" type="button">Build my own <span class="arw">→</span></button><button class="dark-toggle" id="themeBtn" title="Toggle theme">Theme</button>
     </div>
   </header>
   <div class="main">
@@ -864,6 +864,16 @@ else loadPreset(PRESETS[0]);
 .fa-own:focus-visible{outline:2px solid #6644C9;outline-offset:3px}
 .fa-own .arw{font-size:15px;line-height:1;opacity:.9}
 @media (max-width:560px){.fa-own{padding:9px 15px;font-size:13px}}
+/* Source on GitHub — sits beside Build my own on every page; outlined so the purple stays the one call to action */
+.fa-gh{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:9px;margin-right:8px;
+  font:500 13px/1 system-ui,-apple-system,"Segoe UI",sans-serif;color:#4F2FB0;background:transparent;border:1px solid rgba(79,47,176,.45);
+  text-decoration:none;white-space:nowrap;letter-spacing:.01em}
+.fa-gh::before{content:"";width:14px;height:14px;background:currentColor;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/></svg>") center/contain no-repeat}
+.fa-gh:hover{background:rgba(79,47,176,.08);border-color:#4F2FB0}
+.fa-gh:focus-visible{outline:2px solid #6644C9;outline-offset:3px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fa-gh{color:#B9A6F2;border-color:rgba(185,166,242,.5)}:root:not([data-theme="light"]) .fa-gh:hover{background:rgba(185,166,242,.12);border-color:#B9A6F2}}
+:root[data-theme="dark"] .fa-gh{color:#B9A6F2;border-color:rgba(185,166,242,.5)}:root[data-theme="dark"] .fa-gh:hover{background:rgba(185,166,242,.12);border-color:#B9A6F2}
+@media (max-width:560px){.fa-gh{padding:7px 10px;font-size:12px}}
 .fa-scrim{position:fixed;inset:0;background:rgba(8,12,18,.62);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;
   /* Its OWN palette. The three demos each name their tokens differently
      (--surface / --card / --shell), so inheriting them left the dialog with an
@@ -903,6 +913,7 @@ else loadPreset(PRESETS[0]);
   background:var(--fa-wash);color:var(--fa-brand);border:1px solid color-mix(in srgb,var(--fa-brand) 35%,transparent);
   font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;vertical-align:1px}
 .fa-link:hover{background:var(--fa-brand);color:#fff;border-color:var(--fa-brand)}
+.fa-src{color:var(--fa-brand);font-weight:600;text-decoration:underline;text-underline-offset:2px}
 .fa-pbox{position:relative;background:var(--fa-bg2);border:1px solid var(--fa-line);border-radius:10px}
 .fa-pbox pre{margin:0;padding:14px 16px;font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-word;max-height:42vh;overflow:auto;color:var(--fa-ink)}
@@ -918,8 +929,10 @@ else loadPreset(PRESETS[0]);
     <div class="fa-mh">
       <div>
         <h2 id="faTitle">Build your own, on your own data</h2>
-        <p>This page is a frozen snapshot. Paste the prompt below into Claude and it will pull live
-           FocusAlpha data through the connector — your universe, your filters, your account.</p>
+        <p>This page is a frozen snapshot. Its source is public on
+           <a class="fa-src" href="https://github.com/focusAlpha/dashboards/tree/main/screener-dashboard" target="_blank" rel="noopener">GitHub</a>.
+           Paste the prompt below into Claude: it fetches that source and republishes it reading live
+           FocusAlpha data through your connector — your universe, your filters, your account.</p>
       </div>
       <button class="fa-x" id="faX" aria-label="Close">×</button>
     </div>
@@ -928,47 +941,38 @@ else loadPreset(PRESETS[0]);
         <li>Connect <b>FocusAlpha</b> in your preferred AI, if you haven’t already <a class="fa-link" href="https://focusalpha.ai/start" target="_blank" rel="noopener">Connect →</a></li>
         <li><b>Copy</b> the prompt below and paste it into a new conversation</li>
         <li>Edit the conditions at the bottom — that last block is yours to change</li>
+        <li>Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions</li>
       </ol>
       <div class="fa-pbox">
         <button class="fa-copy" id="faCopy">Copy</button>
-        <pre id="faPrompt">Build me a screening dashboard like https://focusalpha.ai/screener-dashboard, on my own filters.
-Sample page: https://focusalpha.ai/screener-dashboard  ·  its full source: https://github.com/focusAlpha/dashboards/blob/main/screener-dashboard/index.html
-The sample's data is frozen as of 2026-09-23. Mine must fetch live, through the connector.
+        <pre id="faPrompt">Build me a live screening dashboard from the FocusAlpha sample at https://focusalpha.ai/screener-dashboard, on my own filters.
 
-FIRST look at the data, before writing any page:
-1. Call screen_companies({ list_facets: true }) — it is free and it gives the exact spelling of
-   every country, sector, exchange and event family, with the row counts behind each.
-2. Call screen_companies once with my conditions below and read one row in full. Do not guess
-   field names or units: margins, yields and growth come back as FRACTIONS (0.15 = 15%) while
-   the price returns come back as percents.
+The page is open source. Fetch this ONE file and use it verbatim as the page:
+  https://raw.githubusercontent.com/focusAlpha/dashboards/main/screener-dashboard/live.html
+It is a single self-contained HTML file, about 70 KB, no build step, no dependencies. Download it
+exactly as it is, with curl or your fetch tool. Do not summarise it, retype it, or rebuild it from
+memory. The sample on focusalpha.ai is this same page with a data snapshot frozen on 2026-09-23
+baked in; live.html is the same page reading through the FocusAlpha connector instead.
 
-THEN build it as an artifact that FETCHES ITS OWN DATA LIVE — not a page with the rows you
-just pasted into it. That part is what makes it a dashboard instead of a screenshot:
+Then, in this order:
+1. Publish the file as an artifact, declaring the connector:
+     capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["screen_companies"] }] } }
+   If the connector is listed in your tools as "focusalpha", use that spelling for server.
+   Without this declaration window.claude.use('mcp') resolves null and the page can never fetch.
+2. Open it and check that the status line says live and the table has rows. If the page says the
+   connector is not available, I have to connect FocusAlpha first: https://focusalpha.ai/start
+3. Now change it for me. The default screen is PRESETS[0] near the top of the script, and its
+   parameters are the ones the API takes (market_cap_usd_gte, guidance_better_90d_gte, ret_3m_lte,
+   sort, ...). Put my conditions below in as the first preset, republish, and send me the link.
 
-- declare the connector when you publish the artifact:
-    capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["screen_companies"] }] } }
-  Without this declaration window.claude.use('mcp') resolves null and the page can never fetch.
-- in the page:
-    const mcp = await window.claude.use('mcp');
-  It also resolves null for a viewer with no FocusAlpha connector — say that on the page
-  rather than rendering an empty table.
-- call a tool with:
-    const r = await mcp.callTool("FocusAlpha", "&lt;tool&gt;", input, { cache: { staleTime: 120000 } });
-    const payload = r.payload;
-  Failures reject with an error carrying a code; render a sentence per code (not connected,
-  needs sign-in, rate limited) instead of a blank screen.
-- every control re-runs the call, debounced about 200ms, with a visible loading state.
-
-What the page needs:
-- a left rail of filters, one control per API parameter, with the parameter name printed under
-  each label so I can see exactly what the control sends
-- a table: ticker, company, country, sector, market cap, 1M / 3M / 12M return, guidance
-  good-news and bad-news counts, and the 90-day event tags. Clicking a header re-sorts it
-  through the API, not in the browser
-- the exact call the page is sending, shown above the table
-- coverage.refreshed_at printed on the page; missing values shown as "—", never as 0
-- keep two things apart in separate columns: a guidance RAISE means a number went up, GOOD NEWS
-  means better for the company. A cost line raised is a raise AND bad news.
+Rules for any change:
+- Keep the data layer exactly as it is: every read goes through MCP.callTool(SERVER, TOOL, params).
+  Never paste rows into the page. The point of this page is that it fetches its own data.
+- Before adding a filter, call screen_companies({ list_facets: true }) once. It is free and it gives
+  the exact spelling of every country, sector, exchange and event family. Do not guess field names.
+- Units: margins, yields and growth are FRACTIONS (0.15 = 15%); price returns are percents.
+- A guidance RAISE means a number went up. GOOD NEWS means better for the company. A cost line
+  raised is both. The page keeps them in separate columns; keep it that way.
 
 My conditions (edit these):
   market_cap_usd_gte: 5000000000

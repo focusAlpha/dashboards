@@ -1,0 +1,715 @@
+<!doctype html><html><head>
+<!--
+  FocusAlpha · Global stock screener · LIVE SOURCE
+  The same page as https://focusalpha.ai/screener-dashboard with no data baked in: every number is read
+  through the viewer's FocusAlpha connector (MCP) when the page opens. Opened as a plain web
+  page, without a connector, it shows only its empty state.
+
+  To use it: publish this file as a claude.ai artifact with the connector declared —
+    capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["screen_companies"] }] } }
+  Where to edit: PRESETS[0] near the top of the script is the default screen; its keys are the screen_companies parameters.
+  Source and licence (MIT): https://github.com/focusAlpha/dashboards
+-->
+<meta name="robots" content="noindex">
+<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>FocusAlpha Screening Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F3F6; --surface:#FFFFFF; --surface2:#F7F8FA; --ink:#151A22; --muted:#5B6472; --faint:#8B93A1; --line:#DCDFE6; --line2:#EBEDF2;
+  --accent:#1E4ED8; --accent-ink:#FFFFFF; --accent-soft:#E6ECFB;
+  --up:#157A4A; --up-soft:#E3F3EA; --down:#C2363B; --down-soft:#FBE6E7; --warn:#A8690C; --warn-soft:#FBF0DC;
+  --bar:#6F86C9; --sel:#EEF2FC; --shadow:0 8px 24px rgba(21,26,34,.10);
+  --src-sec:#1E4ED8; --src-jp:#B0466A; --src-kr:#3B7D74; --src-hk:#8A5A2B; --src-cn:#B7412B; --src-news:#5C5F8A;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0E1116; --surface:#151A21; --surface2:#1A2029; --ink:#E8EAEF; --muted:#9AA3B2; --faint:#6E7788; --line:#2A313C; --line2:#222833;
+  --accent:#7A9BFF; --accent-ink:#0E1116; --accent-soft:#1D2740;
+  --up:#3DBB7A; --up-soft:#173224; --down:#F0656A; --down-soft:#3A1E20; --warn:#E0A030; --warn-soft:#3A2D16;
+  --bar:#5F7ACF; --sel:#1B2233; --shadow:0 8px 24px rgba(0,0,0,.45);
+  --src-sec:#7A9BFF; --src-jp:#E07C9E; --src-kr:#5FBFB2; --src-hk:#D9A066; --src-cn:#F08A6E; --src-news:#A6A9E0;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1116; --surface:#151A21; --surface2:#1A2029; --ink:#E8EAEF; --muted:#9AA3B2; --faint:#6E7788; --line:#2A313C; --line2:#222833;
+  --accent:#7A9BFF; --accent-ink:#0E1116; --accent-soft:#1D2740;
+  --up:#3DBB7A; --up-soft:#173224; --down:#F0656A; --down-soft:#3A1E20; --warn:#E0A030; --warn-soft:#3A2D16;
+  --bar:#5F7ACF; --sel:#1B2233; --shadow:0 8px 24px rgba(0,0,0,.45);
+  --src-sec:#7A9BFF; --src-jp:#E07C9E; --src-kr:#5FBFB2; --src-hk:#D9A066; --src-cn:#F08A6E; --src-news:#A6A9E0;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.num{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+a{color:var(--accent)}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh;min-height:0}
+/* masthead */
+.mast{display:flex;align-items:center;gap:18px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.brand{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-weight:600;font-size:17px;letter-spacing:.01em;display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.brand small{font-family:"IBM Plex Mono",monospace;font-weight:400;font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.status{display:flex;gap:18px;margin-left:auto;font-size:11.5px;color:var(--muted);white-space:nowrap;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.status b{color:var(--ink);font-weight:500}
+/* layout */
+.main{display:grid;grid-template-columns:296px minmax(0,1fr);min-height:0}
+.rail{border-right:1px solid var(--line);background:var(--surface);overflow:auto;min-height:0}
+.center{display:flex;flex-direction:column;min-height:0;min-width:0}
+/* rail */
+.rail-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px 6px;position:sticky;top:0;background:var(--surface);z-index:2;border-bottom:1px solid var(--line2)}
+.rail-head h2{margin:0;font-family:"IBM Plex Sans Condensed",sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);flex:1}
+.linkbtn{background:none;border:0;color:var(--accent);padding:2px 4px;font-size:12px}
+.railclose{display:none}
+.axis{border-bottom:1px solid var(--line2)}
+.axis>summary{list-style:none;display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;user-select:none}
+.axis>summary::-webkit-details-marker{display:none}
+.axis>summary .n{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);width:14px}
+.axis>summary .t{font-weight:600;font-size:12.5px;flex:1}
+.axis>summary .active{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--accent);background:var(--accent-soft);padding:1px 6px;border-radius:3px}
+.axis>summary .chev{color:var(--faint);transition:transform .15s}
+.axis[open]>summary .chev{transform:rotate(90deg)}
+.axis .body{padding:2px 14px 12px;display:flex;flex-direction:column;gap:9px}
+.axis .hint{font-size:11px;color:var(--muted);line-height:1.4;margin:0}
+.ctl{display:grid;grid-template-columns:104px 1fr;align-items:center;gap:6px}
+.ctl label{font-size:11.5px;color:var(--muted)}
+.ctl label .api{display:block;font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--faint);letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctl .pair{display:flex;gap:4px;align-items:center}
+.ctl input[type=number],.ctl input[type=date],.ctl input[type=text],.ctl select{width:100%;min-width:0;padding:4px 6px;border:1px solid var(--line);border-radius:4px;background:var(--surface2);font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+.ctl .pair span{font-size:10px;color:var(--faint)}
+.ctl .unit{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint);padding-left:2px}
+.tri{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.tri button{flex:1;border:0;background:var(--surface2);padding:4px 0;font-size:11px;color:var(--muted)}
+.tri button+button{border-left:1px solid var(--line)}
+.tri button.on{background:var(--accent);color:var(--accent-ink)}
+.multi{border:1px solid var(--line);border-radius:4px;background:var(--surface2)}
+.multi input.search{width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;padding:5px 7px;font-size:11.5px;font-family:"IBM Plex Mono",monospace}
+.multi .opts{max-height:168px;overflow:auto}
+.multi .opt{display:flex;align-items:center;gap:6px;padding:3px 7px;font-size:11.5px;cursor:pointer}
+.multi .opt:hover{background:var(--sel)}
+.multi .opt input{margin:0}
+.multi .opt .v{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.multi .opt .cnt{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint)}
+.multi .more{padding:3px 7px;font-size:10.5px;color:var(--faint)}
+.srcdot{display:inline-block;width:6px;height:6px;border-radius:50%;flex:none}
+.exbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;padding:7px 9px;border:1px solid var(--line);border-radius:5px;background:var(--surface2)}
+.exbtn.on{border-color:var(--accent);background:var(--accent-soft)}
+.exbtn .k{font-family:"IBM Plex Mono",monospace;font-size:11px;word-break:break-word}
+.exbtn .d{font-size:11px;color:var(--muted)}
+/* presets */
+.presets{padding:10px 18px 0;border-bottom:1px solid var(--line);background:var(--surface)}
+.presets .lbl{font-family:"IBM Plex Sans Condensed",sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.pstrip{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:thin}
+.pchip{flex:none;display:flex;flex-direction:column;gap:2px;text-align:left;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface2);min-width:150px;max-width:200px}
+.pchip .pn{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pchip .pd{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pchip .pg{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase}
+.pchip.on{border-color:var(--accent);background:var(--accent-soft)}
+.pchip.on .pg{color:var(--accent)}
+/* query */
+.qbar{padding:12px 18px;border-bottom:1px solid var(--line);background:var(--bg)}
+.qbox{background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.qbox .qh{display:flex;align-items:center;gap:10px;padding:6px 10px;border-bottom:1px solid var(--line2);font-size:11px;color:var(--muted)}
+.qbox .qh .tab{background:none;border:0;padding:2px 6px;border-radius:3px;color:var(--muted);font-size:11px}
+.qbox .qh .tab.on{background:var(--accent-soft);color:var(--accent)}
+.qbox .qh .cp{margin-left:auto}
+.qbox pre{margin:0;padding:8px 10px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;line-height:1.5;overflow:auto;flex:1;max-height:170px;white-space:pre-wrap;word-break:break-word}
+.qbox pre .k{color:var(--accent)} .qbox pre .s{color:var(--up)} .qbox pre .d{color:var(--muted)}
+/* table bar + live state */
+.tbar{display:flex;align-items:center;gap:10px;padding:8px 18px;border-bottom:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.tbar .lb{font-size:11px;color:var(--muted)}
+.cg{display:flex;gap:4px;flex-wrap:wrap}
+.cg button{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:2px 9px;font-size:11px;color:var(--muted)}
+.cg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tbar .sortsel{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);flex-wrap:wrap}
+.tbar select{padding:3px 6px;border:1px solid var(--line);border-radius:4px;background:var(--surface2);font-family:"IBM Plex Mono",monospace;font-size:11px}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);white-space:nowrap;margin-right:4px}
+.live .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.live.ok .dot{background:var(--up)}
+.live.loading .dot{background:var(--warn);animation:pulse 1s ease-in-out infinite}
+.live.error .dot{background:var(--down)}
+@keyframes pulse{50%{opacity:.3}}
+.banner{display:flex;align-items:center;gap:10px;padding:7px 18px;border-bottom:1px solid var(--line);background:var(--warn-soft);font-size:12px;flex-wrap:wrap}
+.banner[hidden],.linkbtn[hidden]{display:none}
+.banner b{font-weight:600}
+.banner .act{margin-left:auto}
+.twrap{overflow:auto;flex:1;min-height:0;background:var(--surface)}
+.twrap.loading tbody{opacity:.45;transition:opacity .15s}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:900px}
+th{position:sticky;top:0;background:var(--surface);z-index:1;text-align:left;font-weight:500;font-size:10.5px;color:var(--muted);letter-spacing:.03em;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap;user-select:none}
+th[data-sort]{cursor:pointer}
+th.r,td.r{text-align:right}
+th.sorted{color:var(--accent)}
+th .arr{font-size:9px;margin-left:3px}
+td{padding:6px 8px;border-bottom:1px solid var(--line2);vertical-align:middle;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+tr.row{cursor:pointer}
+tr.row:hover td{background:var(--sel)}
+tr.row.on td{background:var(--accent-soft)}
+td .tk{font-family:"IBM Plex Mono",monospace;font-weight:500}
+td .nm{color:var(--muted);font-size:11.5px}
+.pos{color:var(--up)} .neg{color:var(--down)}
+.gpill{display:inline-flex;align-items:center;gap:3px;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:1px 6px;border-radius:3px}
+.gpill.up{background:var(--up-soft);color:var(--up)} .gpill.dn{background:var(--down-soft);color:var(--down)} .gpill.z{color:var(--faint)}
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:var(--surface2);border:1px solid var(--line);margin-right:3px;color:var(--muted);max-width:170px;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.tag.hit{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.tag.m{color:var(--ink)}
+.tag.risk{border-color:var(--down);color:var(--down);background:var(--down-soft)}
+.sbadge{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:2px;vertical-align:-1px}
+.dim{color:var(--faint)}
+.sus{color:var(--warn);font-size:9px;vertical-align:super}
+.pager{display:flex;align-items:center;gap:10px;padding:7px 18px;border-top:1px solid var(--line);background:var(--surface);font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+.pager button{border:1px solid var(--line);background:var(--surface2);border-radius:4px;padding:2px 9px;font-size:11.5px}
+.pager button:disabled{opacity:.4;cursor:default}
+.state{padding:44px 20px;text-align:center;color:var(--muted);max-width:540px;margin:0 auto;white-space:normal}
+.state h4{margin:0 0 6px;font-family:"IBM Plex Sans Condensed",sans-serif;font-size:16px;font-weight:600;color:var(--ink)}
+.state p{margin:0 0 12px;font-size:12.5px;line-height:1.5}
+.state .msg{font-family:"IBM Plex Mono",monospace;font-size:11px;background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:6px 8px;text-align:left;word-break:break-word}
+.btn{border:1px solid var(--line);background:var(--surface2);border-radius:4px;padding:4px 11px;font-size:12px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+/* drawer */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:440px;max-width:100vw;background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow);transform:translateX(100%);transition:transform .18s ease;z-index:20;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+@media (prefers-reduced-motion:reduce){.drawer{transition:none}.axis>summary .chev{transition:none}.live.loading .dot{animation:none}}
+.dh{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.dh .tk{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500}
+.dh .nm{font-family:"IBM Plex Sans Condensed",sans-serif;font-size:17px;font-weight:600;line-height:1.15;text-wrap:balance}
+.dh .meta{font-size:11.5px;color:var(--muted);margin-top:3px}
+.dh .x{margin-left:auto;background:none;border:1px solid var(--line);border-radius:4px;width:26px;height:26px;color:var(--muted);flex:none}
+.db{overflow:auto;padding:6px 16px 20px;flex:1}
+.sec{padding:10px 0;border-bottom:1px solid var(--line2)}
+.sec h3{margin:0 0 6px;font-family:"IBM Plex Sans Condensed",sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:baseline;gap:8px}
+.sec h3 .src{font-family:"IBM Plex Mono",monospace;font-weight:400;letter-spacing:0;text-transform:none;color:var(--faint);font-size:10px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
+.kv .it{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:2px 0;border-bottom:1px dotted var(--line2)}
+.kv .it .k{color:var(--muted)} .kv .it .v{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.tags{display:flex;flex-wrap:wrap;gap:3px}
+.tags .tag{margin:0;max-width:100%}
+.snip{background:var(--surface2);border:1px solid var(--line);border-radius:5px;padding:7px 9px;font-family:"IBM Plex Mono",monospace;font-size:11px;line-height:1.55;white-space:pre-wrap;word-break:break-word;margin:0}
+.snip .c{color:var(--muted)}
+.note{font-size:11px;color:var(--muted);line-height:1.45}
+@media (max-width:980px){
+  .main{grid-template-columns:1fr}
+  .rail{display:none}
+  .rail.show{display:block;position:fixed;inset:0;z-index:15}
+  .railclose{display:inline-block}
+  .mast .status span{display:none}
+  .mast{padding:10px 16px;gap:10px}
+  .brand small{display:none}
+  .brand{min-width:0}
+  .presets,.qbar,.tbar,.pager,.banner{padding-left:16px;padding-right:16px}
+  .kv{grid-template-columns:1fr}
+}
+.railtoggle{display:none;border:1px solid var(--line);background:var(--surface2);border-radius:4px;padding:3px 9px;font-size:11.5px}
+@media (max-width:980px){.railtoggle{display:inline-block}}
+@media (max-width:520px){.brand>span{display:none}}
+.dark-toggle{border:1px solid var(--line);background:var(--surface2);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--muted)}
+</style>
+
+<div class="app">
+  <header class="mast">
+    <div class="brand">FocusAlpha <span>Screening Terminal</span><small>screen_companies · live</small></div>
+    <button class="railtoggle" id="railToggle">Filters</button>
+    <div class="status">
+      <span>row data <b id="stRef">—</b></span>
+      <span>events axis <b id="stEv">—</b></span>
+      <span>universe <b id="stUni">—</b> companies</span>
+      <button class="dark-toggle" id="themeBtn" title="Toggle theme">Theme</button>
+    </div>
+  </header>
+  <div class="main">
+    <aside class="rail" id="rail">
+      <div class="rail-head"><h2>Filters · ten axes</h2><button class="linkbtn" id="clearAll">Clear all</button><button class="linkbtn railclose" id="railClose">Done</button></div>
+      <div id="axes"></div>
+      <div style="padding:12px 14px 20px" class="note">Every control is one parameter of <span class="mono">screen_companies</span>, sent live to FocusAlpha with your connector. Values shown as % are sent as fractions (0.15 = 15%) where the API expects fractions; the call above the table is exactly what the page sends. Vocabulary counts are across the whole universe.</div>
+    </aside>
+    <section class="center">
+      <div class="presets">
+        <p class="lbl">Saved screens · click to load</p>
+        <div class="pstrip" id="pstrip"></div>
+      </div>
+      <div class="qbar">
+        <div class="qbox">
+          <div class="qh"><span>Live call · what this page sends</span>
+            <button class="tab on" data-q="mcp">MCP</button><button class="tab" data-q="rest">REST</button>
+            <button class="linkbtn cp" id="copyQ">Copy</button></div>
+          <pre id="qecho"></pre>
+        </div>
+      </div>
+      <div class="tbar">
+        <span class="lb">Columns</span><div class="cg" id="colgroups"></div>
+        <div class="sortsel">
+          <span class="live" id="live" aria-live="polite"><span class="dot"></span><span id="liveTxt">connecting…</span></span>
+          <button class="linkbtn" id="refresh" hidden title="Fetch this page again from FocusAlpha, skipping the cache">Refresh</button>
+          <span>sort</span><select id="sortSel"></select><select id="orderSel"><option value="desc">desc</option><option value="asc">asc</option></select>
+        </div>
+      </div>
+      <div class="banner" id="banner" hidden></div>
+      <div class="twrap" id="twrap"><table id="tbl"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+      <div class="pager"><button id="prev">‹ Prev</button><span id="pinfo"></span><button id="next">Next ›</button><span id="dropnote" style="margin-left:auto"></span></div>
+    </section>
+  </div>
+</div>
+<aside class="drawer" id="drawer" aria-label="Company detail"></aside>
+
+<script>
+(function(){
+const SERVER='FocusAlpha', TOOL='screen_companies';
+const CACHE_ROWS={staleTime:120000,gcTime:1800000}, CACHE_FACETS={staleTime:300000,gcTime:86400000};
+const $=s=>document.querySelector(s);
+/* ---------- investment-relevant events only ---------- */
+// Cross-market types: each is one rollup_family value (filings + news, every market).
+const EV_ROLLUP=[
+ {v:'management',l:'Management change'},{v:'earnings',l:'Earnings'},{v:'guidance',l:'Guidance update'},
+ {v:'merger_acquisition',l:'M&A'},{v:'capital_return',l:'Buyback / dividend'},{v:'capital',l:'Capital raise / financing'},
+ {v:'ownership',l:'Ownership / stake change'},{v:'analyst',l:'Analyst rating change'},{v:'contract',l:'Major contract'},
+ {v:'fda_clinical',l:'FDA / clinical'},{v:'legal',l:'Litigation'},{v:'regulatory',l:'Regulatory action'},
+ {v:'rating',l:'Credit rating'},{v:'index',l:'Index change'},{v:'incident',l:'Incident'}];
+// Filed events with no clean rollup: each expands to the regulators' own words (sent as event_family, matches ANY).
+const EV_FILED=[
+ {v:'pw',l:'Profit warning / forecast revision',fam:['Profit Warning','earnings_forecast_revision','业绩预告']},
+ {v:'tob',l:'Tender offer / change of control',fam:['tob','tender_offer','control_change','Announcement by Offeree Company under the Takeovers Code','Announcement by Offeror Company under the Takeovers Code','Privatisation/Withdrawal or Cancellation of Listing of Securities']},
+ {v:'bk',l:'Bankruptcy / default risk',risk:1,fam:['bankruptcy','bankruptcy_rehab','going_concern','obligation_acceleration','Breach of Loan Agreement']},
+ {v:'aud',l:'Restatement / auditor change',risk:1,fam:['earnings_restatement','auditor_change','Change in Auditors',"Change in Auditors subject to Shareholders' Approval",'Modified Report by Auditors','Prior Period Adjustments due to Correction of Material Errors','Revision of Published Financial Statements and Reports']},
+ {v:'dl',l:'Listing notice / suspension',risk:1,note:'SEC Item 3.01 also fires on a voluntary listing transfer, so check the filing',fam:['listing_deficiency','特别处理和退市','退市整理期','Suspension','Trading Halt','trading_halt']},
+ {v:'imp',l:'Impairment / special losses',risk:1,fam:['material_impairment','special_items','exit_or_disposal_plan']},
+ {v:'unlock',l:'Lock-up expiry (China)',fam:['解禁']}];
+EV_FILED.forEach(f=>f.t=f.fam.join(' · ')+(f.note?' — '+f.note:''));
+const filedFamilies=ids=>[...new Set((ids||[]).flatMap(id=>(EV_FILED.find(f=>f.v===id)||{fam:[]}).fam))];
+const SORTS=['market_cap_usd','ret_1m','ret_3m','ret_6m','ret_12m','short_percent_float','days_to_cover','guidance_better_90d','guidance_worse_90d','tw_foreign_held_pct','tw_revenue_yoy_pct','ceo_total_comp','insider_ownership_pct','pe_ttm','pb','ps_ttm','fcf_yield','dividend_yield','gross_margin','operating_margin','net_margin','return_on_equity','debt_to_equity','revenue_growth_yoy','eps_growth_yoy','company_id'];
+const DENIAL=new Set(['needs_reauth','server_not_connected','server_not_found','selection_required','not_in_manifest','blocked_by_policy','approval_required','consent_required','not_granted','capability_disabled','capability_removed']);
+const RELATION_KEYS=['makes_term','related_to_term','peer_of','competitor_of'];
+
+/* ---------- live vocabulary (list_facets) ---------- */
+let FAC={}, TOTALS=null, FAC_STATE='idle', COVER=null;
+const fopts=k=>(FAC[k]||[]).map(f=>({v:f.value,n:f.companies,src:f.source}));
+
+/* ---------- filter schema: one control = one API parameter ---------- */
+function axes(){return [
+ {n:'1',t:'Identity',hint:'Where it is listed and who it answers to. country cannot say "US filer" — has_cik can.',c:[
+   {type:'select',p:'country',l:'Country',opts:fopts('country')},
+   {type:'select',p:'sector',l:'Sector',opts:fopts('sector')},
+   {type:'combo',p:'industry',l:'Industry',opts:fopts('industry')},
+   {type:'combo',p:'exchange',l:'Exchange',opts:fopts('exchange')},
+   {type:'tri',p:'has_cik',l:'Files with SEC'}]},
+ {n:'2',t:'Size',hint:'USD is the only column that compares across countries; the local-currency cap rides along on each row for reconciliation.',c:[
+   {type:'range',p:'market_cap_usd',l:'Market cap',unit:'$B',scale:1e9}]},
+ {n:'3',t:'Momentum',hint:'Price returns in percent. History starts 2025-07-14, so 12 months is the longest window.',c:[
+   {type:'range',p:'ret_1m',l:'1-month',unit:'%'},{type:'range',p:'ret_3m',l:'3-month',unit:'%'},{type:'range',p:'ret_6m',l:'6-month',unit:'%'},{type:'range',p:'ret_12m',l:'12-month',unit:'%'}]},
+ {n:'4',t:'Valuation',hint:'Ratios exist for the tracked US-GAAP cohort (~3,500 filers). A loss-maker has no PE — use is_lossmaking, not pe_ttm.',c:[
+   {type:'range',p:'pe_ttm',l:'PE (TTM)',unit:'x'},{type:'range',p:'pb',l:'Price / book',unit:'x'},{type:'range',p:'ps_ttm',l:'Price / sales',unit:'x'},
+   {type:'range',p:'fcf_yield',l:'FCF yield',unit:'%',frac:true},{type:'range',p:'dividend_yield',l:'Dividend yield',unit:'%',frac:true},
+   {type:'tri',p:'has_fundamentals',l:'Has statements'},{type:'tri',p:'is_lossmaking',l:'Loss-making'}]},
+ {n:'5',t:'Profitability & leverage',hint:'Margins and growth are fractions in the API (0.15 = 15%); typed here in percent.',c:[
+   {type:'range',p:'gross_margin',l:'Gross margin',unit:'%',frac:true},{type:'range',p:'operating_margin',l:'Operating margin',unit:'%',frac:true},{type:'range',p:'net_margin',l:'Net margin',unit:'%',frac:true},
+   {type:'range',p:'return_on_equity',l:'ROE',unit:'%',frac:true},{type:'range',p:'debt_to_equity',l:'Debt / equity',unit:'x'},
+   {type:'range',p:'revenue_growth_yoy',l:'Revenue growth',unit:'%',frac:true},{type:'range',p:'eps_growth_yoy',l:'EPS growth',unit:'%',frac:true}]},
+ {n:'6',t:'Guidance',hint:'Two counts that must not be mixed: a guidance raise = a number went UP; good news = better for the company. A cost line raised is a guidance raise and bad news. Seven disclosure regimes feed this.',c:[
+   {type:'int',p:'guidance_better_90d_gte',l:'Good-news moves ≥'},{type:'int',p:'guidance_worse_90d_gte',l:'Bad-news moves ≥'},
+   {type:'int',p:'guidance_raises_90d_gte',l:'Guidance raises ≥'},{type:'int',p:'guidance_cuts_90d_gte',l:'Guidance cuts ≥'},
+   {type:'date',p:'guidance_better_since',l:'Good news since'},{type:'date',p:'guidance_worse_since',l:'Bad news since'}]},
+ {n:'7',t:'Events · 90 days',hint:'Investment-relevant events only — routine filings (board-meeting dates, monthly returns, AGM notices) are left out. Within a list a company needs ANY ticked type; across lists it needs ALL of them, so "Management change" + "Insider buying" finds both at once. "Happened since" dates the ticked types.',c:[
+   {type:'evlist',p:'rollup_family',l:'Any market',note:'filings + news',api:'rollup_family',opts:EV_ROLLUP,counts:()=>Object.fromEntries((FAC.rollup_family||[]).map(f=>[f.value,f.companies]))},
+   {type:'evlist',p:'x_filed',l:'Filings to watch',note:'regulators\' own words',api:'event_family · expanded per type',opts:EV_FILED},
+   {type:'select',p:'insider_net_90d',l:'Insider buying / selling',opts:[{v:'buying'},{v:'selling'}]},
+   {type:'date',p:'x_since',l:'Happened since',api:'rollup_family_since · event_family_since'}]},
+ {n:'8',t:'Positioning',hint:'Short interest is FINRA, US only, twice a month. CEO pay and D&O stake come from the proxy. Insider buying / selling sits under Events.',c:[
+   {type:'range',p:'short_percent_float',l:'Short % float',unit:'%'},{type:'min',p:'days_to_cover_gte',l:'Days to cover ≥'},
+   {type:'range',p:'insider_ownership_pct',l:'D&O stake',unit:'%'},{type:'range',p:'ceo_total_comp',l:'CEO total comp',unit:'$M',scale:1e6}]},
+ {n:'9',t:'Taiwan',hint:'Taiwan listings only: foreign ownership from TWSE, monthly revenue YoY from MOPS.',c:[
+   {type:'range',p:'tw_foreign_held_pct',l:'Foreign held',unit:'%'},{type:'range',p:'tw_revenue_yoy_pct',l:'Monthly rev YoY',unit:'%'}]},
+ {n:'10',t:'Products & relations',hint:'What a company makes and who it names. Any of 60,620 product terms (comma-separated; spellings are separate terms, so pass every one) and any of 4,403 companies as peer_of / competitor_of. An unknown company is an error, not an empty page.',c:[
+   {type:'text',p:'makes_term',l:'Makes',ph:'dram,nand,memory'},
+   {type:'text',p:'related_to_term',l:'Related to',ph:'term, term'},
+   {type:'text',p:'peer_of',l:'Peer of',ph:'ticker or cmp_…'},
+   {type:'text',p:'competitor_of',l:'Competitor of',ph:'ticker or cmp_…'},
+   {type:'ex',p:'makes_term',v:'memory,memory products,dram,nand,memory chips,memory semiconductors',d:'Memory makers — six spellings passed together, because the vocabulary expands spellings, not concepts'},
+   {type:'ex',p:'peer_of',v:'NVDA',d:'Companies in NVIDIA\'s disclosed compensation peer group, either direction'},
+   {type:'ex',p:'competitor_of',v:'MU',d:'Named as a competitor in Micron\'s 10-K Item 1, or naming Micron'}]},
+]}
+
+const COLGROUPS={
+ guidance:{l:'Guidance',cols:[
+   {k:'gb',h:'Good news',r:1,f:o=>gpill(o.gb,'up')},{k:'gw',h:'Bad news',r:1,f:o=>gpill(o.gw,'dn')},{k:'gr',h:'Guidance raise',r:1,f:o=>dimz(o.gr)},{k:'gc',h:'Guidance cut',r:1,f:o=>dimz(o.gc)},{k:'glb',h:'Last good',f:o=>o.glb||'<span class="dim">—</span>'},{k:'glw',h:'Last bad',f:o=>o.glw||'<span class="dim">—</span>'}]},
+ events:{l:'Events',cols:[
+   {k:'ev',h:'Investment events (90d)',f:o=>evTags(o,5)}]},
+ valuation:{l:'Valuation',cols:[
+   {k:'pe',h:'PE',r:1,f:o=>o.lm===1?'<span class="dim" title="loss-making">loss</span>':n1(o.pe,'x')},{k:'pb',h:'P/B',r:1,f:o=>n1(o.pb,'x')},{k:'ps',h:'P/S',r:1,f:o=>n1(o.ps,'x')},{k:'fy',h:'FCF yld',r:1,f:o=>pctf(o.fy)},{k:'dy',h:'Div yld',r:1,f:o=>pctf(o.dy)}]},
+ profit:{l:'Profitability',cols:[
+   {k:'gm',h:'Gross m.',r:1,f:o=>pctf(o.gm)},{k:'om',h:'Op m.',r:1,f:o=>pctf(o.om)},{k:'nm',h:'Net m.',r:1,f:o=>pctf(o.nm)},{k:'roe',h:'ROE',r:1,f:o=>pctf(o.roe)},{k:'de',h:'D/E',r:1,f:o=>n1(o.de,'x')},{k:'rg',h:'Rev YoY',r:1,f:o=>pctf(o.rg,true)},{k:'eg',h:'EPS YoY',r:1,f:o=>pctf(o.eg,true)}]},
+ positioning:{l:'Positioning',cols:[
+   {k:'sf',h:'Short %',r:1,f:o=>n1(o.sf,'%')},{k:'dc',h:'DTC',r:1,f:o=>n1(o.dc,'')},{k:'sc',h:'SI chg',r:1,f:o=>sgn(o.sc)},{k:'io',h:'D&O %',r:1,f:o=>n1(o.io,'%')},{k:'cp',h:'CEO comp',r:1,f:o=>o.cp?'$'+(o.cp/1e6).toFixed(1)+'M':'<span class="dim">—</span>'}]},
+ taiwan:{l:'Taiwan',cols:[{k:'twf',h:'Foreign %',r:1,f:o=>n1(o.twf,'%')},{k:'twr',h:'Rev YoY',r:1,f:o=>sgn(o.twr)}]},
+ products:{l:'Products',cols:[{k:'pt',h:'Terms',r:1,f:o=>dimz(o.pt)},{k:'pc',h:'Peers',r:1,f:o=>dimz(o.pc)},{k:'cc',h:'Competitors',r:1,f:o=>dimz(o.cc)},{k:'mk',h:'Matched',f:o=>matchedCell(o)}]},
+};
+const BASE=[{k:'t',h:'Ticker',f:o=>`<span class="tk">${esc(o.t||'—')}</span>`},{k:'n',h:'Company',f:o=>`<span class="nm">${esc(o.n)}</span>`},{k:'c',h:'Ctry',f:o=>esc(o.c||'')},{k:'s',h:'Sector',f:o=>`<span class="nm">${esc(o.s||'')}</span>`},{k:'mc',h:'Mkt cap',r:1,f:o=>cap(o.mc)},{k:'r1',h:'1M',r:1,f:o=>ret(o.r1,o)},{k:'r3',h:'3M',r:1,f:o=>ret(o.r3,o)},{k:'r12',h:'12M',r:1,f:o=>ret(o.r12,o)}];
+
+const PRESETS=[
+ {id:'raisers',g:'Guidance',n:'Guidance raisers, 90d',d:'Good-news guidance moves, most first',p:{guidance_better_90d_gte:1},sort:'guidance_better_90d',cols:['guidance']},
+ {id:'cutters',g:'Guidance',n:'Guidance cutters, 90d',d:'Bad-news moves against their own last event',p:{guidance_worse_90d_gte:1},sort:'guidance_worse_90d',cols:['guidance']},
+ {id:'sept',g:'Guidance',n:'Raised since Sept 1',d:'Timestamp filter — the newest good-news move',p:{guidance_better_since:'2026-09-01'},sort:'guidance_better_90d',cols:['guidance']},
+ {id:'contra',g:'Guidance × momentum',n:'Raised, but down 3M',d:'Better guidance the price has not paid for',p:{guidance_better_90d_gte:1,ret_3m_lte:0},sort:'ret_3m',order:'asc',cols:['guidance']},
+ {id:'mgmt',g:'Events',n:'Management change',d:'Every market, filings and news',p:{rollup_family:['management']},sort:'market_cap_usd',cols:['events']},
+ {id:'mgmtins',g:'Events × insiders',n:'New management, insiders buying',d:'Management change AND net Form 4 buying',p:{rollup_family:['management'],insider_net_90d:'buying'},sort:'market_cap_usd',cols:['events','positioning']},
+ {id:'ma',g:'Events',n:'M&A in play',d:'M&A across every market, filings and news',p:{rollup_family:['merger_acquisition']},sort:'market_cap_usd',cols:['events']},
+ {id:'buyback',g:'Events',n:'Buybacks & dividends',d:'Capital return announced in 90 days',p:{rollup_family:['capital_return']},sort:'market_cap_usd',cols:['events','valuation']},
+ {id:'pw',g:'Events · filed',n:'Profit warnings & revisions',d:'HKEX warnings, TDnet revisions, China 业绩预告',p:{x_filed:['pw']},sort:'ret_3m',order:'asc',cols:['events','guidance']},
+ {id:'redflag',g:'Events · filed',n:'Red flags',d:'Default risk, restatement or auditor change, listing notice',p:{x_filed:['bk','aud','dl']},sort:'market_cap_usd',cols:['events']},
+ {id:'ins',g:'Positioning',n:'Insider buying into shorts',d:'Net Form 4 buying, short interest ≥ 8% of float',p:{insider_net_90d:'buying',short_percent_float_gte:8},sort:'short_percent_float',cols:['positioning','guidance']},
+ {id:'cheap',g:'Valuation',n:'Cheap, profitable, growing',d:'PE ≤ 15, op margin ≥ 15%, revenue +10%',p:{pe_ttm_lte:15,operating_margin_gte:0.15,revenue_growth_yoy_gte:0.10},sort:'pe_ttm',order:'asc',cols:['valuation','profit']},
+ {id:'loss',g:'Valuation',n:'Loss-making & shorted',d:'The screen a null PE cannot express',p:{is_lossmaking:true,short_percent_float_gte:10},sort:'short_percent_float',cols:['valuation','positioning']},
+ {id:'twn',g:'Taiwan',n:'Taiwan: foreign-held growth',d:'Foreign ≥ 50%, monthly revenue +20% YoY',p:{tw_foreign_held_pct_gte:50,tw_revenue_yoy_pct_gte:20},sort:'tw_revenue_yoy_pct',cols:['taiwan']},
+ {id:'mem',g:'Products',n:'Memory makers',d:'makes_term with six spellings',p:{makes_term:'memory,memory products,dram,nand,memory chips,memory semiconductors',market_cap_usd_gte:null},sort:'market_cap_usd',cols:['products','events']},
+ {id:'nvpeer',g:'Relations',n:'NVIDIA\'s peer group',d:'peer_of=NVDA, from the proxy statement',p:{peer_of:'NVDA'},sort:'market_cap_usd',cols:['products','guidance']},
+ {id:'mucomp',g:'Relations',n:'Micron\'s named competitors',d:'competitor_of=MU, from 10-K Item 1',p:{competitor_of:'MU',market_cap_usd_gte:null},sort:'market_cap_usd',cols:['products','valuation']},
+ {id:'ceo',g:'Positioning',n:'Highest-paid CEOs, weak year',d:'CEO comp ≥ $30M and 12M return ≤ 0',p:{ceo_total_comp_gte:30000000,ret_12m_lte:0},sort:'ceo_total_comp',cols:['positioning']},
+];
+
+/* ---------- state ---------- */
+let S={}, SORT='market_cap_usd', ORDER='desc', COLS=new Set(['guidance']), PAGE=0, PAGESIZE=100, SEL=null, QMODE='mcp', ACTIVE_PRESET=null;
+let MCP=null, LIVE='boot', ERR=null, LOADING=false, FETCHED=null, SEQ=0, CTRL=null, DEB=null;
+let ROWS=[], ROWS_KEY=null, NEXT=null, CURSORS=[null];
+const DEFAULT_CAP=3e9;
+
+/* ---------- formatting ---------- */
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function cap(v){if(v==null)return '<span class="dim">—</span>';if(v>=1e12)return '$'+(v/1e12).toFixed(2)+'T';if(v>=1e9)return '$'+(v/1e9).toFixed(1)+'B';return '$'+(v/1e6).toFixed(0)+'M'}
+function ret(v,o){if(v==null)return '<span class="dim">—</span>';return `<span class="${v>0?'pos':v<0?'neg':''}">${v>0?'+':''}${v.toFixed(1)}%</span>${o&&o.rs?'<span class="sus" title="return disagrees with market-cap change">?</span>':''}`}
+function sgn(v){if(v==null)return '<span class="dim">—</span>';return `<span class="${v>0?'pos':v<0?'neg':''}">${v>0?'+':''}${v.toFixed(1)}%</span>`}
+function n1(v,u){return v==null?'<span class="dim">—</span>':v.toFixed(1)+u}
+function pctf(v,s){if(v==null)return '<span class="dim">—</span>';const p=v*100;return s?`<span class="${p>0?'pos':p<0?'neg':''}">${p>0?'+':''}${p.toFixed(1)}%</span>`:p.toFixed(1)+'%'}
+function dimz(v){return (v==null||v===0)?'<span class="dim">0</span>':esc(v)}
+function gpill(v,cls){return v?`<span class="gpill ${cls}">${cls==='up'?'▲':'▼'} ${v}</span>`:'<span class="gpill z">0</span>'}
+function evList(o){
+  const rsel=new Set(S.rollup_family||[]),fsel=new Set(S.x_filed||[]),out=[];
+  EV_ROLLUP.forEach(r=>{if((o.rf||[]).includes(r.v))out.push({l:r.l,t:'rollup_family: '+r.v,hit:rsel.has(r.v)})});
+  EV_FILED.forEach(f=>{const m=(o.ef||[]).filter(x=>f.fam.includes(x));if(m.length)out.push({l:f.l,t:'filed: '+m.join(', ')+(f.note?' — '+f.note:''),hit:fsel.has(f.v),risk:f.risk})});
+  return out.sort((a,b)=>(b.hit-a.hit)||((b.risk||0)-(a.risk||0)));
+}
+function evTags(o,max){
+  const all=evList(o);if(!all.length)return '<span class="dim">—</span>';
+  const shown=max?all.slice(0,max):all;
+  return shown.map(e=>`<span class="tag ${e.hit?'hit':e.risk?'risk':'m'}" title="${esc(e.t)}">${esc(e.l)}</span>`).join('')+(max&&all.length>max?`<span class="dim">+${all.length-max}</span>`:'');
+}
+function clock(s){return s?String(s).replace('T',' ').slice(0,16)+'Z':'—'}
+function hm(ts){if(!ts)return '';const d=new Date(ts),now=new Date();const t=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});return d.toDateString()===now.toDateString()?t:d.toLocaleDateString([],{month:'short',day:'numeric'})+' '+t}
+const nz=v=>{if(v==null||v==='')return null;const x=typeof v==='number'?v:parseFloat(v);return isFinite(x)?x:null};
+const day=s=>s?String(s).slice(0,10):null;
+function relLabel(kind,rel){const who=S[kind==='peer'?'peer_of':'competitor_of']||rel.of;return `${kind} of ${esc(who)}${rel.mutual?' · mutual':''}`}
+function relTitle(rel){return esc('sources: '+(rel.sources||[]).join(', ')+(rel.mutual?' · both named each other':''))}
+function termTitle(m){return esc(`${m.role||''} · ${(m.sources||[]).join(', ')}${m.grade?' · grade '+m.grade:''}`)}
+function matchedCell(o){
+  if(o.mk)return o.mk.map(m=>`<span class="tag hit" title="${termTitle(m)}">${esc(m.term)}</span>`).join('');
+  if(o.pr)return `<span class="tag hit" title="${relTitle(o.pr)}">${relLabel('peer',o.pr)}</span>`;
+  if(o.cm)return `<span class="tag hit" title="${relTitle(o.cm)}">${relLabel('competitor',o.cm)}</span>`;
+  return '<span class="dim">—</span>';
+}
+
+/* ---------- API row → compact row ---------- */
+function mapRow(r){
+  const rel=Array.isArray(r.matched_relation)?r.matched_relation:[];
+  const peer=rel.find(x=>x&&x.relation==='peer'), comp=rel.find(x=>x&&x.relation==='competitor');
+  const terms=Array.isArray(r.matched_terms)&&r.matched_terms.length?r.matched_terms:null;
+  return {id:r.company_id,n:r.company_name,t:r.primary_ticker,x:r.primary_exchange,c:r.country,s:r.sector,i:r.industry,k:!!r.has_cik,
+    mc:nz(r.market_cap_usd),mcl:nz(r.market_cap_local),mccy:r.market_cap_currency,mcAsOf:r.market_cap_as_of,
+    r1:nz(r.ret_1m),r3:nz(r.ret_3m),r6:nz(r.ret_6m),r12:nz(r.ret_12m),rs:!!r.return_suspect,
+    pe:nz(r.pe_ttm),pb:nz(r.pb),ps:nz(r.ps_ttm),fy:nz(r.fcf_yield),dy:nz(r.dividend_yield),
+    gm:nz(r.gross_margin),om:nz(r.operating_margin),nm:nz(r.net_margin),roe:nz(r.return_on_equity),de:nz(r.debt_to_equity),rg:nz(r.revenue_growth_yoy),eg:nz(r.eps_growth_yoy),
+    lm:r.is_lossmaking===true?1:r.is_lossmaking===false?0:null,fp:r.fundamentals_period,fg:r.fundamentals_grain,fsrc:r.fundamentals_source,fccy:r.fundamentals_currency,st:!!r.fundamentals_stale,
+    rev:nz(r.revenue),ni:nz(r.net_income),fcf:nz(r.free_cash_flow),
+    gb:nz(r.guidance_better_90d)||0,gw:nz(r.guidance_worse_90d)||0,gr:nz(r.guidance_raises_90d)||0,gc:nz(r.guidance_cuts_90d)||0,
+    glb:day(r.guidance_last_better_at),glw:day(r.guidance_last_worse_at),gl:day(r.guidance_last_at),
+    es:r.event_sources_90d||[],ef:r.event_families_90d||[],ne:r.news_event_types_90d||[],rf:r.rollup_families_90d||[],
+    nf:nz(r.event_filings_90d),nn:nz(r.news_events_90d),el:day(r.event_last_at),
+    sf:nz(r.short_percent_float),dc:nz(r.days_to_cover),sc:nz(r.short_interest_change_pct),siAsOf:r.short_interest_as_of,
+    io:nz(r.insider_ownership_pct),cp:nz(r.ceo_total_comp),ceo:r.ceo_name,cpy:r.ceo_comp_fiscal_year,
+    twf:nz(r.tw_foreign_held_pct),twr:nz(r.tw_revenue_yoy_pct),
+    pt:nz(r.product_terms),rt:nz(r.related_terms),pc:nz(r.peer_companies),cc:nz(r.competitor_companies),
+    mk:terms,pr:peer||null,cm:comp||null};
+}
+
+/* ---------- rail ---------- */
+function buildRail(){
+  const root=$('#axes');const open=new Set([...root.querySelectorAll('details.axis[open]')].map(d=>d.dataset.axis));const first=!root.children.length;
+  root.innerHTML='';
+  axes().forEach((ax,i)=>{
+    const det=document.createElement('details');det.className='axis';det.open=first?i<1:open.has(ax.t);det.dataset.axis=ax.t;
+    det.innerHTML=`<summary><span class="n">${ax.n}</span><span class="t">${ax.t}</span><span class="active" hidden></span><span class="chev">›</span></summary><div class="body"><p class="hint">${ax.hint}</p></div>`;
+    const body=det.querySelector('.body');
+    ax.c.forEach(c=>body.appendChild(control(c)));
+    root.appendChild(det);
+  });
+}
+function control(c){
+  const w=document.createElement('div');w.className='ctl';w.dataset.p=c.p;
+  const apiName=c.api||c.p;
+  const lab=`<label>${c.l||''}<span class="api" title="${apiName}${c.type==='range'?'_gte / _lte':''}">${apiName}${c.type==='range'?'_gte/_lte':''}</span></label>`;
+  let type=c.type;
+  if(type==='select'&&!c.opts.length)type='combo';   // vocabulary not loaded: let people type the value
+  if(type==='range'){
+    w.innerHTML=lab+`<div class="pair"><input type="number" step="any" placeholder="min" data-k="${c.p}_gte"><span>–</span><input type="number" step="any" placeholder="max" data-k="${c.p}_lte"><span class="unit">${c.unit}</span></div>`;
+    w.querySelectorAll('input').forEach(inp=>{inp.addEventListener('change',()=>{const raw=inp.value===''?null:parseFloat(inp.value);let v=raw;if(v!=null&&isFinite(v)){if(c.scale)v=v*c.scale;if(c.frac)v=+(v/100).toPrecision(12)}else v=null;setParam(inp.dataset.k,v)})});
+    w._sync=()=>{w.querySelectorAll('input').forEach(inp=>{let v=S[inp.dataset.k];if(v==null){inp.value='';return}if(c.scale)v=v/c.scale;if(c.frac)v=+(v*100).toFixed(4);inp.value=v})};
+  }else if(type==='int'||type==='min'){
+    w.innerHTML=lab+`<div class="pair"><input type="number" step="${type==='int'?1:'any'}" min="0" placeholder="${type==='int'?'n':'min'}" data-k="${c.p}"></div>`;
+    const inp=w.querySelector('input');inp.addEventListener('change',()=>{const v=inp.value===''?null:(type==='int'?parseInt(inp.value,10):parseFloat(inp.value));setParam(c.p,v==null||!isFinite(v)?null:v)});
+    w._sync=()=>{inp.value=S[c.p]==null?'':S[c.p]};
+  }else if(type==='date'){
+    w.innerHTML=lab+`<div class="pair"><input type="date" data-k="${c.p}"></div>`;
+    const inp=w.querySelector('input');inp.addEventListener('change',()=>setParam(c.p,inp.value||null));
+    w._sync=()=>{inp.value=S[c.p]||''};
+  }else if(type==='select'){
+    w.innerHTML=lab+`<select><option value="">any</option>${c.opts.map(o=>`<option value="${esc(o.v)}">${esc(o.v)}${o.n!=null?' · '+o.n.toLocaleString():''}</option>`).join('')}</select>`;
+    const sel=w.querySelector('select');sel.addEventListener('change',()=>setParam(c.p,sel.value||null));
+    w._sync=()=>{const v=S[c.p]||'';if(v&&![...sel.options].some(o=>o.value===v)){const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o)}sel.value=v};
+  }else if(type==='combo'||type==='text'){
+    const id='dl_'+c.p;
+    w.innerHTML=lab+`<div class="pair"><input type="text" ${type==='combo'?`list="${id}"`:''} placeholder="${esc(c.ph||(type==='combo'?(c.opts.length?'type to search':'type a value'):''))}" spellcheck="false" autocomplete="off">${type==='combo'?`<datalist id="${id}">${c.opts.map(o=>`<option value="${esc(o.v)}">${o.n!=null?o.n.toLocaleString():''}</option>`).join('')}</datalist>`:''}</div>`;
+    const inp=w.querySelector('input');inp.addEventListener('change',()=>setParam(c.p,inp.value.trim()||null));
+    w._sync=()=>{inp.value=S[c.p]||''};
+  }else if(type==='tri'){
+    w.innerHTML=lab+`<div class="tri"><button data-v="">any</button><button data-v="true">yes</button><button data-v="false">no</button></div>`;
+    w.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setParam(c.p,b.dataset.v===''?null:b.dataset.v==='true')));
+    w._sync=()=>{w.querySelectorAll('button').forEach(b=>b.classList.toggle('on',(S[c.p]==null&&b.dataset.v==='')||(S[c.p]===true&&b.dataset.v==='true')||(S[c.p]===false&&b.dataset.v==='false')))};
+  }else if(type==='evlist'){
+    w.style.gridTemplateColumns='1fr';
+    w.innerHTML=`<label>${c.l}${c.note?` <span class="dim">· ${c.note}</span>`:''}<span class="api">${apiName} · matches ANY</span></label><div class="multi"><div class="opts" style="max-height:none"></div></div>`;
+    const opts=w.querySelector('.opts');
+    w._sync=()=>{const sel=new Set(S[c.p]||[]);const cnt=c.counts?c.counts():{};
+      opts.innerHTML=c.opts.map(o=>`<label class="opt" title="${esc(o.t||(apiName+': '+o.v))}"><input type="checkbox" value="${esc(o.v)}" ${sel.has(o.v)?'checked':''}>${o.risk?'<span class="srcdot" style="background:var(--down)" title="red flag"></span>':''}<span class="v">${esc(o.l)}</span><span class="cnt">${cnt[o.v]!=null?cnt[o.v].toLocaleString():''}</span></label>`).join('');
+      opts.querySelectorAll('input').forEach(cb=>cb.addEventListener('change',()=>{const cur=new Set(S[c.p]||[]);cb.checked?cur.add(cb.value):cur.delete(cb.value);setParam(c.p,c.opts.map(o=>o.v).filter(v=>cur.has(v)))}))};
+  }else if(type==='ex'){
+    w.style.gridTemplateColumns='1fr';w.dataset.p='';
+    w.innerHTML=`<button class="exbtn"><span class="k">${c.p}: <b>${esc(c.v)}</b></span><span class="d">${c.d}</span></button>`;
+    const b=w.querySelector('button');b.addEventListener('click',()=>{const on=S[c.p]===c.v;RELATION_KEYS.forEach(k=>S[k]=null);if(!on){S[c.p]=c.v;S.market_cap_usd_gte=null}else{S.market_cap_usd_gte=DEFAULT_CAP}ACTIVE_PRESET=null;COLS.add('products');buildColGroups();syncRail();run()});
+    w._sync=()=>{b.classList.toggle('on',S[c.p]===c.v)};
+  }
+  return w;
+}
+function setParam(k,v){S[k]=v;ACTIVE_PRESET=null;syncRail();run()}
+function syncRail(){
+  document.querySelectorAll('.ctl').forEach(w=>w._sync&&w._sync());
+  document.querySelectorAll('.axis').forEach(det=>{const ps=[...det.querySelectorAll('.ctl')].map(w=>w.dataset.p).filter(Boolean);
+    const n=Object.keys(S).filter(k=>S[k]!=null&&S[k]!==''&&!(Array.isArray(S[k])&&!S[k].length)&&ps.some(p=>k===p||k===p+'_gte'||k===p+'_lte')).length;
+    const a=det.querySelector('.active');a.hidden=!n;a.textContent=n+' set';if(n)det.open=true});
+  document.querySelectorAll('.pchip').forEach(b=>b.classList.toggle('on',b.dataset.id===ACTIVE_PRESET));
+  $('#sortSel').value=SORT;$('#orderSel').value=ORDER;
+  try{localStorage.setItem('fa_screen_state',JSON.stringify({S,SORT,ORDER,COLS:[...COLS],ACTIVE_PRESET}))}catch(e){}
+}
+
+/* ---------- presets ---------- */
+function buildPresets(){
+  const st=$('#pstrip');st.innerHTML='';
+  PRESETS.forEach(p=>{const b=document.createElement('button');b.className='pchip';b.dataset.id=p.id;b.innerHTML=`<span class="pg">${p.g}</span><span class="pn">${p.n}</span><span class="pd">${p.d}</span>`;b.title=p.d;b.addEventListener('click',()=>loadPreset(p));st.appendChild(b)});
+}
+function loadPreset(p){
+  S={market_cap_usd_gte:DEFAULT_CAP};Object.assign(S,p.p);SORT=p.sort||'market_cap_usd';ORDER=p.order||'desc';COLS=new Set(p.cols||[]);ACTIVE_PRESET=p.id;
+  syncRail();buildColGroups();run();
+}
+
+/* ---------- the call ---------- */
+function apiParams(){const o={};for(const k in S){const v=S[k];if(k.startsWith('x_')||v==null||v===''||(Array.isArray(v)&&!v.length))continue;o[k]=Array.isArray(v)?v.join(','):v}
+  const fam=filedFamilies(S.x_filed);if(fam.length)o.event_family=fam.join(',');
+  if(S.x_since){if(o.rollup_family)o.rollup_family_since=S.x_since;if(o.event_family)o.event_family_since=S.x_since}
+  if(SORT!=='market_cap_usd')o.sort=SORT;if(ORDER!==(SORT==='company_id'?'asc':'desc'))o.order=ORDER;return o}
+function callParams(){const p=apiParams();p.limit=PAGESIZE;if(CURSORS[PAGE])p.cursor=CURSORS[PAGE];return p}
+function renderQuery(){
+  const p=apiParams();let html;
+  if(QMODE==='mcp'){const lines=Object.entries(p).map(([k,v])=>`  <span class="k">${k}</span>: ${typeof v==='string'?`<span class="s">"${esc(v)}"</span>`:esc(v)}`);html=`<span class="d">// MCP tool · FocusAlpha</span>\nscreen_companies({\n${lines.join(',\n')}${lines.length?',\n':''}  <span class="k">limit</span>: ${PAGESIZE}\n})`}
+  else{const qs=Object.entries(p).map(([k,v])=>`${k}=${esc(encodeURIComponent(v))}`).join('&\n    &');html=`<span class="d">// REST · Professional, 1 credit</span>\nGET /v1/screen?${qs}${qs?'\n    &':''}limit=${PAGESIZE}\n<span class="d">// vocabulary: GET /v1/screen/facets (free)</span>`}
+  $('#qecho').innerHTML=html;
+}
+$('#copyQ').addEventListener('click',()=>{const t=$('#qecho').innerText;try{navigator.clipboard.writeText(t);$('#copyQ').textContent='Copied';setTimeout(()=>$('#copyQ').textContent='Copy',1200)}catch(e){}});
+document.querySelectorAll('.qh .tab').forEach(b=>b.addEventListener('click',()=>{QMODE=b.dataset.q;document.querySelectorAll('.qh .tab').forEach(x=>x.classList.toggle('on',x===b));renderQuery()}));
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function normErr(e){if(!e||typeof e!=='object')return {code:'upstream_error',message:String(e||'')};return {code:e.code||'upstream_error',message:e.message||'',retryable:!!e.retryable,server:e.server}}
+async function call(input,cache,signal){
+  for(let attempt=0;;attempt++){
+    try{const opts={cache};if(signal)opts.signal=signal;return await MCP.callTool(SERVER,TOOL,input,opts)}
+    catch(e){
+      if(attempt===0&&e&&e.retryable&&!(signal&&signal.aborted)){
+        await sleep(Math.min(60000,e.retryAfterMs||1500)+Math.random()*700);
+        if(signal&&signal.aborted)throw {code:'cancelled'};continue;
+      }
+      throw e;
+    }
+  }
+}
+function run(){PAGE=0;CURSORS=[null];NEXT=null;renderQuery();renderTable();clearTimeout(DEB);DEB=setTimeout(()=>fetchRows(false),200)}
+async function fetchRows(refresh){
+  if(!MCP){renderLive();renderTable();return}
+  const my=++SEQ;if(CTRL)CTRL.abort();const ctrl=CTRL=new AbortController();
+  const input=callParams(),key=JSON.stringify(input);
+  LOADING=true;renderLive();renderTable();
+  let res;
+  try{res=await call(input,refresh?Object.assign({},CACHE_ROWS,{refresh:true}):CACHE_ROWS,ctrl.signal)}
+  catch(e){
+    if(my!==SEQ||(e&&e.code==='cancelled'))return;
+    LOADING=false;
+    if(e&&e.code==='user_changed'){LIVE='gone';ROWS=[];NEXT=null;renderLive();renderBanner();renderTable();return}
+    ERR=normErr(e);LIVE='error';
+    // keep last-good rows only for a transient failure of the SAME call; anything else retracts them
+    if(DENIAL.has(ERR.code)||ROWS_KEY!==key||ERR.code==='tool_error'||ERR.code==='bad_request'||ERR.code==='transform_error'){ROWS=[];ROWS_KEY=null;NEXT=null}
+    renderLive();renderBanner();renderTable();return;
+  }
+  if(my!==SEQ)return;
+  LOADING=false;
+  const pl=res&&res.payload;
+  if(!pl||typeof pl!=='object'||!Array.isArray(pl.data)){
+    ERR={code:'bad_shape',message:typeof pl==='string'?pl.slice(0,300):'The answer did not contain a list of companies.'};LIVE='error';ROWS=[];ROWS_KEY=null;NEXT=null;
+    renderLive();renderBanner();renderTable();return;
+  }
+  ROWS=pl.data.filter(r=>r&&typeof r==='object').map(mapRow);ROWS_KEY=key;NEXT=pl.next_cursor||null;if(pl.coverage)COVER=pl.coverage;
+  FETCHED=(res.cache&&res.cache.storedAt)||Date.now();ERR=null;LIVE='ok';
+  renderLive();renderBanner();renderClocks();renderTable();
+  if(SEL&&!ROWS.some(o=>o.id===SEL))closeDrawer();
+  if(FAC_STATE==='idle'||FAC_STATE==='error')fetchFacets();
+}
+async function fetchFacets(){
+  FAC_STATE='loading';
+  try{
+    const res=await call({list_facets:true},CACHE_FACETS);const d=res&&res.payload&&res.payload.data;
+    if(!d||!d.facets)throw {code:'bad_shape'};
+    FAC=d.facets;TOTALS=d.totals||null;
+    if(!COVER&&res.payload.coverage)COVER=res.payload.coverage;FAC_STATE='ok';
+  }catch(e){FAC_STATE='error'}
+  buildRail();syncRail();renderClocks();
+}
+
+/* ---------- live status ---------- */
+function renderLive(){
+  const el=$('#live');el.className='live '+(LOADING?'loading':LIVE==='ok'?'ok':LIVE==='error'?'error':'');
+  let t;if(LOADING)t='loading from FocusAlpha…';else if(LIVE==='ok')t='live · fetched '+hm(FETCHED);else if(LIVE==='error')t='last call failed';else if(LIVE==='nomcp')t='no connector in this view';else if(LIVE==='gone')t='signed out';else t='connecting…';
+  $('#liveTxt').textContent=t;$('#refresh').hidden=!MCP||LOADING;
+}
+function renderClocks(){
+  $('#stRef').textContent=COVER?clock(COVER.refreshed_at):'—';
+  $('#stEv').textContent=COVER?clock(COVER.events_refreshed_at):'—';
+  $('#stUni').textContent=TOTALS&&TOTALS.companies!=null?TOTALS.companies.toLocaleString():'—';
+}
+function renderBanner(){
+  const b=$('#banner');
+  if(LIVE==='error'&&ROWS.length&&ERR){b.hidden=false;b.innerHTML=`<span><b>FocusAlpha didn't answer the refresh.</b> Showing the rows fetched ${esc(hm(FETCHED))}.</span><button class="btn act" data-act="retry">Retry</button>`}
+  else{b.hidden=true;b.innerHTML=''}
+}
+$('#banner').addEventListener('click',e=>{if(e.target.closest('[data-act="retry"]'))fetchRows(false)});
+function errView(e){
+  const code=e.code, name=esc(e.server||SERVER);
+  const V={
+    server_not_connected:['FocusAlpha isn\'t connected for you',`Add the ${name} connector in claude.ai Settings → Connectors, then try again.`,'Try again'],
+    server_not_found:['FocusAlpha isn\'t connected for you',`That ${name} connection no longer exists. Add it again in claude.ai Settings → Connectors.`,'Try again'],
+    needs_reauth:['FocusAlpha needs you to sign in again',`Reconnect ${name} in claude.ai Settings → Connectors, then try again.`,'Try again'],
+    selection_required:['Pick which FocusAlpha connection to use',`You have more than one ${name} connector. Choose one in the prompt claude.ai shows, then try again.`,'Try again'],
+    not_in_manifest:['FocusAlpha is turned off for this page','The connector was declined or switched off for this page. Allow it in the page\'s connector settings to load live rows.',null],
+    consent_required:['Allow FocusAlpha for this page','The page calls screen_companies as you, and needs your OK first.','Allow and load'],
+    blocked_by_policy:['Your organization blocks this call','Connector policy blocks screen_companies for your account here.',null],
+    approval_required:['This call needs approval','Your organization requires per-call approval for screen_companies, which pages can\'t request yet.',null],
+    server_unavailable:['FocusAlpha didn\'t answer','It was tried twice. The service may be busy — try again in a moment.','Retry'],
+    rate_limited:['Too many calls just now','Wait a few seconds, then try again.','Retry'],
+    tool_error:['FocusAlpha couldn\'t run this screen','It answered with the message below. Adjust the filter it names — for example, an unknown peer_of or competitor_of company is an error, not an empty page.',null],
+    bad_request:['The page sent a call FocusAlpha couldn\'t take','Reset the filters with Clear all, or pick a saved screen.',null],
+    transform_error:['The page sent a call FocusAlpha couldn\'t take','Reset the filters with Clear all, or pick a saved screen.',null],
+    bad_shape:['FocusAlpha answered in an unexpected shape','The page expected a list of companies.','Retry'],
+    not_granted:['Live rows aren\'t available in this view','Connectors weren\'t granted to this page here. Open it on claude.ai, signed in with FocusAlpha connected.',null],
+    capability_disabled:['Live rows aren\'t available in this view','This view can\'t reach connectors. Open the page on claude.ai, signed in with FocusAlpha connected.',null],
+    capability_removed:['Live rows aren\'t available in this view','This view can\'t reach connectors. Open the page on claude.ai, signed in with FocusAlpha connected.',null],
+  };
+  const v=V[code]||['FocusAlpha didn\'t answer','Something went wrong between the page and the connector.','Retry'];
+  const showMsg=e.message&&(code==='tool_error'||code==='bad_request'||code==='transform_error'||code==='bad_shape'||!V[code]);
+  return `<div class="state"><h4>${v[0]}</h4><p>${v[1]}</p>${showMsg?`<p class="msg">${esc(e.message)}</p>`:''}${v[2]?`<button class="btn primary" data-act="retry">${v[2]}</button>`:''}</div>`;
+}
+function stateView(){
+  if(LIVE==='nomcp')return `<div class="state"><h4>Live rows need the FocusAlpha connector</h4><p>This view can't reach connectors. Open the page on claude.ai, signed in with FocusAlpha connected. The call above is exactly what it will send.</p></div>`;
+  if(LIVE==='gone')return '';
+  if(LOADING||LIVE==='boot')return `<div class="state"><h4>Loading from FocusAlpha…</h4><p>Running the screen above against the live universe.</p></div>`;
+  if(LIVE==='error'&&ERR)return errView(ERR);
+  return `<div class="state"><h4>No company matches</h4><p>Loosen a filter. Event types ticked in two different lists (or an event plus insider buying) only match companies that carry both, and companies without a value for the sort column are left out.</p></div>`;
+}
+
+/* ---------- table ---------- */
+function buildColGroups(){
+  const g=$('#colgroups');g.innerHTML='';Object.entries(COLGROUPS).forEach(([k,v])=>{const b=document.createElement('button');b.textContent=v.l;b.classList.toggle('on',COLS.has(k));b.addEventListener('click',()=>{COLS.has(k)?COLS.delete(k):COLS.add(k);buildColGroups();renderTable();syncRail()});g.appendChild(b)});
+}
+function columns(){let c=[...BASE];for(const k of Object.keys(COLGROUPS))if(COLS.has(k))c=c.concat(COLGROUPS[k].cols);return c}
+const SORT_OF_COL={mc:'market_cap_usd',r1:'ret_1m',r3:'ret_3m',r12:'ret_12m',gb:'guidance_better_90d',gw:'guidance_worse_90d',pe:'pe_ttm',pb:'pb',ps:'ps_ttm',fy:'fcf_yield',dy:'dividend_yield',gm:'gross_margin',om:'operating_margin',nm:'net_margin',roe:'return_on_equity',de:'debt_to_equity',rg:'revenue_growth_yoy',eg:'eps_growth_yoy',sf:'short_percent_float',dc:'days_to_cover',io:'insider_ownership_pct',cp:'ceo_total_comp',twf:'tw_foreign_held_pct',twr:'tw_revenue_yoy_pct'};
+function renderTable(){
+  const cols=columns();
+  $('#thead').innerHTML='<tr>'+cols.map(c=>{const s=SORT_OF_COL[c.k];const sorted=s&&s===SORT;return `<th class="${c.r?'r':''} ${sorted?'sorted':''}" ${s?`data-sort="${s}" title="sort by ${s}"`:''}>${c.h}${sorted?`<span class="arr">${ORDER==='asc'?'▲':'▼'}</span>`:''}</th>`}).join('')+'</tr>';
+  $('#thead').querySelectorAll('th[data-sort]').forEach(th=>th.addEventListener('click',()=>{const s=th.dataset.sort;if(SORT===s)ORDER=ORDER==='asc'?'desc':'asc';else{SORT=s;ORDER='desc'}ACTIVE_PRESET=null;syncRail();run()}));
+  $('#twrap').classList.toggle('loading',LOADING&&ROWS.length>0);
+  $('#tbody').innerHTML=ROWS.length?ROWS.map(o=>`<tr class="row ${SEL===o.id?'on':''}" data-id="${esc(o.id)}">${cols.map(c=>`<td class="${c.r?'r num':''}">${c.f(o)}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${cols.length}">${stateView()}</td></tr>`;
+  const start=PAGE*PAGESIZE;
+  $('#pinfo').textContent=ROWS.length?`page ${PAGE+1} · rows ${(start+1).toLocaleString()}–${(start+ROWS.length).toLocaleString()}${NEXT?'':' · last page'} · ${PAGESIZE} per call`:`page ${PAGE+1}`;
+  $('#prev').disabled=PAGE===0||LOADING;$('#next').disabled=!NEXT||LOADING;
+  $('#dropnote').textContent=SORT!=='market_cap_usd'?`companies with no ${SORT} are left out by the API`:'';
+}
+$('#tbody').addEventListener('click',e=>{if(e.target.closest('[data-act="retry"]')){fetchRows(false);return}const tr=e.target.closest('tr.row');if(tr)openDrawer(tr.dataset.id)});
+$('#prev').addEventListener('click',()=>{if(PAGE>0){PAGE--;fetchRows(false);$('#twrap').scrollTop=0}});
+$('#next').addEventListener('click',()=>{if(NEXT){CURSORS[PAGE+1]=NEXT;PAGE++;fetchRows(false);$('#twrap').scrollTop=0}});
+$('#refresh').addEventListener('click',()=>fetchRows(true));
+$('#sortSel').innerHTML=SORTS.map(s=>`<option value="${s}">${s}</option>`).join('');
+$('#sortSel').addEventListener('change',e=>{SORT=e.target.value;ACTIVE_PRESET=null;syncRail();run()});
+$('#orderSel').addEventListener('change',e=>{ORDER=e.target.value;ACTIVE_PRESET=null;syncRail();run()});
+
+/* ---------- drawer ---------- */
+function kv(pairs){return `<div class="kv">${pairs.map(([k,v])=>`<div class="it"><span class="k">${k}</span><span class="v">${v==null||v===''?'<span class="dim">—</span>':v}</span></div>`).join('')}</div>`}
+function money(v,ccy){if(v==null)return null;const a=Math.abs(v);const s=a>=1e9?(v/1e9).toFixed(2)+'B':a>=1e6?(v/1e6).toFixed(1)+'M':v.toLocaleString();return (!ccy||ccy==='USD'?'$':esc(ccy)+' ')+s}
+function openDrawer(id){
+  const o=ROWS.find(x=>x.id===id);if(!o)return;SEL=id;
+  document.querySelectorAll('tr.row').forEach(tr=>tr.classList.toggle('on',tr.dataset.id===id));
+  const dr=$('#drawer');
+  const ident=o.t||o.id;
+  const insider=S.insider_net_90d?`<span class="gpill ${S.insider_net_90d==='buying'?'up':'dn'}">${esc(S.insider_net_90d)}</span> <span class="dim">(filter)</span>`:'<span class="dim">filter only</span>';
+  dr.innerHTML=`<div class="dh"><div><div class="tk">${esc(o.t||'—')} <span class="dim" style="font-size:11px">${esc(o.x||'')}</span></div><div class="nm">${esc(o.n)}</div><div class="meta">${esc(o.c||'')} · ${esc(o.s||'')} · ${esc(o.i||'')} · <span class="mono">${esc(o.id)}</span>${o.k?' · SEC filer':''}</div></div><button class="x" id="dclose" aria-label="Close">×</button></div>
+  <div class="db">
+    <div class="sec"><h3>Size & momentum <span class="src">market_cap_usd · ret_* ${o.mcAsOf?'· as of '+esc(o.mcAsOf):''}</span></h3>${kv([['Market cap',cap(o.mc)],['Local cap',o.mcl!=null&&o.mccy&&o.mccy!=='USD'?money(o.mcl,o.mccy):null],['12-month',ret(o.r12,o)],['1-month',ret(o.r1,o)],['3-month',ret(o.r3,o)],['6-month',ret(o.r6,o)],['Return flag',o.rs?'<span class="sus">suspect</span>':'clean']])}</div>
+    <div class="sec"><h3>Guidance, 90 days <span class="src">get_guidance_changes</span></h3>${kv([['Good-news moves',gpill(o.gb,'up')],['Bad-news moves',gpill(o.gw,'dn')],['Guidance raise',o.gr],['Guidance cut',o.gc],['Last good news',o.glb],['Last bad news',o.glw],['Last guidance',o.gl]])}<p class="note" style="margin:6px 0 0">A guidance raise ≠ good news: a cost line going up counts as a guidance raise and as bad news. The quote behind every move is served by <span class="mono">get_guidance</span>.</p></div>
+    <div class="sec"><h3>Investment events, 90 days <span class="src">get_company_events</span></h3>${evList(o).length?`<div class="tags">${evTags(o,0)}</div>`:'<span class="dim">none of the tracked types in 90 days</span>'}
+      <p class="note" style="margin:6px 0 0">Routine filings (board-meeting dates, monthly returns, AGM notices) are left out. Red tags are filed red flags; hover a tag for the regulator's own word.</p></div>
+    <div class="sec"><h3>Valuation & profitability <span class="src">${o.fp?`${esc(o.fg||'')} · period ${esc(o.fp)}`:'not in tracked cohort'}</span></h3>${o.fp?kv([['PE (TTM)',o.lm===1?'loss-making':n1(o.pe,'x')],['P/B',n1(o.pb,'x')],['P/S',n1(o.ps,'x')],['FCF yield',pctf(o.fy)],['Dividend yield',pctf(o.dy)],['Revenue',money(o.rev,o.fccy)],['Net income',money(o.ni,o.fccy)],['Free cash flow',money(o.fcf,o.fccy)],['Gross margin',pctf(o.gm)],['Operating margin',pctf(o.om)],['Net margin',pctf(o.nm)],['ROE',pctf(o.roe)],['Debt / equity',n1(o.de,'x')],['Revenue YoY',pctf(o.rg,true)],['EPS YoY',pctf(o.eg,true)],['Stale',o.st?'yes':'no']]):'<p class="note">No statements in this source: the ratio columns are a tracked cohort of US-GAAP filers (~3,500). Empty means "not tracked here", never "no financials" — Japan, Korea, Taiwan, HK and China have their own statement tools.</p>'}</div>
+    <div class="sec"><h3>Positioning <span class="src">short_interest · insider · proxy</span></h3>${kv([['Short % float',n1(o.sf,'%')],['Days to cover',n1(o.dc,'')],['SI change',sgn(o.sc)],['SI as of',o.siAsOf?esc(o.siAsOf):null],['Insider net 90d',insider],['CEO',o.ceo?esc(o.ceo):null],['CEO total comp',o.cp?money(o.cp)+(o.cpy?` <span class="dim">FY${esc(o.cpy)}</span>`:''):null],['D&O stake',n1(o.io,'%')]])}</div>
+    ${(o.twf!=null||o.twr!=null)?`<div class="sec"><h3>Taiwan</h3>${kv([['Foreign held',n1(o.twf,'%')],['Monthly revenue YoY',sgn(o.twr)]])}</div>`:''}
+    <div class="sec"><h3>Products & relations <span class="src">entity graph</span></h3>${kv([['Product terms',o.pt],['Related terms',o.rt],['Peer companies',o.pc],['Named competitors',o.cc]])}
+      ${o.mk?`<div style="margin-top:6px" class="tags">${o.mk.map(m=>`<span class="tag hit" title="${termTitle(m)}">${esc(m.role||'makes')}: ${esc(m.term)} <span class="dim">· ${esc((m.sources||[]).join(', '))}</span></span>`).join('')}</div>`:''}${o.pr?`<div style="margin-top:6px"><span class="tag hit" title="${relTitle(o.pr)}">${relLabel('peer',o.pr)} · ${esc((o.pr.sources||[]).join(', '))}</span></div>`:''}${o.cm?`<div style="margin-top:6px"><span class="tag hit" title="${relTitle(o.cm)}">${relLabel('competitor',o.cm)} · ${esc((o.cm.sources||[]).join(', '))}</span></div>`:''}</div>
+    <div class="sec"><h3>Go deeper</h3><pre class="snip"><span class="c">// the quote behind each guidance move</span>
+get_guidance_changes({ company: "${esc(ident)}" })
+<span class="c">// the labelled event stream, one row per event</span>
+get_company_events({ company: "${esc(ident)}", min_impact: 60 })
+<span class="c">// who this company's events reprice without naming</span>
+get_company_events({ company: "${esc(ident)}", relation: "knock_on" })
+<span class="c">// who is in its value chain</span>
+screen_companies({ peer_of: "${esc(ident)}" })</pre></div>
+  </div>`;
+  dr.classList.add('open');$('#dclose').addEventListener('click',closeDrawer);
+}
+function closeDrawer(){$('#drawer').classList.remove('open');SEL=null;document.querySelectorAll('tr.row.on').forEach(t=>t.classList.remove('on'))}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+
+/* ---------- misc ---------- */
+$('#clearAll').addEventListener('click',()=>{S={market_cap_usd_gte:DEFAULT_CAP};SORT='market_cap_usd';ORDER='desc';ACTIVE_PRESET=null;syncRail();run()});
+$('#railToggle').addEventListener('click',()=>$('#rail').classList.toggle('show'));
+$('#railClose').addEventListener('click',()=>$('#rail').classList.remove('show'));
+$('#themeBtn').addEventListener('click',()=>{const r=document.documentElement;const cur=r.getAttribute('data-theme');const sys=matchMedia('(prefers-color-scheme: dark)').matches;const now=cur?cur:(sys?'dark':'light');r.setAttribute('data-theme',now==='dark'?'light':'dark')});
+
+/* ---------- boot ---------- */
+buildRail();buildPresets();renderLive();
+let restored=null;try{restored=JSON.parse(localStorage.getItem('fa_screen_state'))}catch(e){}
+function sanitize(s){ // drop event filters this page no longer offers, so nothing hidden narrows the screen
+  const o=Object.assign({},s);['event_source','event_family','news_event_type','event_since','event_family_since','news_event_type_since','rollup_family_since'].forEach(k=>delete o[k]);
+  if(Array.isArray(o.rollup_family))o.rollup_family=o.rollup_family.filter(v=>EV_ROLLUP.some(r=>r.v===v));
+  if(Array.isArray(o.x_filed))o.x_filed=o.x_filed.filter(v=>EV_FILED.some(f=>f.v===v));
+  return o;
+}
+if(restored&&restored.S&&typeof restored.S==='object'){S=sanitize(restored.S);SORT=SORTS.includes(restored.SORT)?restored.SORT:'market_cap_usd';ORDER=restored.ORDER==='asc'?'asc':'desc';COLS=new Set(restored.COLS||['guidance']);ACTIVE_PRESET=restored.ACTIVE_PRESET||null;syncRail();buildColGroups();run()}
+else loadPreset(PRESETS[0]);
+(async()=>{
+  let m=null;
+  try{m=window.claude&&typeof window.claude.use==='function'?await window.claude.use('mcp'):null}catch(e){m=null}
+  if(!m){LIVE='nomcp';renderLive();renderTable();return}
+  MCP=m;clearTimeout(DEB);fetchRows(false);
+})();
+})();
+</script>
+
+</body></html>

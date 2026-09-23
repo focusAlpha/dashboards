@@ -387,7 +387,7 @@ td.bar span{position:relative}
           public filing or market data, and none of it is investment advice.</p>
         <div class="conn-actions">
           <a class="btn ghost" id="b-sec" href="https://adviserinfo.sec.gov/" target="_blank" rel="noopener">SEC profile</a>
-          <button class="fa-own" id="ownBtn" type="button">Build my own <span class="arw">→</span></button>
+          <a class="fa-gh" href="https://github.com/focusAlpha/dashboards/tree/main/manager-profile-dashboard" target="_blank" rel="noopener" title="This page's source on GitHub (MIT)">Source on GitHub</a><button class="fa-own" id="ownBtn" type="button">Build my own <span class="arw">→</span></button>
         </div>
       </aside>
     </div>
@@ -1941,6 +1941,16 @@ boot();
 .fa-own:focus-visible{outline:2px solid #6644C9;outline-offset:3px}
 .fa-own .arw{font-size:15px;line-height:1;opacity:.9}
 @media (max-width:560px){.fa-own{padding:9px 15px;font-size:13px}}
+/* Source on GitHub — sits beside Build my own on every page; outlined so the purple stays the one call to action */
+.fa-gh{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:9px;margin-right:8px;
+  font:500 13px/1 system-ui,-apple-system,"Segoe UI",sans-serif;color:#4F2FB0;background:transparent;border:1px solid rgba(79,47,176,.45);
+  text-decoration:none;white-space:nowrap;letter-spacing:.01em}
+.fa-gh::before{content:"";width:14px;height:14px;background:currentColor;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/></svg>") center/contain no-repeat}
+.fa-gh:hover{background:rgba(79,47,176,.08);border-color:#4F2FB0}
+.fa-gh:focus-visible{outline:2px solid #6644C9;outline-offset:3px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fa-gh{color:#B9A6F2;border-color:rgba(185,166,242,.5)}:root:not([data-theme="light"]) .fa-gh:hover{background:rgba(185,166,242,.12);border-color:#B9A6F2}}
+:root[data-theme="dark"] .fa-gh{color:#B9A6F2;border-color:rgba(185,166,242,.5)}:root[data-theme="dark"] .fa-gh:hover{background:rgba(185,166,242,.12);border-color:#B9A6F2}
+@media (max-width:560px){.fa-gh{padding:7px 10px;font-size:12px}}
 .fa-scrim{position:fixed;inset:0;background:rgba(8,12,18,.62);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;
   /* Its OWN palette. The three demos each name their tokens differently
      (--surface / --card / --shell), so inheriting them left the dialog with an
@@ -1980,6 +1990,7 @@ boot();
   background:var(--fa-wash);color:var(--fa-brand);border:1px solid color-mix(in srgb,var(--fa-brand) 35%,transparent);
   font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;vertical-align:1px}
 .fa-link:hover{background:var(--fa-brand);color:#fff;border-color:var(--fa-brand)}
+.fa-src{color:var(--fa-brand);font-weight:600;text-decoration:underline;text-underline-offset:2px}
 .fa-pbox{position:relative;background:var(--fa-bg2);border:1px solid var(--fa-line);border-radius:10px}
 .fa-pbox pre{margin:0;padding:14px 16px;font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-word;max-height:42vh;overflow:auto;color:var(--fa-ink)}
@@ -1995,8 +2006,10 @@ boot();
     <div class="fa-mh">
       <div>
         <h2 id="faTitle">Build your own, on your own data</h2>
-        <p>This page is a frozen snapshot. Paste the prompt below into Claude and it will pull live
-           FocusAlpha data through the connector — your universe, your filters, your account.</p>
+        <p>This page is a frozen snapshot. Its source is public on
+           <a class="fa-src" href="https://github.com/focusAlpha/dashboards/tree/main/manager-profile-dashboard" target="_blank" rel="noopener">GitHub</a>.
+           Paste the prompt below into Claude: it fetches that source and republishes it reading live
+           FocusAlpha data through your connector — your universe, your filters, your account.</p>
       </div>
       <button class="fa-x" id="faX" aria-label="Close">×</button>
     </div>
@@ -2005,52 +2018,48 @@ boot();
         <li>Connect <b>FocusAlpha</b> in your preferred AI, if you haven’t already <a class="fa-link" href="https://focusalpha.ai/start" target="_blank" rel="noopener">Connect →</a></li>
         <li><b>Copy</b> the prompt below and paste it into a new conversation</li>
         <li>Edit the conditions at the bottom — that last block is yours to change</li>
+        <li>Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions</li>
       </ol>
       <div class="fa-pbox">
         <button class="fa-copy" id="faCopy">Copy</button>
-        <pre id="faPrompt">Build me a fund dashboard like https://focusalpha.ai/manager-profile-dashboard, on a manager I follow.
-Sample page: https://focusalpha.ai/manager-profile-dashboard  ·  its full source: https://github.com/focusAlpha/dashboards/blob/main/manager-profile-dashboard/index.html
-The sample's data is frozen as of 2026-09-23. Mine must fetch live, through the connector.
+        <pre id="faPrompt">Build me a live fund dashboard from the FocusAlpha sample at https://focusalpha.ai/manager-profile-dashboard, on a manager I follow.
 
-FIRST look at the data, before writing any page:
-1. search_institutions({ q: "&lt;fund name&gt;", has_style: true }) — get the CRD and the CIK.
-2. get_institution_profile({ id: "crd:&lt;CRD&gt;" }) and read it: Form ADV Part 1 self-reported
-   figures (regulatory AUM, accounts, headcount, performance fees) plus the Part 2A brochure —
-   strategy, style tags and the full fee schedule, each claim next to the verbatim sentence.
-3. get_institutional_holdings({ filer_cik: "&lt;CIK&gt;", report_period_gte: "&lt;two years ago&gt;" }) —
-   the filed 13F book, quarter by quarter. Read one row before you write any code.
+The page is open source. Fetch this ONE file and use it verbatim as the page:
+  https://raw.githubusercontent.com/focusAlpha/dashboards/main/manager-profile-dashboard/live.html
+It is a single self-contained HTML file, about 115 KB, no build step, no dependencies. Download it
+exactly as it is, with curl or your fetch tool. Do not summarise it, retype it, or rebuild it from
+memory. The sample on focusalpha.ai is this same page with Lone Pine's data frozen on 2026-09-23
+baked in; live.html reads everything through the FocusAlpha connector: the Form ADV profile and
+brochure, the filed 13F book quarter by quarter, prices for the replication, and the ^SP500TR
+benchmark.
 
-THEN build it as an artifact that FETCHES ITS OWN DATA LIVE — not a page with the rows you
-just pasted into it. That part is what makes it a dashboard instead of a screenshot:
+Then, in this order:
+1. Publish the file as an artifact, declaring the connector:
+     capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["search_institutions", "search_companies", "get_institution_profile", "get_institutional_holdings", "get_market_data", "get_benchmark_prices"] }] } }
+   If the connector is listed in your tools as "focusalpha", use that spelling for server.
+   Without this declaration window.claude.use('mcp') resolves null and the page can never fetch.
+2. Open it and check that it loads Lone Pine live; the status line counts the calls it made. If the
+   page says the connector is not available, I have to connect FocusAlpha first:
+   https://focusalpha.ai/start
+3. Now change the fund. The PEERS list near the top of the script holds the default fund (the first
+   entry) and its peers, each with a CIK and a CRD. Call search_institutions({ q: "&lt;name&gt;",
+   has_style: true }) for my fund and for each peer I name, put my fund first, republish, and send
+   me the link. The page's own search box can load any fund at runtime; the list only sets the
+   default and the peer set.
 
-- declare the connector when you publish the artifact:
-    capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["search_institutions", "get_institution_profile", "get_institutional_holdings", "get_market_data", "get_benchmark_prices"] }] } }
-  Without this declaration window.claude.use('mcp') resolves null and the page can never fetch.
-- in the page:
-    const mcp = await window.claude.use('mcp');
-  It also resolves null for a viewer with no FocusAlpha connector — say that on the page
-  rather than rendering an empty table.
-- call a tool with:
-    const r = await mcp.callTool("FocusAlpha", "&lt;tool&gt;", input, { cache: { staleTime: 120000 } });
-    const payload = r.payload;
-  Failures reject with an error carrying a code; render a sentence per code (not connected,
-  needs sign-in, rate limited) instead of a blank screen.
-- every control re-runs the call, debounced about 200ms, with a visible loading state.
-
-What the page needs:
-- the declared side and the revealed side next to each other: what the brochure SAYS the firm
-  does, in its own words, against what the 13F actually holds
-- the current book as a table, with what changed against the previous quarter
-- a replicating portfolio: buy each book at the close of the FIRST TRADING DAY AFTER its 13F
-  appeared, hold until the next filing, measure against ^SP500TR from get_benchmark_prices.
-  Buying at the quarter-end price uses information nobody had yet — do not do it.
-- the fee schedule with the brochure sentence each rate came from
-
-Two things to get right, or the page is wrong rather than merely ugly:
-- a 13F is not AUM. It is long US-listed equity only: no shorts, no options, no non-US listings.
+Rules for any change:
+- Keep the data layer exactly as it is: every read goes through the page's call() helper into
+  MCP.callTool. Never paste rows into the page. The point of this page is that it fetches its own data.
+- A 13F is not AUM. It is long US-listed equity only: no shorts, no options, no non-US listings.
   A falling line can be a drawdown or a move into assets the form does not cover, and the filing
-  cannot tell those apart.
-- the replicated return is not the fund's return. Label it as the replication.</pre>
+  cannot tell those apart. The page says so; keep it.
+- The replication buys each book at the close of the FIRST TRADING DAY AFTER its 13F appeared,
+  never at quarter end, because the quarter-end price uses information nobody had yet. Keep it,
+  and keep it labelled as a replication, not as the fund's return.
+
+My fund and peers (edit these):
+  fund:  Coatue Management
+  peers: Tiger Global Management, Viking Global Investors, Lone Pine Capital</pre>
       </div>
     </div>
     <div class="fa-mf">Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.</div>

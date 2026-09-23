@@ -1,0 +1,1855 @@
+<!doctype html><html><head>
+<!--
+  FocusAlpha · Hedge fund profile, 13F holdings vs Form ADV · LIVE SOURCE
+  The same page as https://focusalpha.ai/manager-profile-dashboard with no data baked in: every number is read
+  through the viewer's FocusAlpha connector (MCP) when the page opens. Opened as a plain web
+  page, without a connector, it shows only its empty state.
+
+  To use it: publish this file as a claude.ai artifact with the connector declared —
+    capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["search_institutions","search_companies","get_institution_profile","get_institutional_holdings","get_market_data","get_benchmark_prices"] }] } }
+  Where to edit: PEERS near the top of the script: the first entry is the default fund, the rest are its peers (CIK + CRD each).
+  Source and licence (MIT): https://github.com/focusAlpha/dashboards
+-->
+<meta name="robots" content="noindex">
+<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Lone Pine Capital — Fund Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* ------------------------------------------------------------ tokens
+   Palette lifted from the FocusAlpha connection card: lavender ground,
+   white cards, one violet, a sage green and a clay orange. The three hues
+   also encode WHERE a number comes from: violet = Form ADV, green = 13F
+   filings, orange = market prices (the replicating portfolio). */
+:root{
+  color-scheme: light;
+  --bg:#F4F3F9; --card:#FFFFFF; --card2:#FAF9FD; --sunk:#F1EFF8;
+  --ink:#15141B; --ink2:#3E3C4A; --muted:#6D6B7B; --faint:#8F8D9F;
+  --line:#ECEAF3; --line2:#DEDBEA;
+  --accent:#5B3FD3; --accent-ink:#4B31C4; --accent-wash:#F3F0FE; --accent-soft:#C4B8F6;
+  --green:#6CC08C; --green-ink:#1E8450; --green-wash:#EEF8F2;
+  --orange:#E0904F; --orange-ink:#AE5418; --orange-wash:#FDF3EA;
+  --pos:#1E8450; --neg:#C2461F;
+  --btn:#16151B; --btn-ink:#FFFFFF;
+  --s1:#5B3FD3; --s2:#D46A24; --s3:#2F8FBF; --s4:#2E9A62; --s5:#C04F96; --s6:#8C7A1E; --s7:#16151B;
+  --bench:#8F8CA0;
+  --shadow:0 1px 2px rgba(30,20,70,.04), 0 12px 32px -14px rgba(40,25,110,.14);
+  --sans:"Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "PingFang SC", "Hiragino Sans GB", sans-serif;
+  --mono:"DM Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --bg:#0E0D13; --card:#17161E; --card2:#1B1A24; --sunk:#121118;
+    --ink:#EEEDF6; --ink2:#CAC8D8; --muted:#9794A9; --faint:#78768A;
+    --line:#26242F; --line2:#34313F;
+    --accent:#8D78F3; --accent-ink:#B3A5FA; --accent-wash:#211C3A; --accent-soft:#5A4AA6;
+    --green:#58A87A; --green-ink:#62CC91; --green-wash:#132419;
+    --orange:#D4884A; --orange-ink:#F0A267; --orange-wash:#2A1C11;
+    --pos:#62CC91; --neg:#F27D58;
+    --btn:#EEEDF6; --btn-ink:#15141B;
+    --s1:#8069EE; --s2:#D0712F; --s3:#3389BC; --s4:#23965E; --s5:#C4579A; --s6:#968024; --s7:#EEEDF6;
+    --bench:#7A778C;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 32px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --bg:#0E0D13; --card:#17161E; --card2:#1B1A24; --sunk:#121118;
+  --ink:#EEEDF6; --ink2:#CAC8D8; --muted:#9794A9; --faint:#78768A;
+  --line:#26242F; --line2:#34313F;
+  --accent:#8D78F3; --accent-ink:#B3A5FA; --accent-wash:#211C3A; --accent-soft:#5A4AA6;
+  --green:#58A87A; --green-ink:#62CC91; --green-wash:#132419;
+  --orange:#D4884A; --orange-ink:#F0A267; --orange-wash:#2A1C11;
+  --pos:#62CC91; --neg:#F27D58;
+  --btn:#EEEDF6; --btn-ink:#15141B;
+  --s1:#8069EE; --s2:#D0712F; --s3:#3389BC; --s4:#23965E; --s5:#C4579A; --s6:#968024; --s7:#EEEDF6;
+  --bench:#7A778C;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 14px 32px -14px rgba(0,0,0,.7);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--sans); font-size:14.5px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent-ink); text-decoration-thickness:1px; text-underline-offset:2px}
+.num,td.n{font-variant-numeric:tabular-nums}
+.page{max-width:1240px; margin:0 auto; padding-inline:20px; padding-block:20px 72px}
+@media (max-width:520px){ .page{padding-inline:16px} }
+
+/* source colouring — the one structural device on the page */
+.src-adv{--c:var(--accent); --ci:var(--accent-ink); --cw:var(--accent-wash)}
+.src-13f{--c:var(--green);  --ci:var(--green-ink);  --cw:var(--green-wash)}
+.src-px {--c:var(--orange); --ci:var(--orange-ink); --cw:var(--orange-wash)}
+.tri{display:inline-flex; align-items:flex-end; gap:3px; height:18px; flex:none}
+.tri i{display:block; width:7px; border-radius:4px; background:var(--c)}
+.tri i:nth-child(1){height:8px; opacity:.45}
+.tri i:nth-child(2){height:13px; opacity:.7}
+.tri i:nth-child(3){height:18px}
+.tri.sm{height:12px; gap:2px}
+.tri.sm i{width:4px; border-radius:2px}
+.tri.sm i:nth-child(1){height:6px} .tri.sm i:nth-child(2){height:9px} .tri.sm i:nth-child(3){height:12px}
+
+/* ------------------------------------------------------------ hero */
+.hero{
+  background:var(--card); border:1px solid var(--line); border-radius:28px;
+  box-shadow:var(--shadow); overflow:hidden; position:relative;
+}
+.bars{
+  position:relative; height:196px; overflow:hidden;
+  display:flex; justify-content:center; gap:18px;
+  -webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent 100%);
+          mask-image:linear-gradient(to bottom,#000 55%,transparent 100%);
+}
+.cap{
+  flex:none; width:54px; border-radius:999px; align-self:flex-start;
+  background:linear-gradient(to bottom,var(--cc) 0%,var(--cc) 52%,color-mix(in srgb,var(--cc) 12%,transparent) 100%);
+  transition:transform .6s cubic-bezier(.2,.7,.2,1), height .6s cubic-bezier(.2,.7,.2,1);
+}
+.cap.NEW{--cc:var(--accent)} .cap.ADD{--cc:var(--green)} .cap.TRIM{--cc:var(--orange)}
+.cap.HOLD{--cc:var(--accent-soft); filter:blur(5px); opacity:.55}
+.cap.ph{--cc:var(--accent-soft); filter:blur(6px); opacity:.35}
+.cap.ph.g{--cc:var(--green)} .cap.ph.o{--cc:var(--orange)}
+@media (max-width:640px){ .bars{gap:10px; height:150px} .cap{width:34px} }
+.bars-cap{
+  position:relative; margin:-30px 36px 8px; z-index:2; min-height:16px;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.04em; color:var(--faint);
+  display:flex; flex-wrap:wrap; gap:4px 12px; align-items:center;
+}
+.bars-cap span{display:inline-flex; align-items:center; gap:5px}
+.bars-cap i{width:8px; height:8px; border-radius:50%; display:block}
+@media (max-width:900px){ .bars-cap{margin:-26px 20px 8px} }
+
+.hero-body{
+  display:grid; grid-template-columns:minmax(0,1.55fr) minmax(0,1fr);
+  gap:28px 40px; padding:6px 36px 32px;
+}
+@media (max-width:900px){ .hero-body{grid-template-columns:minmax(0,1fr); padding:6px 20px 24px} }
+.eyebrow{
+  font-family:var(--mono); font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+  color:var(--accent); margin:0 0 10px;
+}
+h1{
+  font-size:clamp(30px,4.2vw,44px); font-weight:800; letter-spacing:-.025em;
+  line-height:1.08; margin:0; text-wrap:balance;
+}
+.pre{color:var(--accent); font-weight:600}
+.ids{font-family:var(--mono); font-size:11.5px; color:var(--faint); margin:10px 0 0; display:flex; flex-wrap:wrap; gap:4px 14px}
+.ids b{color:var(--ink2); font-weight:500}
+.sub{color:var(--muted); font-size:16px; line-height:1.55; margin:14px 0 0; max-width:62ch}
+.pills{display:flex; flex-wrap:wrap; gap:6px; margin-top:16px}
+.pill{
+  font-size:12px; font-weight:600; padding:4px 11px; border-radius:999px;
+  border:1px solid var(--line2); color:var(--ink2); background:var(--card2);
+}
+.pill.ac{color:var(--accent-ink); background:var(--accent-wash); border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+.pill.gr{color:var(--green-ink); background:var(--green-wash); border-color:color-mix(in srgb,var(--green) 40%,transparent)}
+
+.switch{margin-top:22px; display:flex; flex-direction:column; gap:10px}
+.switch-l{font-size:13px; font-weight:700; color:var(--ink2)}
+.chips{display:flex; flex-wrap:wrap; gap:7px}
+.chip{
+  font:600 13px/1 var(--sans); color:var(--ink2); background:var(--card);
+  border:1px solid var(--line2); border-radius:999px; padding:8px 13px 8px 10px;
+  display:inline-flex; align-items:center; gap:7px; cursor:pointer;
+  transition:background .15s, border-color .15s, color .15s;
+}
+.chip:hover{border-color:var(--accent-soft); background:var(--accent-wash)}
+.chip i{width:9px; height:9px; border-radius:50%; display:block; flex:none}
+.chip[aria-pressed="true"]{background:var(--btn); color:var(--btn-ink); border-color:var(--btn)}
+.chip .x{margin-left:2px; opacity:.6; font-weight:500}
+.search{position:relative; max-width:420px}
+.search input{
+  width:100%; font:500 14px var(--sans); color:var(--ink); background:var(--card2);
+  border:1px solid var(--line2); border-radius:14px; padding:11px 14px;
+}
+.search input::placeholder{color:var(--faint)}
+.search input:focus{outline:2px solid var(--accent); outline-offset:1px; background:var(--card)}
+.results{
+  position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:30;
+  background:var(--card); border:1px solid var(--line2); border-radius:14px;
+  box-shadow:var(--shadow); padding:6px; max-height:320px; overflow:auto;
+}
+.results button{
+  width:100%; text-align:left; font:inherit; color:var(--ink); background:none; border:0;
+  border-radius:10px; padding:9px 10px; cursor:pointer; display:flex; justify-content:space-between; gap:12px;
+}
+.results button:hover,.results button:focus-visible{background:var(--accent-wash)}
+.results small{color:var(--muted); font-size:12px}
+.results .msg{padding:10px; color:var(--muted); font-size:13px}
+
+/* connection panel — mirrors the card's right column */
+.conn{display:flex; flex-direction:column; gap:14px; min-width:0}
+.conn-card{border:1px solid var(--line); border-radius:20px; padding:20px 22px; background:var(--card)}
+.conn-t{display:flex; align-items:center; gap:10px; font-size:19px; font-weight:800; letter-spacing:-.01em; line-height:1.25}
+.dot{width:9px; height:9px; border-radius:50%; background:var(--faint); flex:none}
+.dot.live{background:var(--green); box-shadow:0 0 0 4px color-mix(in srgb,var(--green) 22%,transparent)}
+.dot.busy{background:var(--orange); animation:pulse 1.2s ease-in-out infinite}
+.dot.bad{background:var(--neg)}
+@keyframes pulse{50%{opacity:.35}}
+.asof{margin:14px 0 0; display:grid; grid-template-columns:auto 1fr; gap:6px 14px; font-size:13px}
+.asof dt{color:var(--faint); font-family:var(--mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; padding-top:2px}
+.asof dd{margin:0; color:var(--ink2); font-weight:600}
+.prog{height:4px; border-radius:4px; background:var(--sunk); overflow:hidden; margin-top:16px}
+.prog i{display:block; height:100%; width:0; background:var(--accent); border-radius:4px; transition:width .3s}
+.phase{font-size:12.5px; color:var(--muted); margin:8px 0 0; min-height:1.4em}
+.conn-meta{font-size:13px; color:var(--faint); line-height:1.55; margin:0}
+.conn-actions{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.5fr); gap:10px}
+.btn{
+  font:700 15px var(--sans); border-radius:14px; height:50px; padding:0 18px;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  cursor:pointer; text-decoration:none; white-space:nowrap; transition:transform .1s, opacity .15s;
+}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:var(--card); color:var(--ink); border:1px solid var(--line2)}
+.btn.ghost:hover{background:var(--card2)}
+.btn.solid{background:var(--btn); color:var(--btn-ink); border:1px solid var(--btn)}
+.btn[disabled]{opacity:.45; cursor:progress}
+.btn[aria-disabled="true"]{opacity:.45; pointer-events:none}
+
+/* ------------------------------------------------------------ banner */
+.banner{
+  margin-top:18px; border-radius:20px; padding:18px 22px; background:var(--orange-wash);
+  border:1px solid color-mix(in srgb,var(--orange) 40%,transparent);
+  display:flex; gap:16px; align-items:flex-start; justify-content:space-between; flex-wrap:wrap;
+}
+.banner b{display:block; font-size:16px; margin-bottom:2px}
+.banner p{margin:0; color:var(--ink2); max-width:70ch}
+
+/* ------------------------------------------------------------ stat tiles */
+.tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr)); gap:12px; margin-top:22px}
+@media (max-width:640px){ .tiles{grid-template-columns:1fr 1fr} .tiles .tile:first-child{grid-column:span 2} }
+.tile{
+  border-radius:20px; padding:16px 16px 15px; background:var(--cw);
+  border:1px solid color-mix(in srgb,var(--c) 22%,var(--line));
+  display:flex; flex-direction:column; gap:3px; min-width:0;
+}
+.tile .tri{margin-bottom:10px}
+.tile .k{font-size:13px; font-weight:700; color:var(--ink2)}
+.tile .v{font-size:26px; font-weight:800; letter-spacing:-.025em; line-height:1.2; font-variant-numeric:tabular-nums}
+.tile .v.pos{color:var(--pos)} .tile .v.neg{color:var(--neg)}
+.tile .n{font-size:12.5px; color:var(--muted); line-height:1.45}
+.key{display:flex; flex-wrap:wrap; gap:6px 18px; margin:12px 2px 0; font-size:12.5px; color:var(--muted)}
+.key span{display:inline-flex; align-items:center; gap:7px}
+
+/* ------------------------------------------------------------ sections */
+.sec{margin-top:44px}
+.sec-h{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; gap:6px 16px; margin-bottom:6px}
+.sec-e{display:flex; align-items:center; gap:8px; font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ci); margin-bottom:6px}
+h2{font-size:22px; font-weight:800; letter-spacing:-.015em; line-height:1.2; margin:0; text-wrap:balance}
+.tool{font-family:var(--mono); font-size:10.5px; color:var(--faint); background:var(--card); border:1px solid var(--line); border-radius:999px; padding:3px 9px; white-space:nowrap}
+.tools{display:flex; flex-wrap:wrap; gap:5px}
+.lede{color:var(--muted); font-size:14px; margin:6px 0 14px; max-width:80ch}
+.lede b{color:var(--ink2)}
+.panel{background:var(--card); border:1px solid var(--line); border-radius:22px; box-shadow:var(--shadow); padding:18px 20px}
+.panel.flush{padding:0; overflow:hidden}
+.grid2{display:grid; gap:18px}
+.grid2>*{min-width:0}
+@media (min-width:940px){ .grid2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} }
+.caption{font-size:13px; color:var(--muted); margin:10px 2px 0; line-height:1.55; max-width:90ch}
+.caption b{color:var(--ink2)}
+
+/* states */
+.skel{border-radius:14px; background:linear-gradient(90deg,var(--sunk) 0%,var(--card2) 50%,var(--sunk) 100%); background-size:200% 100%; animation:sh 1.3s linear infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.skel.line{height:12px; border-radius:6px; margin:6px 0}
+.state{padding:26px 22px; color:var(--muted); font-size:13.5px}
+.state b{display:block; color:var(--ink2); font-size:14.5px; margin-bottom:2px}
+.state.err b{color:var(--neg)}
+.wait{display:inline-flex; align-items:center; gap:8px}
+
+/* ------------------------------------------------------------ tables */
+.tw{overflow-x:auto; -webkit-overflow-scrolling:touch}
+table{border-collapse:collapse; width:100%; font-size:13px}
+th,td{padding:10px 12px; text-align:left; border-bottom:1px solid var(--line); white-space:nowrap; vertical-align:middle}
+thead th{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--faint); font-weight:500; background:var(--card2); border-bottom:1px solid var(--line2);
+}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:var(--card2)}
+th.n,td.n{text-align:right}
+tr.me td{background:var(--accent-wash)}
+tr.me:hover td{background:color-mix(in srgb,var(--accent) 12%,var(--card))}
+tr.bm td{color:var(--muted); background:var(--card2)}
+.nm{font-weight:700; color:var(--ink)}
+.co{color:var(--muted); font-size:12px}
+.pos{color:var(--pos)} .neg{color:var(--neg)}
+.sw{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:8px; vertical-align:0}
+.tk{font-weight:800; letter-spacing:.01em}
+.sub2{display:block; color:var(--muted); font-size:11.5px; font-weight:500; max-width:260px; overflow:hidden; text-overflow:ellipsis}
+.tag{font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px; border:1px solid var(--line2); color:var(--muted); background:var(--card2)}
+.tag.NEW{color:var(--accent-ink); background:var(--accent-wash); border-color:color-mix(in srgb,var(--accent) 30%,transparent)}
+.tag.ADD{color:var(--green-ink); background:var(--green-wash); border-color:color-mix(in srgb,var(--green) 45%,transparent)}
+.tag.TRIM{color:var(--orange-ink); background:var(--orange-wash); border-color:color-mix(in srgb,var(--orange) 45%,transparent)}
+.ok{color:var(--pos); font-weight:700} .no{color:var(--neg); font-weight:700}
+.minip{font-size:11.5px; color:var(--orange-ink); font-weight:600}
+td.bar{position:relative; min-width:128px}
+td.bar i{position:absolute; right:0; top:7px; bottom:7px; border-radius:6px 0 0 6px; background:color-mix(in srgb,var(--accent) 16%,transparent)}
+td.bar span{position:relative}
+
+/* heat grid */
+.heat td{padding:0; border-bottom:1px solid var(--line)}
+.heat td.l{padding:9px 12px; font-weight:600}
+.heat .c{height:36px; display:flex; align-items:center; justify-content:center; font-size:12px; font-variant-numeric:tabular-nums; margin:3px; border-radius:8px}
+
+/* matrix */
+.mx td{padding:0 2px}
+.mx td.l{padding:9px 12px}
+.cell{height:36px; display:flex; align-items:center; justify-content:center; min-width:66px; margin:3px; border-radius:8px; font-size:12.5px; font-variant-numeric:tabular-nums; font-weight:700}
+
+/* ------------------------------------------------------------ charts */
+.chart{position:relative; width:100%}
+.chart svg{display:block; width:100%; height:auto; overflow:visible}
+.axis text{font-family:var(--mono); font-size:10.5px; fill:var(--faint)}
+.axis .ttl{font-family:var(--sans); font-size:12px; fill:var(--muted)}
+.grid line{stroke:var(--line); stroke-width:1}
+.zero{stroke:var(--line2); stroke-width:1}
+.ser{fill:none; stroke-width:2; stroke-linejoin:round; stroke-linecap:round}
+.ser.focus{stroke-width:2.75}
+.ser.bm{stroke:var(--bench); stroke-width:1.75; stroke-dasharray:5 4}
+.endlab{font-family:var(--sans); font-size:11.5px; font-weight:700; fill:var(--ink2)}
+.pdot{stroke:var(--card); stroke-width:2}
+.legend{display:flex; flex-wrap:wrap; gap:6px 16px; margin:0 0 10px; padding:0; list-style:none}
+.legend li{display:flex; align-items:center; gap:7px; font-size:12.5px; color:var(--ink2); font-weight:600}
+.legend i{width:14px; height:3px; border-radius:2px; display:block; flex:none}
+.legend i.d{background:repeating-linear-gradient(90deg,var(--bench) 0 4px,transparent 4px 7px)}
+.tip{
+  position:absolute; pointer-events:none; opacity:0; transition:opacity .1s;
+  background:var(--card); border:1px solid var(--line2); border-radius:12px;
+  box-shadow:var(--shadow); padding:9px 12px; font-size:12.5px; z-index:20; min-width:170px;
+}
+.tip.on{opacity:1}
+.tip .th{font-family:var(--mono); font-size:10.5px; color:var(--faint); letter-spacing:.06em; margin-bottom:5px; text-transform:uppercase}
+.tip .row{display:flex; align-items:center; gap:10px; justify-content:space-between; line-height:1.7}
+.tip .row .k{display:flex; align-items:center; gap:7px; color:var(--ink2)}
+.tip .row b{font-variant-numeric:tabular-nums}
+.tip i{width:8px; height:8px; border-radius:50%; flex:none}
+
+/* quotes, notes */
+.quotes{display:grid; gap:12px; margin-top:16px}
+@media (min-width:820px){ .quotes{grid-template-columns:1fr 1fr} }
+.qc{border:1px solid var(--line); border-radius:18px; padding:14px 16px; background:var(--card); font-size:13.5px; line-height:1.6}
+.qc.sum{background:var(--accent-wash); border-color:color-mix(in srgb,var(--accent) 22%,var(--line))}
+.qh{font-family:var(--mono); font-size:10.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--faint); margin-bottom:6px; display:flex; flex-wrap:wrap; gap:4px 10px}
+.qh b{color:var(--accent-ink); font-weight:500}
+.qc q{color:var(--ink2)}
+.qc q::before{content:"\201C"} .qc q::after{content:"\201D"}
+.qs{margin-top:8px; color:var(--muted); font-size:12.5px}
+.fees td{white-space:normal; vertical-align:top}
+.fees .fq{color:var(--muted); font-size:12px; margin-top:3px; max-width:62ch; line-height:1.5}
+.notes{display:grid; gap:12px}
+@media (min-width:820px){ .notes{grid-template-columns:1fr 1fr} }
+.note{border:1px solid var(--line); border-radius:18px; padding:14px 16px; background:var(--card); font-size:13.5px; line-height:1.6}
+.note h3{font-size:14px; font-weight:800; margin:0 0 6px; display:flex; align-items:center; gap:8px}
+.note code{font-family:var(--mono); font-size:11.5px; background:var(--sunk); padding:1px 5px; border-radius:5px}
+.note ul{margin:6px 0 0; padding-left:18px}
+.note li{margin:2px 0}
+.foot{font-size:12.5px; color:var(--faint); margin:16px 2px 0; line-height:1.6}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:6px}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+@media (prefers-reduced-motion:reduce){ *{transition:none!important; animation:none!important} }
+</style>
+
+<div class="page">
+
+  <header class="hero">
+    <div class="bars" id="bars" aria-hidden="true"></div>
+    <div class="bars-cap" id="bars-cap"></div>
+    <div class="hero-body">
+      <div>
+        <p class="eyebrow">Institutional holdings · live from FocusAlpha</p>
+        <h1 id="h-name"><span class="pre">Sample:</span> Lone Pine Capital</h1>
+        <div class="ids" id="h-ids"></div>
+        <p class="sub" id="h-sub">A sample of what FocusAlpha can build: Lone Pine&rsquo;s filed 13F
+          holdings, the Form ADV profile behind them, and a replicating portfolio traded only on what
+          had actually been filed &mdash; pulled live each time the page opens and set against five
+          Tiger-lineage peers. Use it as a template: search below to swap in any fund you follow.</p>
+        <div class="pills" id="h-pills"></div>
+        <div class="switch">
+          <span class="switch-l" id="focus-l">Focus manager</span>
+          <div class="chips" id="chips" role="group" aria-labelledby="focus-l"></div>
+          <div class="search">
+            <label class="sr" for="q">Search for any 13F filer to swap in</label>
+            <input id="q" type="search" autocomplete="off" placeholder="Swap in any fund — search by name">
+            <div class="results" id="q-res" hidden></div>
+          </div>
+        </div>
+      </div>
+      <aside class="conn" aria-live="polite">
+        <div class="conn-card">
+          <div class="conn-t"><span class="dot" id="c-dot"></span><span id="c-title">Connecting to FocusAlpha…</span></div>
+          <dl class="asof" id="c-asof"></dl>
+          <div class="prog"><i id="c-prog"></i></div>
+          <p class="phase" id="c-phase"></p>
+        </div>
+        <p class="conn-meta">Reads FocusAlpha with your own connector access &mdash; every figure is
+          public filing or market data, and none of it is investment advice.</p>
+        <div class="conn-actions">
+          <a class="btn ghost" id="b-sec" href="https://adviserinfo.sec.gov/" target="_blank" rel="noopener">SEC profile</a>
+          <button class="btn solid" id="b-refresh" type="button">Refresh data</button>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <div class="banner" id="banner" hidden></div>
+
+  <div class="tiles" id="tiles"></div>
+  <div class="key">
+    <span class="src-adv"><span class="tri sm"><i></i><i></i><i></i></span>Form ADV (what the firm reports)</span>
+    <span class="src-13f"><span class="tri sm"><i></i><i></i><i></i></span>13F filings (what it holds)</span>
+    <span class="src-px"><span class="tri sm"><i></i><i></i><i></i></span>Replicating portfolio (daily prices)</span>
+  </div>
+
+  <!-- peers -->
+  <section class="sec src-13f">
+    <div class="sec-h">
+      <div><div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>Peer set</div>
+        <h2>Six managers, one lineage</h2></div>
+      <div class="tools"><span class="tool">get_institution_profile</span><span class="tool">get_institutional_holdings</span><span class="tool">get_market_data</span></div>
+    </div>
+    <p class="lede">Size and headcount from Form ADV Part 1; portfolio shape from the filed 13F
+      books; return, beta and alpha from one shared replication against the
+      <b>S&amp;P 500 Total Return</b>. Ranked by excess return once every book is priced.</p>
+    <div class="panel flush"><div class="tw" id="peers"></div></div>
+    <p class="caption" id="peers-note"></p>
+  </section>
+
+  <!-- declared vs revealed -->
+  <section class="sec src-adv">
+    <div class="sec-h">
+      <div><div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>Form ADV Part 2A × 13F</div>
+        <h2>What they say, against what they hold</h2></div>
+      <div class="tools"><span class="tool">get_institution_profile</span></div>
+    </div>
+    <p class="lede">The Part 2A brochure is the only place a manager describes, in its own words,
+      how it invests. A 13F says nothing about intent, only exposure. <b>Read together they can
+      disagree</b> &mdash; a firm can describe a blend mandate and run a book whose multiples read
+      as growth.</p>
+    <div class="panel flush"><div class="tw" id="dvr"></div></div>
+    <p class="caption" id="dvr-note"></p>
+    <div class="quotes" id="quotes"></div>
+  </section>
+
+  <section class="sec src-adv">
+    <div class="sec-h">
+      <div><div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>Form ADV Part 2A · Item 5</div>
+        <h2 id="fees-h">What the funds charge</h2></div>
+      <div class="tools"><span class="tool">get_institution_profile</span></div>
+    </div>
+    <p class="lede">The fee schedule as the brochure prints it. The parsed rate is for scanning;
+      <b>where it and the sentence disagree, the sentence wins</b>.</p>
+    <div class="panel flush"><div class="tw" id="fees"></div></div>
+  </section>
+
+  <!-- backtest -->
+  <section class="sec src-px">
+    <div class="sec-h">
+      <div><div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>Replicating portfolio</div>
+        <h2>Trading only on what had been filed</h2></div>
+      <div class="tools"><span class="tool">get_market_data</span><span class="tool">get_benchmark_prices</span></div>
+    </div>
+    <p class="lede">Each book is bought at the <b>close of the first trading day after its 13F
+      appeared on EDGAR</b> and held until the next filing &mdash; buying at quarter-end would use
+      information nobody had yet. Long US-listed equity only: no shorts, options or non-US listings,
+      so this is not the fund's own performance.</p>
+    <div class="panel">
+      <ul class="legend" id="lg-curve"></ul>
+      <div class="chart" id="c-curve"><div class="tip" id="t-curve"></div></div>
+    </div>
+    <p class="caption" id="curve-note"></p>
+  </section>
+
+  <section class="sec">
+    <div class="grid2">
+      <div class="src-px">
+        <div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>Risk-adjusted</div>
+        <h2>How much of the return is just beta</h2>
+        <p class="lede">Beta against the index, and annualised Jensen alpha (risk-free at zero).
+          <b>Upper right is money made picking stocks</b>; lower right is a rise bought with
+          market exposure.</p>
+        <div class="panel"><div class="chart" id="c-scatter"><div class="tip" id="t-scatter"></div></div></div>
+      </div>
+      <div class="src-px">
+        <div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>Attribution</div>
+        <h2 id="contrib-h">What carried the book, and what cost it</h2>
+        <p class="lede">Each name's contribution to the replicating portfolio &mdash; weight times
+          its move while held, summed across holding periods.</p>
+        <div class="panel"><div class="chart" id="c-contrib"><div class="tip" id="t-contrib"></div></div></div>
+        <p class="caption" id="hit"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec src-px">
+    <div class="sec-h">
+      <div><div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>Per filing</div>
+        <h2>Excess return, holding period by holding period</h2></div>
+    </div>
+    <p class="lede">One cell per filed book, from the day it was bought to the day it was replaced,
+      against the index over the same days. A consistent sign says more than any one big period.</p>
+    <div class="panel flush"><div class="tw" id="mx"></div></div>
+  </section>
+
+  <!-- current book -->
+  <section class="sec src-13f">
+    <div class="sec-h">
+      <div><div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>Latest 13F-HR</div>
+        <h2 id="book-h">The current book</h2></div>
+      <div class="tools"><span class="tool">get_institutional_holdings</span><span class="tool">search_companies</span></div>
+    </div>
+    <p class="lede" id="book-lede"></p>
+    <div class="panel flush"><div class="tw" id="book"></div></div>
+    <p class="caption" id="exits"></p>
+  </section>
+
+  <section class="sec src-13f">
+    <div class="sec-h">
+      <div><div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>Sector weights</div>
+        <h2>Where the weight moved</h2></div>
+      <div class="tools"><span class="tool">search_companies</span></div>
+    </div>
+    <p class="lede">Share of the filed book by sector, quarter by quarter. Sectors come from the
+      FocusAlpha company registry; <b>unresolved</b> is holdings it could not match to a company.</p>
+    <div class="panel flush"><div class="tw" id="sectors"></div></div>
+  </section>
+
+  <section class="sec src-13f">
+    <div class="sec-h">
+      <div><div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>13F history</div>
+        <h2>Filed US equity, quarter by quarter</h2></div>
+      <div class="tools"><span class="tool">get_institutional_holdings</span></div>
+    </div>
+    <p class="lede"><b>This is not AUM</b> &mdash; only the slice a 13F requires: long US-listed
+      equity. A falling line can be drawdown or a move into assets the form doesn't cover, and the
+      filing can't tell the two apart.</p>
+    <div class="panel">
+      <ul class="legend" id="lg-hist"></ul>
+      <div class="chart" id="c-hist"><div class="tip" id="t-hist"></div></div>
+    </div>
+  </section>
+
+  <section class="sec src-13f">
+    <div class="sec-h">
+      <div><div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>Tenure</div>
+        <h2 id="ten-h">Held the longest</h2></div>
+    </div>
+    <p class="lede" id="ten-lede">The positions carried through the most quarters in the filings
+      FocusAlpha holds, with the largest weight each reached.</p>
+    <div class="panel flush"><div class="tw" id="tenure"></div></div>
+  </section>
+
+  <section class="sec src-adv">
+    <div class="sec-h">
+      <div><div class="sec-e"><span class="tri sm"><i></i><i></i><i></i></span>Provenance</div>
+        <h2>Sources and method</h2></div>
+    </div>
+    <div class="notes" id="notes"></div>
+    <p class="foot" id="foot"></p>
+  </section>
+
+</div>
+<script>
+(function(){
+"use strict";
+
+/* ================================================================== config */
+const SERVER = 'FocusAlpha';
+const T = {
+  profile:'get_institution_profile', holdings:'get_institutional_holdings',
+  prices:'get_market_data', bench:'get_benchmark_prices',
+  company:'search_companies', inst:'search_institutions'
+};
+const BENCH = {symbol:'^SP500TR', name:'S&P 500 Total Return', short:'S&P 500 TR'};
+const DATA_START = '2025-07-14';            // first day get_market_data holds
+const PEERS = [
+  {slug:'lone_pine',    name:'Lone Pine Capital',       short:'Lone Pine',  cik:'1061165', crd:'156602'},
+  {slug:'tiger_global', name:'Tiger Global Management', short:'Tiger',      cik:'1167483', crd:'160318'},
+  {slug:'viking',       name:'Viking Global Investors', short:'Viking',     cik:'1103804', crd:'132272'},
+  {slug:'coatue',       name:'Coatue Management',       short:'Coatue',     cik:'1135730', crd:'157910'},
+  {slug:'maverick',     name:'Maverick Capital',        short:'Maverick',   cik:'934639',  crd:'108262'},
+  {slug:'whale_rock',   name:'Whale Rock Capital',      short:'Whale Rock', cik:'1387322', crd:'140746'}
+];
+const PEER_CUT = {cum:0.95, max:60};         // peers: price the names that make up 95% of the book, at most 60
+const NOW = new Date();
+const iso = d => d.toISOString().slice(0,10);
+const monthStart = n => iso(new Date(Date.UTC(NOW.getUTCFullYear(), NOW.getUTCMonth()-n, 1)));
+const PRICE_START = (()=>{ const s = monthStart(15); return s < DATA_START ? DATA_START : s; })();
+const HOLD_START = monthStart(27);
+
+/* ================================================================== helpers */
+const $ = id => document.getElementById(id);
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ok = x => x!=null && isFinite(x);
+const pct  = (x,d=1) => ok(x) ? (x*100).toFixed(d)+'%' : '—';
+const spct = (x,d=1) => ok(x) ? (x>=0?'+':'−')+Math.abs(x*100).toFixed(d)+'%' : '—';
+const num  = (x,d=2) => ok(x) ? (+x).toFixed(d) : '—';
+const sgn  = x => !ok(x) ? '' : x>0 ? 'pos' : x<0 ? 'neg' : '';
+const usd  = x => !ok(x) ? '—' : Math.abs(x)>=1e12 ? '$'+(x/1e12).toFixed(2)+'T'
+  : Math.abs(x)>=1e9 ? '$'+(x/1e9).toFixed(1)+'B' : Math.abs(x)>=1e6 ? '$'+(x/1e6).toFixed(0)+'M'
+  : Math.abs(x)>=1e3 ? '$'+(x/1e3).toFixed(0)+'K' : '$'+Math.round(x);
+const intf = x => ok(x) ? Math.round(x).toLocaleString('en-US') : '—';
+const MON = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fdate = d => { if(!d) return '—'; const s=String(d).slice(0,10); const [y,m,dd]=s.split('-'); return `${MON[+m-1]} ${+dd}, ${y}`; };
+const fshort = d => { if(!d) return ''; const s=String(d).slice(0,10); const [y,m]=s.split('-'); return `${MON[+m-1]} ’${y.slice(2)}`; };
+const qlab = p => { if(!p) return '—'; const [y,m]=p.split('-'); return `Q${Math.ceil(+m/3)} ${y}`; };
+const qshort = p => { if(!p) return ''; const [y,m]=p.split('-'); return `Q${Math.ceil(+m/3)} ’${y.slice(2)}`; };
+const col = v => 'var('+v+')';
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
+const uniq = a => [...new Set(a)];
+function ago(ms){
+  if(!ms) return '—';
+  const s = (Date.now()-ms)/1000;
+  if(s<60) return 'just now';
+  if(s<3600) return Math.round(s/60)+' min ago';
+  if(s<86400) return Math.round(s/3600)+' h ago';
+  return fdate(iso(new Date(ms)));
+}
+const SMALL = new Set(['and','of','the','for','in','on','at','to']);
+const KEEP = new Set(['LLC','LP','L.P.','II','III','USA','US','AG','NV','N.V.','PLC','SA','ETF','ADR','REIT','AI']);
+function titleCase(s){
+  if(!s) return '';
+  return String(s).toLowerCase().split(/\s+/).map((w,i)=>{
+    const up = w.toUpperCase();
+    if(KEEP.has(up)) return up;
+    if(i>0 && SMALL.has(w)) return w;
+    return w.charAt(0).toUpperCase()+w.slice(1);
+  }).join(' ');
+}
+function niceFirm(s){
+  return titleCase(s).replace(/,?\s+(LLC|L\.?P\.?|Inc\.?|Ltd\.?|Co\.?|Corp\.?|Limited)$/i,'')
+                     .replace(/,?\s+(LLC|L\.?P\.?)$/i,'').trim();
+}
+const shortFirm = s => { const w = niceFirm(s).split(' ').filter(x=>!/^(capital|management|investors|partners|advisors|advisers|group|global|asset|investment|investments)$/i.test(x)); return (w.slice(0,2).join(' ') || niceFirm(s).split(' ')[0]); };
+
+/* per-viewer cache (convenience only — the page works without it) */
+const store = {
+  get(k){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; }catch(e){ return null; } },
+  set(k,v){
+    try{ localStorage.setItem(k, JSON.stringify(v)); }
+    catch(e){
+      try{ Object.keys(localStorage).filter(x=>x.startsWith('fa:bt:')).forEach(x=>localStorage.removeItem(x));
+           localStorage.setItem(k, JSON.stringify(v)); }catch(e2){}
+    }
+  },
+  drop(prefix, keep){ try{ Object.keys(localStorage).filter(x=>x.startsWith(prefix) && x!==keep).forEach(x=>localStorage.removeItem(x)); }catch(e){} },
+  raw(k,v){ try{ if(v===undefined) return localStorage.getItem(k); localStorage.setItem(k,v); }catch(e){ return null; } }
+};
+
+/* ================================================================== state */
+function mkFund(m, slot, custom){
+  return Object.assign({}, m, {slot, color:'--s'+(slot+1), custom:!!custom,
+    prof:null, profErr:null, profAt:0, qs:null, holdErr:null, holdAt:0, truncated:false,
+    bt:null, btErr:null, btProg:null, btFull:false});
+}
+const S = {
+  mcp:null, mcpState:'connecting', pageErr:null, loading:false, phase:'',
+  focus:'lone_pine', funds:PEERS.map((p,i)=>mkFund(p,i,false)),
+  bench:null, benchErr:null, benchAt:0,
+  calls:{q:0, d:0, err:0, by:{}}, run:0, repairs:0
+};
+const fundBy = slug => S.funds.find(f=>f.slug===slug);
+const focusFund = () => fundBy(S.focus) || S.funds[0];
+
+/* ================================================================== MCP layer */
+const AUTHZ = new Set(['server_not_connected','needs_reauth','selection_required','not_in_manifest',
+  'blocked_by_policy','approval_required','consent_required','not_granted','capability_disabled',
+  'capability_removed','server_not_found','no_mcp','user_changed']);
+function normErr(e){
+  if(e && typeof e==='object' && e.code) return e;
+  return {code:'upstream_error', message: e && e.message ? e.message : String(e||'')};
+}
+function errCopy(e){
+  const c = e && e.code, m = (e && e.message) || '';
+  switch(c){
+    case 'no_mcp': return ['Live data needs claude.ai','This view can’t reach your connectors. Open the page in claude.ai with the FocusAlpha connector added to load filings and prices.'];
+    case 'not_granted': case 'capability_disabled': case 'capability_removed': case 'transform_error':
+      return ['This view can’t reach connectors','Open the page in claude.ai to load live FocusAlpha data.'];
+    case 'server_not_connected': return ['FocusAlpha isn’t connected','Add FocusAlpha in claude.ai Settings → Connectors, then reload this page.'];
+    case 'needs_reauth': return ['Reconnect FocusAlpha','Your FocusAlpha connection has lapsed. Reconnect it in claude.ai Settings → Connectors, then reload.'];
+    case 'selection_required': return ['Choose a FocusAlpha connection','You have more than one FocusAlpha connector. Pick one when claude.ai asks, then reload.'];
+    case 'not_in_manifest': return ['FocusAlpha is off for this page','FocusAlpha was declined or turned off for this page. Allow it in the page’s connector settings, then reload.'];
+    case 'consent_required': return ['Allow FocusAlpha for this page','The page hasn’t been allowed to use FocusAlpha yet. Allow it, then press Refresh data.'];
+    case 'blocked_by_policy': return ['Blocked by your organization','Your organization’s policy blocks this FocusAlpha tool for your account.'];
+    case 'approval_required': return ['Needs per-call approval','Your organization requires approval for each FocusAlpha call, which a page can’t request yet.'];
+    case 'server_unavailable': case 'rate_limited': return ['FocusAlpha didn’t answer','The service is busy or unreachable right now. Press Refresh data in a minute.'];
+    case 'server_not_found': return ['Connector not found','That FocusAlpha connector no longer exists. Re-add it in claude.ai Settings → Connectors.'];
+    case 'user_changed': return ['Signed-in account changed','Reload the page.'];
+    case 'tool_error': return ['FocusAlpha returned an error', m || 'The tool reported a failure.'];
+    case 'empty': return ['Nothing to show', m];
+    default: return ['Couldn’t load this', m || 'The connector returned an unexpected error.'];
+  }
+}
+
+/* priority pool: filings first, then the focus book's prices, then peers, then sectors */
+const Q = {items:[], active:0, max:6, seq:0};
+function enqueue(pri, fn){
+  return new Promise((res,rej)=>{
+    Q.items.push({pri, fn, res, rej, seq:Q.seq++});
+    Q.items.sort((a,b)=>a.pri-b.pri || a.seq-b.seq);
+    pump();
+  });
+}
+function pump(){
+  while(Q.active<Q.max && Q.items.length){
+    const it = Q.items.shift(); Q.active++;
+    Promise.resolve().then(it.fn).then(it.res, it.rej).finally(()=>{ Q.active--; pump(); });
+  }
+}
+function payloadOf(r){
+  let p = r && r.payload !== undefined ? r.payload : r;
+  if(typeof p === 'string'){ try{ p = JSON.parse(p); }catch(e){} }
+  return p;
+}
+function call(tool, input, {force=false, pri=5}={}){
+  S.calls.q++; S.calls.by[tool] = (S.calls.by[tool]||0)+1;
+  const opts = {cache: force ? {staleTime:0, gcTime:86400000, refresh:true} : {staleTime:300000, gcTime:86400000}};
+  return enqueue(pri, async ()=>{
+    let r;
+    try{ r = await S.mcp.callTool(SERVER, tool, input, opts); }
+    catch(e0){
+      const e = normErr(e0);
+      if(e.retryable){
+        await sleep(Math.min(ok(e.retryAfterMs) ? e.retryAfterMs : 700+Math.random()*1300, 60000));
+        r = await S.mcp.callTool(SERVER, tool, input, opts);
+      } else throw e;
+    }
+    return {data:payloadOf(r), at:(r && r.cache && r.cache.storedAt) || Date.now()};
+  }).then(v=>{ S.calls.d++; renderSoon(); return v; },
+          e=>{ S.calls.d++; S.calls.err++; renderSoon(); throw normErr(e); });
+}
+
+/* ================================================================== loaders */
+async function loadBench(force, gen){
+  try{
+    let rows=[], cursor=null, page=0, at=0;
+    do{
+      const inp = {symbol:BENCH.symbol, date_gte:PRICE_START, limit:1000};
+      if(cursor) inp.cursor = cursor;
+      const r = await call(T.bench, inp, {force, pri:0});
+      at = at || r.at;
+      const d = (r.data && r.data.data) || [];
+      rows = rows.concat(d); cursor = r.data && r.data.next_cursor; page++;
+      if(!d.length || d[d.length-1].date <= PRICE_START) break;
+    } while(cursor && page<4);
+    if(gen!==S.run) return;
+    const m = new Map();
+    rows.forEach(x=>{ const v = +(x.close_major!=null ? x.close_major : x.close); if(x && x.date && v>0) m.set(String(x.date).slice(0,10), v); });
+    const dates = [...m.keys()].sort();
+    if(dates.length<20) throw {code:'empty', message:'The benchmark series came back empty.'};
+    S.bench = {dates, vals:dates.map(d=>m.get(d)), at};
+    S.benchErr = null; S.benchAt = at;
+  }catch(e){
+    if(gen===S.run) S.benchErr = normErr(e);
+    throw e;
+  }finally{ renderSoon(); }
+}
+
+async function loadProfile(f, force, gen){
+  try{
+    const r = await call(T.profile, {id: f.crd ? 'crd:'+f.crd : 'cik:'+f.cik}, {force, pri:0});
+    if(gen!==S.run) return;
+    const d = r.data && (r.data.data || r.data);
+    if(!d || typeof d!=='object' || (!d.crd && !d.legal_name)) throw {code:'empty', message:'No adviser profile came back for this firm.'};
+    f.prof = d; f.profAt = r.at; f.profErr = null;
+    if(f.custom){
+      f.name = niceFirm(d.business_name || d.legal_name || f.name);
+      f.short = shortFirm(d.business_name || d.legal_name || f.name);
+      if(!f.crd && d.crd) f.crd = String(d.crd);
+    }
+  }catch(e){
+    if(gen===S.run) f.profErr = normErr(e);
+    throw e;
+  }finally{ renderSoon(); }
+}
+
+async function loadHoldings(f, force, gen){
+  try{
+    const lim = 5000;
+    const r = await call(T.holdings, {filer_cik:f.cik, report_period_gte:HOLD_START, limit:lim}, {force, pri:0});
+    if(gen!==S.run) return;
+    const rows = (r.data && (r.data.institutional_holdings || r.data.data)) || [];
+    const qs = buildQuarters(rows);
+    if(!qs.length) throw {code:'empty', message:`No 13F-HR filings since ${fdate(HOLD_START)}.`};
+    f.qs = qs; f.holdAt = r.at; f.holdErr = null; f.truncated = rows.length>=lim;
+  }catch(e){
+    if(gen===S.run) f.holdErr = normErr(e);
+    throw e;
+  }finally{ renderSoon(); }
+}
+
+/* ================================================================== 13F books */
+function buildQuarters(rows){
+  const byP = new Map();
+  for(const r of rows){
+    if(!r || !r.report_period) continue;
+    const p = String(r.report_period).slice(0,10);
+    if(!byP.has(p)) byP.set(p, []);
+    byP.get(p).push(r);
+  }
+  const out = [];
+  for(const [p, rs] of byP){
+    const byAcc = new Map();
+    for(const r of rs){ const k = r.accession_number || '?'; if(!byAcc.has(k)) byAcc.set(k, []); byAcc.get(k).push(r); }
+    const accs = [...byAcc.entries()].map(([acc,list])=>({acc, list, form:String(list[0].form_type||''),
+      f:list.reduce((m,x)=>x.filing_date && String(x.filing_date).slice(0,10)<m ? String(x.filing_date).slice(0,10) : m, '9999-12-31')}));
+    // the original 13F-HR decides the book and the trade date; amendments stand in only when no original exists
+    let pick = accs.filter(a=>a.form==='13F-HR').sort((a,b)=>a.f<b.f?-1:1)[0];
+    if(!pick) pick = accs.sort((a,b)=>a.f<b.f?1:-1)[0];
+    const pos = new Map();
+    for(const r of pick.list){
+      if(r.put_call) continue;
+      if(r.share_type && r.share_type!=='SH') continue;
+      const v = +r.value_usd; if(!(v>0)) continue;
+      const k = r.cusip || r.ticker || r.name_of_issuer;
+      let e = pos.get(k);
+      if(!e){ e = {k, cusip:r.cusip||null, ticker:r.ticker ? String(r.ticker).toUpperCase() : null,
+                   issuer:r.name_of_issuer||'', cls:r.title_of_class||'', shares:0, value:0}; pos.set(k, e); }
+      e.shares += +r.shares || 0; e.value += v;
+    }
+    const list = [...pos.values()];
+    const total = list.reduce((s,x)=>s+x.value, 0);
+    if(!(total>0)) continue;
+    list.forEach(x=>x.w = x.value/total);
+    list.sort((a,b)=>b.value-a.value);
+    out.push({p, f:pick.f, acc:pick.acc, form:pick.form, amended:accs.length>1, pos:list, total, n:list.length});
+  }
+  out.sort((a,b)=>a.p<b.p?-1:1);
+  out.forEach((q,i)=>{
+    q.top10 = q.pos.slice(0,10).reduce((s,x)=>s+x.w, 0);
+    q.effN = 1/q.pos.reduce((s,x)=>s+x.w*x.w, 0);
+    q.turn = null;
+    if(i>0){
+      const prev = new Map(out[i-1].pos.map(x=>[x.k,x.w])), cur = new Map(q.pos.map(x=>[x.k,x.w]));
+      let t = 0; new Set([...prev.keys(), ...cur.keys()]).forEach(k=>{ t += Math.abs((cur.get(k)||0)-(prev.get(k)||0)); });
+      q.turn = t/2;
+    }
+  });
+  return out;
+}
+function actionOf(x, p){
+  if(!p) return 'NEW';
+  if(!(p.shares>0)) return 'HOLD';
+  const c = x.shares/p.shares - 1;
+  return c>0.02 ? 'ADD' : c<-0.02 ? 'TRIM' : 'HOLD';
+}
+
+/* ================================================================== prices */
+const PX = new Map();                // ticker -> Promise<series|null>
+function getPrice(t, pri){
+  if(PX.has(t)) return PX.get(t);
+  const want = uniq([t, t.replace(/[./]/g,'-'), t.replace(/[./ ]/g,'')]);
+  const p = (async ()=>{
+    let rows=[], cursor=null, page=0;
+    do{
+      const inp = {company:t, date_gte:PRICE_START, limit:1000};
+      if(cursor) inp.cursor = cursor;
+      let r;
+      try{ r = await call(T.prices, inp, {pri}); }
+      catch(e){ if(AUTHZ.has(e.code)) throw e; if(page===0) throw e; break; }
+      const d = (r.data && r.data.data) || [];
+      rows = rows.concat(d); cursor = r.data && r.data.next_cursor; page++;
+      if(!d.length) break;
+      const mine = d.filter(x=>want.includes(String(x.symbol||'').toUpperCase()));
+      const oldest = (mine.length ? mine : d)[(mine.length ? mine : d).length-1].date;
+      if(String(oldest).slice(0,10) <= PRICE_START) break;
+    } while(cursor && page<5);
+    return buildSeries(rows, want);
+  })().catch(e=>{ PX.delete(t); if(AUTHZ.has(e.code)) throw e; return null; });
+  PX.set(t, p);
+  return p;
+}
+function buildSeries(rows, want){
+  let mine = null;
+  for(const w of want){ const m = rows.filter(x=>String(x.symbol||'').toUpperCase()===w); if(m.length){ mine = m; break; } }
+  if(!mine){
+    const by = {};
+    rows.forEach(x=>{ if(x.currency==='USD'){ (by[x.symbol] = by[x.symbol] || []).push(x); } });
+    const syms = Object.keys(by);
+    if(syms.length===1) mine = by[syms[0]];
+  }
+  if(!mine || mine.length<2) return null;
+  const m = new Map();
+  mine.forEach(x=>{ const d = String(x.date).slice(0,10); if(!m.has(d)) m.set(d, x); });
+  const ds = [...m.keys()].sort();
+  const dates=[], idx=[]; let I = 1, repairs = 0, prev = null;
+  for(const d of ds){
+    const x = m.get(d);
+    const a = +(x.adj_close!=null ? x.adj_close : x.close), c = +x.close;
+    if(!(a>0) && !(c>0)) continue;
+    if(prev){
+      let r = (a>0 && prev.a>0) ? a/prev.a-1 : NaN;
+      const rc = (c>0 && prev.c>0) ? c/prev.c-1 : NaN;
+      if(!isFinite(r)) r = isFinite(rc) ? rc : 0;
+      // a vendor adjustment glitch shows up as an impossible adjusted move that the raw close doesn't share
+      if((r>1.5 || r<-0.75) && isFinite(rc) && Math.abs(r-rc)>0.5){ r = rc; repairs++; }
+      I *= 1+r;
+    }
+    dates.push(d); idx.push(I); prev = {a, c};
+  }
+  if(dates.length<2) return null;
+  return {sym:mine[0].symbol, dates, idx, repairs};
+}
+function align(s, D){
+  const out = new Array(D.length).fill(null); let j=0, last=null;
+  for(let i=0;i<D.length;i++){
+    while(j<s.dates.length && s.dates[j]<=D[i]){ last = s.idx[j]; j++; }
+    out[i] = last;
+  }
+  return out;
+}
+
+/* ================================================================== replication */
+function planBooks(f, full){
+  const D = S.bench.dates, N = D.length;
+  const firstAfter = fd => { for(let i=0;i<N;i++) if(D[i]>fd) return i; return -1; };
+  const bs = f.qs.map(q=>({q, from:firstAfter(q.f)})).filter(b=>b.from>=0).sort((a,b)=>a.from-b.from || (a.q.p<b.q.p?-1:1));
+  let startK = -1; bs.forEach((b,k)=>{ if(b.from===0) startK = k; });
+  const act = startK>=0 ? bs.slice(startK) : bs;
+  const segs = [];
+  act.forEach((b,k)=>{
+    const i1 = k+1<act.length ? act[k+1].from : N-1;
+    if(i1>b.from){
+      const inc = full ? b.q.pos.filter(x=>x.ticker) : cut(b.q.pos);
+      segs.push({q:b.q, i0:b.from, i1, inc});
+    }
+  });
+  return segs;
+}
+function cut(pos){
+  const out=[]; let c=0;
+  for(const x of pos){ if(c>=PEER_CUT.cum || out.length>=PEER_CUT.max) break; if(x.ticker) out.push(x); c += x.w; }
+  return out;
+}
+const mean = a => a.reduce((s,x)=>s+x,0)/a.length;
+function sd(a){ const m = mean(a); return Math.sqrt(a.reduce((s,x)=>s+(x-m)*(x-m),0)/(a.length-1)); }
+function cov(a,b){ const ma=mean(a), mb=mean(b); let s=0; for(let i=0;i<a.length;i++) s+=(a[i]-ma)*(b[i]-mb); return s/(a.length-1); }
+
+function computeBacktest(plan, series){
+  const D = S.bench.dates, B = S.bench.vals, N = D.length;
+  const nav = new Array(N).fill(null);
+  let base = 1, first = null, repairs = 0; const per = [], con = new Map(), usedSeries = new Set();
+  for(const s of plan){
+    const legs = []; let tv = 0;
+    for(const x of s.inc){
+      const px = series.get(x.ticker);
+      if(!px || !(px.a[s.i0]>0)) continue;
+      legs.push({x, px:px.a}); tv += x.value;
+      if(!usedSeries.has(x.ticker)){ usedSeries.add(x.ticker); repairs += px.repairs||0; }
+    }
+    if(first==null) first = s.i0;
+    if(!legs.length){
+      for(let t=s.i0;t<=s.i1;t++) nav[t] = base;
+      per.push({p:s.q.p, f:s.q.f, d0:D[s.i0], d1:D[s.i1], n:0, cov:0, r:null, b:B[s.i1]/B[s.i0]-1, e:null});
+      continue;
+    }
+    legs.forEach(l=>l.w = l.x.value/tv);
+    for(let t=s.i0;t<=s.i1;t++){
+      let v = 0; for(const l of legs) v += l.w * (l.px[t]!=null ? l.px[t] : l.px[s.i0]) / l.px[s.i0];
+      nav[t] = base*v;
+    }
+    const r = nav[s.i1]/base - 1, b = B[s.i1]/B[s.i0] - 1;
+    per.push({p:s.q.p, f:s.q.f, d0:D[s.i0], d1:D[s.i1], n:legs.length, cov:tv/s.q.total, r, b, e:r-b});
+    for(const l of legs){
+      const c = l.w*(l.px[s.i1]/l.px[s.i0]-1);
+      const e = con.get(l.x.ticker) || {t:l.x.ticker, issuer:l.x.issuer, c:0, q:0};
+      e.c += c; e.q++; con.set(l.x.ticker, e);
+    }
+    base = nav[s.i1];
+  }
+  if(first==null) return null;
+  const pr=[], br=[];
+  for(let t=first+1;t<N;t++){ if(nav[t-1]>0 && nav[t]>0){ pr.push(nav[t]/nav[t-1]-1); br.push(B[t]/B[t-1]-1); } }
+  if(pr.length<10) return null;
+  const n = pr.length, ret = nav[N-1]/nav[first]-1, bret = B[N-1]/B[first]-1;
+  const vol = sd(pr)*Math.sqrt(252), beta = cov(pr,br)/cov(br,br);
+  const alpha = (mean(pr)-beta*mean(br))*252;
+  const ex = pr.map((x,i)=>x-br[i]); const te = sd(ex)*Math.sqrt(252);
+  let peak = -Infinity, mdd = 0;
+  for(let t=first;t<N;t++){ const v = nav[t]; if(v>peak) peak = v; mdd = Math.min(mdd, v/peak-1); }
+  const valid = per.filter(p=>p.e!=null);
+  const cs = [...con.values()].sort((a,b)=>b.c-a.c);
+  return {
+    curve: nav.map(v=>v==null ? null : +(v/nav[first]).toFixed(5)),
+    first, d0:D[first], d1:D[N-1], ret, bret, excess:ret-bret,
+    ann: Math.pow(1+ret, 252/n)-1, vol, sharpe: mean(pr)*252/vol, beta, alpha, te, ir: mean(ex)*252/te,
+    maxdd: mdd, win: pr.filter((x,i)=>x>br[i]).length/n,
+    hit: valid.length ? valid.filter(p=>p.e>0).length/valid.length : null, nper: valid.length,
+    per, top: cs.filter(x=>x.c>0).slice(0,6), bot: cs.filter(x=>x.c<0).reverse().slice(0,6),
+    cov: per.length ? mean(per.map(p=>p.cov)) : null, repairs, names: usedSeries.size
+  };
+}
+
+async function runBacktest(f, full, gen, force, pri){
+  if(!f.qs || !S.bench){
+    f.btErr = f.holdErr || S.benchErr || {code:'empty', message:'No filings or prices to replicate.'};
+    renderSoon(); return;
+  }
+  const key = ['fa:bt:v2', f.cik, f.qs[f.qs.length-1].acc, PRICE_START, S.bench.dates[S.bench.dates.length-1], full?1:0].join(':');
+  if(!force){
+    const c = store.get(key);
+    if(c && c.curve && c.curve.length===S.bench.dates.length){ f.bt = c; f.btFull = full; f.btErr = null; renderSoon(); return; }
+  }
+  const plan = planBooks(f, full);
+  if(!plan.length){ f.btErr = {code:'empty', message:'No 13F book was public during the price window.'}; renderSoon(); return; }
+  const ticks = uniq(plan.flatMap(s=>s.inc.map(x=>x.ticker)));
+  f.btProg = {done:0, total:ticks.length}; f.btErr = null; renderSoon();
+  const series = new Map();
+  await Promise.all(ticks.map(t=>getPrice(t, pri).then(s=>{ if(s) series.set(t, {a:align(s, S.bench.dates), repairs:s.repairs}); })
+    .finally(()=>{ if(f.btProg) f.btProg.done++; renderSoon(); })));
+  if(gen!==S.run) return;
+  const bt = computeBacktest(plan, series);
+  f.btProg = null;
+  if(!bt){ f.btErr = {code:'empty', message:'Too few priced positions to build a return series.'}; renderSoon(); return; }
+  bt.full = full; bt.priced = series.size; bt.wanted = ticks.length;
+  f.bt = bt; f.btFull = full;
+  store.drop(['fa:bt:v2', f.cik, ''].join(':'), key);
+  store.set(key, bt);
+  renderSoon();
+}
+
+/* ================================================================== sectors */
+const SEC = (()=>{ const c = store.get('fa:sec:v1'); return c && typeof c==='object' ? c : {}; })();
+const SECP = new Map();
+let secSaveT = null;
+function saveSec(){ clearTimeout(secSaveT); secSaveT = setTimeout(()=>store.set('fa:sec:v1', SEC), 800); }
+function getSector(t, pri){
+  const c = SEC[t];
+  if(c && Date.now()-c.ts < 14*864e5) return Promise.resolve(c);
+  if(SECP.has(t)) return SECP.get(t);
+  const p = call(T.company, {ticker:t, limit:3}, {pri}).then(r=>{
+    const d = (r.data && r.data.data) || [];
+    const m = d.find(x=>String(x.primary_ticker||'').toUpperCase()===t) || d[0];
+    const v = {s:m && m.sector || null, i:m && m.industry || null, n:m && m.company_name || null, ts:Date.now()};
+    SEC[t] = v; saveSec(); renderSoon(); return v;
+  }).catch(e=>{ SECP.delete(t); if(AUTHZ.has(e.code)) throw e; return null; });
+  SECP.set(t, p); return p;
+}
+function sectorsFor(f, pri, lastN){
+  if(!f || !f.qs) return Promise.resolve();
+  const qs = lastN ? f.qs.slice(-lastN) : f.qs;
+  const ts = uniq(qs.flatMap(q=>q.pos.map(x=>x.ticker)).filter(Boolean));
+  return Promise.allSettled(ts.map(t=>getSector(t, pri)));
+}
+
+/* ================================================================== orchestration */
+async function runFocus(gen, force){
+  const f = focusFund();
+  if(!f.qs || !S.bench){ renderSoon(); return; }
+  const secs = sectorsFor(f, 2, 2);
+  try{ if(force || !f.bt || !f.btFull) await runBacktest(f, true, gen, force, 1); }
+  catch(e){ f.btErr = normErr(e); f.btProg = null; renderSoon(); }
+  await secs;
+}
+
+async function loadAll(force){
+  const gen = ++S.run;
+  S.pageErr = null; S.loading = true; S.phase = 'Reading 13F filings and Form ADV profiles';
+  if(force){ PX.clear(); SECP.clear(); }
+  S.funds.forEach(f=>{ f.btProg = null; });
+  renderSoon();
+  const jobs = [loadBench(force, gen)];
+  S.funds.forEach(f=>{ jobs.push(loadProfile(f, force, gen)); jobs.push(loadHoldings(f, force, gen)); });
+  const res = await Promise.allSettled(jobs);
+  if(gen!==S.run) return;
+  const errs = res.filter(r=>r.status==='rejected').map(r=>normErr(r.reason));
+  const authz = errs.find(e=>AUTHZ.has(e.code));
+  if(errs.length===res.length || (authz && errs.length>=res.length/2)){
+    S.pageErr = authz || errs[0]; S.loading = false; S.phase = ''; renderSoon(); return;
+  }
+  S.phase = 'Pricing the filed books';
+  const focus = focusFund();
+  const tasks = [runFocus(gen, force)];
+  S.funds.filter(f=>f!==focus).forEach(f=>tasks.push(
+    runBacktest(f, f.custom, gen, force, 3).catch(e=>{ f.btErr = normErr(e); f.btProg = null; renderSoon(); })));
+  await Promise.allSettled(tasks);
+  if(gen!==S.run) return;
+  S.phase = 'Resolving sectors';
+  renderSoon();
+  await sectorsFor(focus, 6);
+  if(gen!==S.run) return;
+  S.loading = false; S.phase = ''; renderSoon();
+}
+
+function setFocus(slug){
+  if(!fundBy(slug) || slug===S.focus) return;
+  S.focus = slug;
+  try{ history.replaceState(null, '', '#'+slug); }catch(e){}
+  if(!fundBy(slug).custom) store.raw('fa:focus', slug);
+  Object.keys(SIG).forEach(k=>delete SIG[k]);
+  renderSoon();
+  if(S.mcp && !S.pageErr){
+    const f = focusFund(), gen = S.run;
+    if(f.qs && S.bench && (!f.bt || !f.btFull)){
+      runBacktest(f, true, gen, false, 1).catch(e=>{ f.btErr = normErr(e); f.btProg = null; renderSoon(); });
+    }
+    sectorsFor(f, 2).catch(()=>{});
+  }
+}
+
+async function addCustom(row){
+  const cik = String(parseInt(row.cik,10));
+  if(!cik || cik==='NaN') return;
+  const known = S.funds.find(f=>String(parseInt(f.cik,10))===cik);
+  if(known){ setFocus(known.slug); return; }
+  S.funds = S.funds.filter(f=>!f.custom);
+  const nm = row.business_name || row.legal_name || ('CIK '+cik);
+  const f = mkFund({slug:'cik'+cik, name:niceFirm(nm), short:shortFirm(nm), cik, crd:row.crd ? String(row.crd) : null}, 6, true);
+  S.funds.push(f);
+  setFocus(f.slug);
+  const gen = S.run;
+  await Promise.allSettled([loadProfile(f, false, gen), loadHoldings(f, false, gen)]);
+  if(gen!==S.run) return;
+  if(S.focus===f.slug) await runFocus(gen, false);
+  else await runBacktest(f, true, gen, false, 3).catch(e=>{ f.btErr = normErr(e); });
+  renderSoon();
+}
+function removeCustom(){
+  const c = S.funds.find(f=>f.custom); if(!c) return;
+  S.funds = S.funds.filter(f=>!f.custom);
+  if(S.focus===c.slug){ S.focus = 'lone_pine'; try{ history.replaceState(null,'','#lone_pine'); }catch(e){} }
+  Object.keys(SIG).forEach(k=>delete SIG[k]);
+  renderSoon();
+  if(S.mcp && !S.pageErr){ const f = focusFund(); if(f.qs && S.bench && !f.btFull) runBacktest(f, true, S.run, false, 1).catch(()=>{}); }
+}
+
+/* ================================================================== render plumbing */
+const SIG = {};
+function once(key, sig, fn){ if(SIG[key]===sig) return; SIG[key] = sig; fn(); }
+let rafP = false;
+function renderSoon(){
+  if(rafP) return; rafP = true;
+  const go = ()=>{ rafP = false; try{ render(); }catch(e){ console.error(e); } };
+  if(document.hidden) setTimeout(go, 250); else requestAnimationFrame(go);
+}
+const skelRows = (n,h) => `<div style="padding:14px 20px">${Array.from({length:n},(_,i)=>`<div class="skel line" style="height:${h||14}px;width:${[92,84,88,76,90,70,86,80][i%8]}%"></div>`).join('')}</div>`;
+function stateBox(kind, e){
+  if(kind==='paused') return `<div class="state"><b>No live data</b>See the notice at the top of the page.</div>`;
+  if(kind==='err'){ const [t,b] = errCopy(e); return `<div class="state err"><b>${esc(t)}</b>${esc(b)}</div>`; }
+  return `<div class="state"><span class="wait"><span class="dot busy"></span>${esc(kind)}</span></div>`;
+}
+function chartState(host, html, h){
+  host.querySelectorAll('svg,.state,.cskel').forEach(n=>n.remove());
+  const d = document.createElement('div');
+  d.innerHTML = html || `<div class="skel cskel" style="height:${h||260}px"></div>`;
+  host.insertBefore(d.firstElementChild || d, host.firstChild);
+}
+const tipHTML = (title, rows) => `<div class="th">${esc(title)}</div>` + rows.map(r=>
+  `<div class="row"><span class="k">${r.c?`<i style="background:${r.c}"></i>`:''}${esc(r.k)}</span><b class="${r.cls||''}">${r.v}</b></div>`).join('');
+function placeTip(tip, host, px, py){
+  tip.classList.add('on');
+  const hw = host.clientWidth, tw = tip.offsetWidth;
+  let x = px+14; if(x+tw>hw-4) x = px-tw-14; if(x<4) x = 4;
+  tip.style.left = x+'px'; tip.style.top = Math.max(4, py-10)+'px';
+}
+const svgEl = (t,a) => { const e = document.createElementNS('http://www.w3.org/2000/svg', t); for(const k in a) e.setAttribute(k, a[k]); return e; };
+function frame(host, {h=300, ml=48, mr=20, mt=14, mb=30}={}){
+  host.querySelectorAll('svg,.state,.cskel').forEach(n=>n.remove());
+  const w = Math.max(300, Math.round(host.clientWidth || 700));
+  const svg = svgEl('svg', {viewBox:`0 0 ${w} ${h}`, role:'img'});
+  host.insertBefore(svg, host.firstChild);
+  return {svg, w, h, ml, mr, mt, mb, iw:w-ml-mr, ih:h-mt-mb};
+}
+function niceTicks(lo, hi, n){
+  if(!(hi>lo)){ hi = lo+1; lo = lo-1; }
+  const step0 = (hi-lo)/(n||5), mag = Math.pow(10, Math.floor(Math.log10(step0))), r = step0/mag;
+  const step = (r<1.5?1:r<3?2:r<7?5:10)*mag;
+  const a = Math.floor(lo/step)*step, b = Math.ceil(hi/step)*step, t = [];
+  for(let v=a; v<=b+step*1e-6; v+=step) t.push(+v.toFixed(10));
+  return {lo:a, hi:b, ticks:t};
+}
+function yAxis(F, ticks, Y, fmt){
+  const g = svgEl('g',{class:'grid'}), t = svgEl('g',{class:'axis'});
+  ticks.forEach(v=>{
+    const y = Y(v);
+    g.appendChild(svgEl('line',{x1:F.ml, x2:F.ml+F.iw, y1:y, y2:y}));
+    const tx = svgEl('text',{x:F.ml-8, y:y+3.5, 'text-anchor':'end'}); tx.textContent = fmt(v); t.appendChild(tx);
+  });
+  F.svg.appendChild(g); F.svg.appendChild(t);
+}
+
+/* ================================================================== line chart (nulls = gaps) */
+function lineChart(o){
+  const H = $(o.host), TP = $(o.tip);
+  const all = o.bench ? o.series.concat([o.bench]) : o.series;
+  const n = o.xs.length;
+  const F = frame(H, {h:o.h||320, ml:52, mr:o.mr||92, mt:14, mb:30});
+  let lo = Infinity, hi = -Infinity;
+  all.forEach(s=>s.vals.forEach(v=>{ if(v!=null){ if(v<lo) lo = v; if(v>hi) hi = v; } }));
+  if(!isFinite(lo)) return;
+  if(o.zeroBase) lo = Math.min(0, lo);
+  const nt = niceTicks(lo, hi, 5);
+  const pad = o.cat ? F.iw/(n*2) : 0;
+  const X = i => F.ml + pad + (n===1 ? F.iw/2 : i/(n-1)*(F.iw-2*pad));
+  const Y = v => F.mt + F.ih - (v-nt.lo)/(nt.hi-nt.lo)*F.ih;
+  yAxis(F, nt.ticks, Y, o.yfmt);
+  const ax = svgEl('g',{class:'axis'});
+  const lab = o.cat ? o.xs.map((_,i)=>i) : [0, Math.round((n-1)*.25), Math.round((n-1)*.5), Math.round((n-1)*.75), n-1];
+  const skip = o.cat && F.iw/n < 46 ? 2 : 1;
+  uniq(lab).forEach((i,k)=>{
+    if(o.cat && k%skip && i!==n-1) return;
+    const t = svgEl('text',{x:X(i), y:F.mt+F.ih+18, 'text-anchor': o.cat ? 'middle' : i===0 ? 'start' : i===n-1 ? 'end' : 'middle'});
+    t.textContent = o.xlab(i); ax.appendChild(t);
+  });
+  F.svg.appendChild(ax);
+  if(o.zeroLine && nt.lo<0 && nt.hi>0) F.svg.appendChild(svgEl('line',{class:'zero', x1:F.ml, x2:F.ml+F.iw, y1:Y(0), y2:Y(0)}));
+  const pathOf = vals => { let d = '', pen = false; vals.forEach((v,i)=>{ if(v==null){ pen = false; return; } d += (pen?'L':'M')+X(i).toFixed(1)+','+Y(v).toFixed(1); pen = true; }); return d; };
+  if(o.bench) F.svg.appendChild(svgEl('path',{class:'ser bm', d:pathOf(o.bench.vals)}));
+  const ordered = o.series.slice().sort((a,b)=>(a.focus?1:0)-(b.focus?1:0));
+  ordered.forEach(s=>{
+    F.svg.appendChild(svgEl('path',{class:'ser'+(s.focus?' focus':''), d:pathOf(s.vals), stroke:col(s.color)}));
+    if(o.dots) s.vals.forEach((v,i)=>{ if(v!=null) F.svg.appendChild(svgEl('circle',{class:'pdot', cx:X(i), cy:Y(v), r:s.focus?4.5:3.5, fill:col(s.color)})); });
+  });
+  const lastIdx = s => { for(let i=s.vals.length-1;i>=0;i--) if(s.vals[i]!=null) return i; return -1; };
+  const ends = all.map(s=>({s, i:lastIdx(s)})).filter(e=>e.i>=0).map(e=>({s:e.s, y:Y(e.s.vals[e.i]), x:X(e.i)})).sort((a,b)=>a.y-b.y);
+  let prev = -1e9;
+  ends.forEach(e=>{
+    const y = Math.max(e.y, prev+13); prev = y;
+    const t = svgEl('text',{class:'endlab', x:F.ml+F.iw-pad+8, y:y+4});
+    t.textContent = e.s.short || e.s.name; F.svg.appendChild(t);
+  });
+  if(o.legend) $(o.legend).innerHTML = o.series.map(s=>`<li><i style="background:${col(s.color)}"></i>${esc(s.name)}</li>`).join('')
+    + (o.bench ? `<li><i class="d"></i>${esc(o.bench.name)}</li>` : '');
+  const cross = svgEl('line',{class:'zero', y1:F.mt, y2:F.mt+F.ih, opacity:0});
+  F.svg.appendChild(cross);
+  const dots = all.map(s=>{ const d = svgEl('circle',{class:'pdot', r:4.5, fill: s===o.bench ? col('--bench') : col(s.color), opacity:0}); F.svg.appendChild(d); return d; });
+  const hit = svgEl('rect',{x:F.ml, y:F.mt, width:F.iw, height:F.ih, fill:'transparent'});
+  F.svg.appendChild(hit);
+  function move(ev){
+    const r = F.svg.getBoundingClientRect(), p = ev.touches ? ev.touches[0] : ev;
+    const cx = (p.clientX-r.left)/r.width*F.w;
+    let i = n===1 ? 0 : Math.round((cx-F.ml-pad)/(F.iw-2*pad)*(n-1)); i = Math.max(0, Math.min(n-1, i));
+    cross.setAttribute('x1', X(i)); cross.setAttribute('x2', X(i)); cross.setAttribute('opacity', 1);
+    all.forEach((s,k)=>{ const v = s.vals[i]; if(v==null){ dots[k].setAttribute('opacity',0); return; }
+      dots[k].setAttribute('cx', X(i)); dots[k].setAttribute('cy', Y(v)); dots[k].setAttribute('opacity', 1); });
+    const rows = all.filter(s=>s.vals[i]!=null).sort((a,b)=>b.vals[i]-a.vals[i]).map(s=>({
+      k:s.short||s.name, c: s===o.bench ? col('--bench') : col(s.color), v:o.tipv(s.vals[i]), cls:o.tipcls ? o.tipcls(s.vals[i]) : ''}));
+    TP.innerHTML = tipHTML(o.tipTitle(i), rows);
+    placeTip(TP, H, X(i)/F.w*H.clientWidth, p.clientY-r.top);
+  }
+  function out(){ cross.setAttribute('opacity',0); dots.forEach(d=>d.setAttribute('opacity',0)); TP.classList.remove('on'); }
+  hit.addEventListener('mousemove', move); hit.addEventListener('mouseleave', out);
+  hit.addEventListener('touchmove', e=>{ move(e); e.preventDefault(); }, {passive:false});
+  hit.addEventListener('touchend', out);
+}
+
+/* ================================================================== hero */
+function renderHero(){
+  const f = focusFund(), p = f.prof, q = f.qs && f.qs[f.qs.length-1];
+  once('hero', [f.slug, f.name, !!p, q&&q.acc, S.funds.length].join('|'), ()=>{
+    $('h-name').innerHTML = (f.custom ? '' : '<span class="pre">Sample:</span> ') + esc(f.name);
+    try{ document.title = (f.slug==='lone_pine' ? 'Lone Pine Capital — Fund Dashboard' : f.name+' — Fund Dashboard'); }catch(e){}
+    const ids = [`<span>CIK <b>${esc(String(parseInt(f.cik,10)))}</b></span>`];
+    const crd = f.crd || (p && p.crd);
+    if(crd) ids.push(`<span>CRD <b>${esc(crd)}</b></span>`);
+    if(p && p.main_office_city) ids.push(`<span>${esc(titleCase(p.main_office_city))}${p.main_office_state?', '+esc(p.main_office_state):''}</span>`);
+    if(p && p.latest_adv_filing_date) ids.push(`<span>Form ADV filed ${esc(fdate(p.latest_adv_filing_date))}</span>`);
+    $('h-ids').innerHTML = ids.join('');
+    const others = S.funds.filter(x=>x!==f).length;
+    $('h-sub').textContent = f.custom
+      ? `${f.name}’s filed 13F holdings, the Form ADV profile behind them, and a replicating portfolio traded only on what had actually been filed — pulled live from FocusAlpha and set against the six sample Tiger-lineage managers. Search again to swap in another fund.`
+      : `A sample of what FocusAlpha can build: ${f.short}’s filed 13F holdings, the Form ADV profile behind them, and a replicating portfolio traded only on what had actually been filed — pulled live each time the page opens and set against ${others===5 ? 'five Tiger-lineage peers' : others+' peers'}. Use it as a template: search below to swap in any fund you follow.`;
+    const pills = [];
+    if(p){
+      if(p.sec_registration_type) pills.push(`<span class="pill gr">${esc(p.sec_registration_type==='Registered' ? 'SEC registered' : p.sec_registration_type)}</span>`);
+      if(p.firm_type) pills.push(`<span class="pill">${esc(p.firm_type.replace('-',' '))}</span>`);
+      if(p.style_tier) pills.push(`<span class="pill ac">${esc(p.style_tier)} book</span>`);
+    }
+    if(f.qs) pills.push(`<span class="pill">${f.qs.length} quarters of 13F</span>`);
+    $('h-pills').innerHTML = pills.join('');
+    const crdLink = crd ? `https://adviserinfo.sec.gov/firm/summary/${encodeURIComponent(crd)}` : null;
+    const b = $('b-sec');
+    if(crdLink){ b.href = crdLink; b.removeAttribute('aria-disabled'); } else { b.removeAttribute('href'); b.setAttribute('aria-disabled','true'); }
+  });
+  once('chips', S.funds.map(x=>x.slug+x.short).join()+'|'+S.focus, ()=>{
+    $('chips').innerHTML = S.funds.map(x=>
+      `<button type="button" class="chip" data-slug="${esc(x.slug)}" aria-pressed="${x.slug===S.focus}"><i style="background:${col(x.color)}"></i>${esc(x.short)}</button>`
+      + (x.custom ? `<button type="button" class="chip" data-rm="1" aria-label="Remove ${esc(x.name)}"><span class="x">✕</span></button>` : '')).join('');
+  });
+  renderBars();
+  renderConn();
+}
+
+function renderBars(){
+  const f = focusFund(), qs = f.qs, q = qs && qs[qs.length-1], prev = qs && qs[qs.length-2];
+  const host = $('bars'), narrow = (host.clientWidth||900) < 640;
+  once('bars', [q ? f.slug+q.acc : 'ph', narrow].join('|'), ()=>{
+    const N = narrow ? 9 : 16, H = narrow ? 150 : 196;
+    let items;
+    if(q){
+      const pm = new Map((prev ? prev.pos : []).map(x=>[x.k,x]));
+      items = q.pos.slice(0,N).map(x=>{ const p = pm.get(x.k);
+        return {t:x.ticker || titleCase(x.issuer), w:x.w, act: prev ? actionOf(x,p) : 'HOLD', chg: p && p.shares>0 ? x.shares/p.shares-1 : null}; });
+    } else {
+      items = [.55,.8,.4,.95,.6,.75,.35,.9,.5,.7,.45,.85,.62,.3,.78,.5].slice(0,N).map((w,i)=>({ph:true, w, cls:i%5===1?'g':i%5===3?'o':''}));
+    }
+    const order = []; items.forEach((it,i)=>{ if(i%2===0) order.push(it); else order.unshift(it); });
+    const maxW = Math.max(...items.map(x=>x.w));
+    host.innerHTML = order.map(it=>{
+      const h = Math.round((narrow?44:58) + (narrow?78:116)*Math.sqrt(it.w/maxW));
+      let top = Math.round((H-h)/2 - 6);
+      if(!it.ph){ const sh = it.act==='NEW' ? -34 : it.chg!=null ? Math.max(-34, Math.min(34, -it.chg*60)) : 0; top += Math.round(sh); }
+      const what = it.act==='NEW' ? 'new position' : it.act==='ADD' ? 'shares '+spct(it.chg,0) : it.act==='TRIM' ? 'shares '+spct(it.chg,0) : 'held';
+      return `<span class="${it.ph ? 'cap ph '+it.cls : 'cap '+it.act}" style="height:${h}px;transform:translateY(${top}px)"${it.ph?'':` title="${esc(it.t)} · ${pct(it.w,1)} of book · ${esc(what)}"`}></span>`;
+    }).join('');
+    $('bars-cap').innerHTML = q
+      ? `<span>Top ${items.length} positions · ${esc(qlab(q.p))} · height = weight</span>`
+        + `<span><i style="background:var(--accent)"></i>new</span><span><i style="background:var(--green)"></i>added</span>`
+        + `<span><i style="background:var(--orange)"></i>trimmed</span><span><i style="background:var(--accent-soft)"></i>held</span>`
+      : '';
+  });
+}
+
+function renderConn(){
+  const f = focusFund(), q = f.qs && f.qs[f.qs.length-1];
+  const ats = [S.benchAt, f.profAt, f.holdAt].filter(Boolean);
+  const sig = [S.pageErr&&S.pageErr.code, S.mcpState, S.loading, S.phase, S.calls.d, S.calls.q, f.slug, q&&q.acc, !!f.prof, S.bench&&S.bench.dates.length, f.btProg&&f.btProg.done, ats.join()].join('|');
+  once('conn', sig, ()=>{
+    let dot = 'dot', title;
+    if(S.pageErr){ dot += ' bad'; title = errCopy(S.pageErr)[0]; }
+    else if(S.mcpState==='connecting'){ dot += ' busy'; title = 'Connecting to FocusAlpha…'; }
+    else if(S.loading){ dot += ' busy'; title = 'Pulling live data…'; }
+    else { dot += ' live'; title = 'Live from FocusAlpha'; }
+    $('c-dot').className = dot; $('c-title').textContent = title;
+    const p = f.prof;
+    const rows = [
+      ['13F', q ? `${qlab(q.p)} · filed ${fdate(q.f)}` : (f.holdErr ? 'unavailable' : '—')],
+      ['Form ADV', p && p.latest_adv_filing_date ? 'filed '+fdate(p.latest_adv_filing_date) : (f.profErr ? 'unavailable' : '—')],
+      ['Prices', S.bench ? 'through '+fdate(S.bench.dates[S.bench.dates.length-1]) : (S.benchErr ? 'unavailable' : '—')],
+      ['Fetched', ats.length ? ago(Math.min(...ats)) : '—']
+    ];
+    $('c-asof').innerHTML = rows.map(r=>`<dt>${r[0]}</dt><dd>${esc(r[1])}</dd>`).join('');
+    const frac = S.pageErr ? 0 : S.calls.q ? S.calls.d/S.calls.q : 0;
+    $('c-prog').style.width = (S.loading ? Math.max(4, frac*100) : (S.calls.q && !S.pageErr ? 100 : 0))+'%';
+    let ph = '';
+    if(S.pageErr) ph = errCopy(S.pageErr)[1];
+    else if(S.loading){
+      ph = S.phase;
+      if(f.btProg) ph = `Pricing ${f.short}’s books · ${f.btProg.done} of ${f.btProg.total} price series`;
+      ph += ` · ${S.calls.d}/${S.calls.q} calls`;
+    } else if(S.calls.q) ph = `${S.calls.d} calls to FocusAlpha${S.calls.err ? ` · ${S.calls.err} came back empty or failed` : ''}`;
+    $('c-phase').textContent = ph;
+    const rb = $('b-refresh');
+    rb.disabled = !S.mcp || S.loading;
+    rb.textContent = S.loading ? 'Loading…' : 'Refresh data';
+  });
+}
+
+function renderBanner(){
+  once('banner', S.pageErr ? S.pageErr.code+S.pageErr.message : '', ()=>{
+    const b = $('banner');
+    if(!S.pageErr){ b.hidden = true; b.innerHTML = ''; return; }
+    const [t, body] = errCopy(S.pageErr);
+    const retry = S.mcp && !['no_mcp','not_granted','capability_disabled','capability_removed','user_changed'].includes(S.pageErr.code);
+    b.innerHTML = `<div><b>${esc(t)}</b><p>${esc(body)}</p></div>` + (retry ? `<button class="btn solid" type="button" id="b-retry">Try again</button>` : '');
+    b.hidden = false;
+    const r = $('b-retry'); if(r) r.addEventListener('click', ()=>loadAll(true));
+  });
+}
+
+/* ================================================================== tiles */
+function renderTiles(){
+  const f = focusFund(), p = f.prof, qs = f.qs, q = qs && qs[qs.length-1], pq = qs && qs[qs.length-2], bt = f.bt;
+  const sig = [f.slug, !!p, q&&q.acc, bt&&bt.ret, bt&&bt.d1, !!f.btErr, !!f.holdErr, !!f.profErr, !!S.pageErr].join('|');
+  once('tiles', sig, ()=>{
+    const pend = S.pageErr ? '—' : '<span class="skel line" style="display:inline-block;width:88px;height:22px"></span>';
+    const errN = e => e ? esc(errCopy(e)[0]) : '';
+    const avgT = qs ? mean(qs.filter(x=>x.turn!=null).map(x=>x.turn)) : null;
+    const T = [
+      ['adv','Regulatory AUM', p ? usd(+p.aum_total) : pend,
+        p ? `Form ADV · ${intf(+p.accounts_total)} accounts · ${intf(+p.employee_count)} staff` : errN(f.profErr)],
+      ['13f','13F equity filed', q ? usd(q.total) : pend,
+        q ? `${qlab(q.p)}${pq ? ` · ${spct(q.total/pq.total-1,0)} vs ${qlab(pq.p)}` : ''}` : errN(f.holdErr)],
+      ['13f','Concentration', q ? pct(q.top10,0) : pend,
+        q ? `top ten · ${q.n} names · ${num(q.effN,0)} effective` : errN(f.holdErr)],
+      ['13f','Turnover', q && q.turn!=null ? pct(q.turn,0) : q ? '—' : pend,
+        q ? `last quarter · ${ok(avgT) ? pct(avgT,0)+' average' : 'one quarter filed'}` : errN(f.holdErr)],
+      ['px','Replicated return', bt ? spct(bt.ret) : f.btErr ? '—' : pend,
+        bt ? `${fshort(bt.d0)} → ${fshort(bt.d1)}` : errN(f.btErr), bt ? sgn(bt.ret) : ''],
+      ['px','Excess over S&P 500 TR', bt ? spct(bt.excess) : f.btErr ? '—' : pend,
+        bt ? `index ${spct(bt.bret)} over the same days` : errN(f.btErr), bt ? sgn(bt.excess) : ''],
+      ['px','Alpha, annualised', bt ? spct(bt.alpha) : f.btErr ? '—' : pend,
+        bt ? `beta ${num(bt.beta)} · information ratio ${num(bt.ir)}` : errN(f.btErr), bt ? sgn(bt.alpha) : '']
+    ];
+    $('tiles').innerHTML = T.map(t=>`<div class="tile src-${t[0]}"><span class="tri"><i></i><i></i><i></i></span>`
+      + `<div class="k">${t[1]}</div><div class="v ${t[5]||''}">${t[2]}</div><div class="n">${t[3]||'&nbsp;'}</div></div>`).join('');
+  });
+}
+
+/* ================================================================== peers */
+function benchStats(){
+  if(!S.bench) return null;
+  const B = S.bench.vals, r = []; for(let i=1;i<B.length;i++) r.push(B[i]/B[i-1]-1);
+  let pk = -Infinity, dd = 0; B.forEach(v=>{ if(v>pk) pk = v; dd = Math.min(dd, v/pk-1); });
+  return {ret:B[B.length-1]/B[0]-1, vol:sd(r)*Math.sqrt(252), maxdd:dd};
+}
+function btCell(f, key, fmt, cls){
+  if(f.bt) return `<td class="n ${cls ? cls(f.bt[key]) : ''}">${fmt(f.bt[key])}</td>`;
+  return `<td class="n co">${f.btProg || (!f.btErr && !S.pageErr) ? '·' : '—'}</td>`;
+}
+function renderPeers(){
+  const sig = S.funds.map(f=>[f.slug, !!f.prof, !!f.profErr, f.qs?f.qs.length:0, !!f.holdErr, f.bt?f.bt.ret:'', f.btProg?f.btProg.done:'', !!f.btErr].join(',')).join('|')+S.focus+!!S.bench+!!S.pageErr;
+  once('peers', sig, ()=>{
+    if(S.pageErr){ $('peers').innerHTML = stateBox('paused'); $('peers-note').textContent=''; return; }
+    if(S.funds.every(f=>!f.prof && !f.qs && !f.profErr && !f.holdErr)){ $('peers').innerHTML = skelRows(7,18); return; }
+    const done = S.funds.every(f=>f.bt || f.btErr);
+    const rows = S.funds.slice().sort((a,b)=> done
+      ? ((b.bt?b.bt.excess:-9)-(a.bt?a.bt.excess:-9))
+      : ((b.prof?+b.prof.aum_total:0)-(a.prof?+a.prof.aum_total:0)));
+    let h = '<table><thead><tr><th>Manager</th><th class="n">Reg. AUM</th><th class="n">13F book</th>'
+      + '<th class="n">Names</th><th class="n">Top 10</th><th class="n">Eff. N</th><th class="n">Turnover</th><th>13F style</th>'
+      + '<th class="n">Wtd P/E</th><th class="n">Return</th><th class="n">Excess</th><th class="n">Beta</th><th class="n">Alpha</th>'
+      + '<th class="n">Max DD</th></tr></thead><tbody>';
+    for(const f of rows){
+      const p = f.prof, q = f.qs && f.qs[f.qs.length-1];
+      const dash = e => `<td class="n co"${e ? ` title="${esc(errCopy(e)[1])}"` : ''}>${e ? '—' : '·'}</td>`;
+      h += `<tr class="${f.slug===S.focus?'me':''}"><td><span class="sw" style="background:${col(f.color)}"></span><span class="nm">${esc(f.name)}</span>`
+        + (f.btProg ? ` <span class="minip">pricing ${f.btProg.done}/${f.btProg.total}</span>` : f.btErr && !f.bt ? ` <span class="co" title="${esc(errCopy(f.btErr)[1])}">no replication</span>` : '')
+        + (f.bt ? `<span class="sub2">${pct(f.bt.cov,0)} of book value priced${f.bt.full ? ' · every position' : ''}</span>` : '')
+        + `</td>`
+        + (p ? `<td class="n">${usd(+p.aum_total)}</td>` : dash(f.profErr))
+        + (q ? `<td class="n">${usd(q.total)}</td><td class="n">${q.n}</td><td class="n">${pct(q.top10,0)}</td><td class="n">${num(q.effN,0)}</td><td class="n">${pct(q.turn,0)}</td>`
+             : dash(f.holdErr).repeat(5))
+        + (p ? `<td class="co">${esc(p.style_tier||'—')}</td><td class="n">${num(p.wtd_pe!=null?+p.wtd_pe:null,1)}</td>` : dash(f.profErr).repeat(2))
+        + btCell(f,'ret',spct,sgn) + (f.bt ? `<td class="n ${sgn(f.bt.excess)}"><b>${spct(f.bt.excess)}</b></td>` : btCell(f,'excess',spct))
+        + btCell(f,'beta',x=>num(x)) + btCell(f,'alpha',spct,sgn) + btCell(f,'maxdd',x=>pct(x,0),()=> 'neg')
+        + '</tr>';
+    }
+    const bs = benchStats();
+    if(bs) h += `<tr class="bm"><td><span class="sw" style="background:var(--bench)"></span>${esc(BENCH.name)}</td><td class="co" colspan="8">Benchmark · <code>${esc(BENCH.symbol)}</code> over the full price window</td>`
+      + `<td class="n">${spct(bs.ret)}</td><td class="n">—</td><td class="n">1.00</td><td class="n">—</td><td class="n">${pct(bs.maxdd,0)}</td></tr>`;
+    $('peers').innerHTML = h + '</tbody></table>';
+    const fs = S.funds.filter(f=>f.bt);
+    let note = '';
+    if(fs.length>=3){
+      const pos = fs.filter(f=>f.bt.alpha>0).map(f=>f.short);
+      const best = fs.slice().sort((a,b)=>b.bt.ret-a.bt.ret)[0];
+      const hb = fs.slice().sort((a,b)=>b.bt.beta-a.bt.beta)[0];
+      note = `Over ${fdate(fs[0].bt.d0)} → ${fdate(fs[0].bt.d1)}, ${pos.length ? `<b>${esc(pos.join(', '))}</b> ${pos.length===1?'was':'were'} ahead of the index after adjusting for beta` : '<b>no manager</b> here beat the index after adjusting for beta'}. `
+        + `${esc(best.short)} returned the most (${spct(best.bt.ret)}); ${esc(hb.short)} ran the highest beta (${num(hb.bt.beta)}), so more of its move came from market exposure. `
+        + `Peers are priced on the names that make up 95% of each book (at most 60); the focus manager on every position.`;
+    } else if(!done) note = 'Returns fill in as each book is priced.';
+    $('peers-note').innerHTML = note;
+  });
+}
+
+/* ================================================================== declared vs revealed */
+const VG = {deep_growth:'Growth', growth_biased:'Growth', blend:'Blend', value_biased:'Value', deep_value:'Value'};
+const TIER = {'Deep Growth':'Growth','Growth-Biased':'Growth','Blend / Core':'Blend','Value-Biased':'Value','Deep Value':'Value'};
+const clean = s => String(s||'').replace(/\s+/g,' ').replace(/\s+([,.;:])/g,'$1').replace(/(\w) -(\w)/g,'$1-$2').trim();
+function renderDvr(){
+  const sig = S.funds.map(f=>[f.slug, !!f.prof, !!f.profErr].join()).join('|')+S.focus+!!S.pageErr;
+  once('dvr', sig, ()=>{
+    if(S.pageErr){ $('dvr').innerHTML = stateBox('paused'); $('quotes').innerHTML=''; $('dvr-note').textContent=''; return; }
+    if(S.funds.every(f=>!f.prof && !f.profErr)){ $('dvr').innerHTML = skelRows(6,18); return; }
+    let h = '<table><thead><tr><th>Manager</th><th>Brochure says</th><th>Styles it names</th><th>13F book reads</th>'
+      + '<th class="n">vg score</th><th class="n">Wtd P/B</th><th class="n">Wtd P/E</th><th>Verdict</th></tr></thead><tbody>';
+    const dis = [], none = [];
+    for(const f of S.funds){
+      const p = f.prof;
+      h += `<tr class="${f.slug===S.focus?'me':''}"><td><span class="sw" style="background:${col(f.color)}"></span><span class="nm">${esc(f.name)}</span></td>`;
+      if(!p){ h += `<td class="co" colspan="7">${f.profErr ? esc(errCopy(f.profErr)[1]) : 'Loading…'}</td></tr>`; continue; }
+      const br = p.brochure && p.brochure.status==='available' ? p.brochure : null;
+      const st = br && br.investment_style || {};
+      const dec = br ? VG[st.declared_vg_bucket] : null, rev = TIER[p.style_tier];
+      let v, vc;
+      if(!br){ v = 'no Part 2A in store'; vc = 'co'; none.push(f.short); }
+      else if(!dec){ v = 'brochure doesn’t say'; vc = 'co'; }
+      else if(!rev){ v = 'no 13F style read'; vc = 'co'; }
+      else if(dec===rev){ v = 'consistent'; vc = 'ok'; }
+      else { v = `says ${dec}, holds ${rev}`; vc = 'no'; dis.push(f.short); }
+      h += `<td>${br ? esc(String(st.declared_vg_bucket||'unclear').replace(/_/g,' ')) : '—'}</td>`
+        + `<td class="co">${st.equity_styles && st.equity_styles.length ? esc(st.equity_styles.join(' + ')) : '—'}</td>`
+        + `<td>${esc(p.style_tier||'—')}</td><td class="n">${num(p.vg_score!=null?+p.vg_score:null)}</td>`
+        + `<td class="n">${num(p.wtd_pb!=null?+p.wtd_pb:null,1)}</td><td class="n">${num(p.wtd_pe!=null?+p.wtd_pe:null,1)}</td>`
+        + `<td class="${vc}">${esc(v)}</td></tr>`;
+    }
+    $('dvr').innerHTML = h + '</tbody></table>';
+    $('dvr-note').innerHTML = `The vg score is the book’s weighted P/B and P/E against a large-cap anchor, so it runs opposite to intuition: <b>lower is growthier</b> (under 0.55 deep growth, about 0.80 blend, 1.35 and up deep value). `
+      + (dis.length ? `<b>${esc(dis.join(' and '))}</b> describe${dis.length===1?'s':''} one style in the brochure and hold${dis.length===1?'s':''} a book the multiples read as another. ` : `Every brochure that states a style matches its book. `)
+      + (none.length ? `${esc(none.join(' and '))} ${none.length===1?'has':'have'} no Part 2A brochure in FocusAlpha’s store yet, so ${none.length===1?'it':'they'} can’t be compared.` : '');
+    // quotes for the focus manager
+    const f = focusFund(), p = f.prof, br = p && p.brochure && p.brochure.status==='available' ? p.brochure : null;
+    if(!br){ $('quotes').innerHTML = p ? `<div class="qc"><div class="qh"><b>${esc(f.name)}</b></div>No Part 2A brochure is in FocusAlpha’s store for this firm yet.</div>` : ''; return; }
+    const st = br.investment_style || {};
+    const flags = [st.analysis_basis && st.analysis_basis!=='unclear' ? st.analysis_basis : null,
+      st.investment_horizon && st.investment_horizon!=='unclear' ? st.investment_horizon+' horizon' : null,
+      st.uses_short_selling ? 'shorts' : null, st.uses_leverage ? 'leverage' : null, st.uses_derivatives ? 'derivatives' : null].filter(Boolean);
+    const cards = [];
+    if(st.summary) cards.push(`<div class="qc sum"><div class="qh"><b>${esc(f.name)}</b><span>brochure summary · ${esc(fdate(br.brochure_date))}</span></div>${esc(clean(st.summary))}`
+      + `<div class="qs">${flags.length ? 'States: '+esc(flags.join(' · '))+' · ' : ''}${br.brochure_url ? `<a href="${esc(br.brochure_url)}" target="_blank" rel="noopener">Open the brochure (PDF)</a>` : ''}</div></div>`);
+    const PRI = ['equity_styles','investment_strategy','analysis_basis','investment_horizon','uses_leverage','uses_short_selling','market_cap_focus','business_description'];
+    const seen = new Set();
+    const qs = (br.quotes||[]).filter(x=>x && x.text).sort((a,b)=>{ const ia = PRI.indexOf(a.topic), ib = PRI.indexOf(b.topic); return (ia<0?99:ia)-(ib<0?99:ib); })
+      .filter(x=>{ const k = clean(x.text).slice(0,80); if(seen.has(k)) return false; seen.add(k); return true; }).slice(0, st.summary ? 5 : 6);
+    qs.forEach(x=>cards.push(`<div class="qc"><div class="qh"><b>${esc(String(x.topic||'').replace(/_/g,' '))}</b><span>ADV Item ${esc(x.item||'—')} · p.${esc(x.page||'—')}</span></div><q>${esc(clean(x.text))}</q></div>`));
+    $('quotes').innerHTML = cards.join('');
+  });
+}
+
+function renderFees(){
+  const f = focusFund();
+  once('fees', [f.slug, !!f.prof, !!f.profErr, !!S.pageErr].join('|'), ()=>{
+    $('fees-h').textContent = `What ${f.short}’s funds charge`;
+    if(S.pageErr){ $('fees').innerHTML = stateBox('paused'); return; }
+    if(!f.prof){ $('fees').innerHTML = f.profErr ? stateBox('err', f.profErr) : skelRows(4,16); return; }
+    const fees = (f.prof.brochure && f.prof.brochure.fees) || [];
+    if(!fees.length){ $('fees').innerHTML = `<div class="state"><b>No fee schedule in store</b>FocusAlpha holds no parsed Item 5 fees for this firm’s brochures.</div>`; return; }
+    const TY = {aum_percent:'Management', performance:'Performance', fixed:'Fixed', hourly:'Hourly', subscription:'Subscription'};
+    const rows = fees.slice().sort((a,b)=> String(a.client_segment||'').localeCompare(String(b.client_segment||'')) || (a.fee_type==='aum_percent'?-1:1));
+    const rate = r => { const a = r.rate_min_pct!=null ? +r.rate_min_pct : null, b = r.rate_max_pct!=null ? +r.rate_max_pct : null;
+      if(a==null && b==null) return r.amount_min_usd!=null ? usd(+r.amount_min_usd)+(r.amount_max_usd!=null && +r.amount_max_usd!==+r.amount_min_usd ? '–'+usd(+r.amount_max_usd) : '') : '—';
+      if(a!=null && b!=null && a!==b) return `${a}–${b}%`; return `${a!=null?a:b}%`; };
+    let h = '<table class="fees"><thead><tr><th>Who pays</th><th>Fee</th><th class="n">Rate</th><th>Charged on</th><th>In the brochure’s words</th></tr></thead><tbody>';
+    rows.forEach(r=>{
+      h += `<tr><td class="nm">${esc(r.client_segment||r.service_type||'—')}</td><td>${esc(TY[r.fee_type]||titleCase(String(r.fee_type||'').replace(/_/g,' ')))}</td>`
+        + `<td class="n"><b>${esc(rate(r))}</b></td><td class="co">${esc(r.rate_basis||r.amount_basis||'—')}</td>`
+        + `<td><div class="fq">“${esc(clean(r.fee_text))}” <span class="co">Item ${esc(r.fee_text_item||'5')}, p.${esc(r.fee_text_page||'—')}${r.from_this_brochure===false && r.from_brochure_url ? ` · <a href="${esc(r.from_brochure_url)}" target="_blank" rel="noopener">${esc(r.from_brochure||'other brochure')}</a>` : ''}</span></div></td></tr>`;
+    });
+    $('fees').innerHTML = h + '</tbody></table>';
+  });
+}
+
+/* ================================================================== curve, scatter, matrix */
+function renderCurve(){
+  const fs = S.funds.filter(f=>f.bt), w = $('c-curve').clientWidth;
+  const sig = fs.map(f=>f.slug+f.bt.ret).join()+S.focus+w+!!S.bench+!!S.pageErr+!!S.benchErr;
+  once('curve', sig, ()=>{
+    const H = $('c-curve');
+    if(S.pageErr){ chartState(H, stateBox('paused')); $('lg-curve').innerHTML=''; $('curve-note').textContent=''; return; }
+    if(S.benchErr && !S.bench){ chartState(H, stateBox('err', S.benchErr)); return; }
+    if(!fs.length || !S.bench){ chartState(H, null, 320); return; }
+    const D = S.bench.dates, B = S.bench.vals;
+    const series = fs.map(f=>({name:f.name, short:f.short, color:f.color, focus:f.slug===S.focus, vals:f.bt.curve.map(v=>v==null?null:(v-1)*100)}));
+    const bench = {name:BENCH.name, short:BENCH.short, vals:B.map(v=>(v/B[0]-1)*100)};
+    lineChart({host:'c-curve', tip:'t-curve', legend:'lg-curve', xs:D, series, bench, h:340, zeroLine:true,
+      xlab:i=>fshort(D[i]), yfmt:v=>(v>0?'+':'')+v.toFixed(0)+'%', tipTitle:i=>fdate(D[i]),
+      tipv:v=>(v>=0?'+':'−')+Math.abs(v).toFixed(1)+'%', tipcls:v=>v>=0?'pos':'neg'});
+    const f = focusFund();
+    $('curve-note').innerHTML = `The index returned <b>${spct(B[B.length-1]/B[0]-1)}</b> from ${fdate(D[0])} to ${fdate(D[D.length-1])}. `
+      + `Each line starts at the first trading day a filed book could be bought, holding whichever 13F was already public.`
+      + (f.bt ? ` ${esc(f.short)} priced ${f.bt.priced} of ${f.bt.wanted} tickers across its books (${pct(f.bt.cov,0)} of book value on average).` : '');
+  });
+}
+
+function renderScatter(){
+  const fs = S.funds.filter(f=>f.bt), H = $('c-scatter'), w = H.clientWidth;
+  once('scatter', fs.map(f=>f.slug+f.bt.alpha).join()+S.focus+w+!!S.pageErr, ()=>{
+    if(S.pageErr){ chartState(H, stateBox('paused')); return; }
+    if(!fs.length){ chartState(H, null, 300); return; }
+    const TP = $('t-scatter');
+    const F = frame(H, {h:320, ml:54, mr:24, mt:22, mb:44});
+    const bs = fs.map(f=>f.bt.beta), as = fs.map(f=>f.bt.alpha);
+    const xt = niceTicks(Math.min(0.8, Math.min(...bs)-0.1), Math.max(1.2, Math.max(...bs)+0.1), 5);
+    const yt = niceTicks(Math.min(-0.05, Math.min(...as)-0.04), Math.max(0.05, Math.max(...as)+0.04), 5);
+    const X = v => F.ml+(v-xt.lo)/(xt.hi-xt.lo)*F.iw, Y = v => F.mt+F.ih-(v-yt.lo)/(yt.hi-yt.lo)*F.ih;
+    yAxis(F, yt.ticks, Y, v=>(v>0?'+':'')+(v*100).toFixed(0)+'%');
+    F.svg.appendChild(svgEl('line',{class:'zero', x1:F.ml, x2:F.ml+F.iw, y1:Y(0), y2:Y(0)}));
+    if(1>xt.lo && 1<xt.hi) F.svg.appendChild(svgEl('line',{class:'zero', x1:X(1), x2:X(1), y1:F.mt, y2:F.mt+F.ih, 'stroke-dasharray':'4 4'}));
+    const ax = svgEl('g',{class:'axis'});
+    xt.ticks.forEach(v=>{ const t = svgEl('text',{x:X(v), y:F.mt+F.ih+17, 'text-anchor':'middle'}); t.textContent = v.toFixed(2); ax.appendChild(t); });
+    const lx = svgEl('text',{class:'ttl', x:F.ml+F.iw/2, y:F.h-4, 'text-anchor':'middle'}); lx.textContent = 'Beta against the S&P 500 TR'; ax.appendChild(lx);
+    const ly = svgEl('text',{class:'ttl', x:F.ml, y:12, 'text-anchor':'start'}); ly.textContent = 'Alpha, annualised'; ax.appendChild(ly);
+    F.svg.appendChild(ax);
+    // labels sit right of their dot; overlapping ones stack downward with a leader line
+    const labs = fs.map(f=>({f, x:X(f.bt.beta), y:Y(f.bt.alpha)})).sort((a,b)=>a.y-b.y);
+    const placed = [];
+    labs.forEach(l=>{
+      l.lx = l.x+13; l.ly = l.y+4; const wd = l.f.short.length*7+6;
+      if(l.lx+wd > F.ml+F.iw){ l.lx = l.x-13-wd; }
+      let moved = true;
+      while(moved){ moved = false; for(const p of placed){ if(l.lx < p.lx+p.wd && p.lx < l.lx+wd && Math.abs(l.ly-p.ly)<14){ l.ly = p.ly+14; moved = true; } } }
+      l.wd = wd; placed.push(l);
+    });
+    labs.forEach(l=>{ if(Math.abs(l.ly-4-l.y)>6) F.svg.appendChild(svgEl('line',{x1:l.x, y1:l.y, x2:l.lx-2, y2:l.ly-4, stroke:'var(--line2)', 'stroke-width':1})); });
+    const labOf = new Map(labs.map(l=>[l.f.slug, l]));
+    fs.slice().sort((a,b)=>(a.slug===S.focus)-(b.slug===S.focus)).forEach(f=>{
+      const x = X(f.bt.beta), y = Y(f.bt.alpha), me = f.slug===S.focus, L = labOf.get(f.slug);
+      const g = svgEl('g',{});
+      g.appendChild(svgEl('circle',{class:'pdot', cx:x, cy:y, r:me?9:7, fill:col(f.color)}));
+      const t = svgEl('text',{class:'endlab', x:L.lx, y:L.ly}); t.textContent = f.short; g.appendChild(t);
+      const hit = svgEl('circle',{cx:x, cy:y, r:18, fill:'transparent'});
+      const show = ()=>{ TP.innerHTML = tipHTML(f.name, [
+          {k:'Beta', v:num(f.bt.beta)}, {k:'Alpha p.a.', v:spct(f.bt.alpha), cls:sgn(f.bt.alpha)},
+          {k:'Return', v:spct(f.bt.ret), cls:sgn(f.bt.ret)}, {k:'Excess', v:spct(f.bt.excess), cls:sgn(f.bt.excess)},
+          {k:'Volatility', v:pct(f.bt.vol,0)}, {k:'Info. ratio', v:num(f.bt.ir)}]);
+        const r = F.svg.getBoundingClientRect(); placeTip(TP, H, x/F.w*H.clientWidth, y/F.h*r.height); };
+      hit.addEventListener('mouseenter', show); hit.addEventListener('touchstart', show, {passive:true});
+      hit.addEventListener('mouseleave', ()=>TP.classList.remove('on'));
+      g.appendChild(hit); F.svg.appendChild(g);
+    });
+  });
+}
+
+function renderMatrix(){
+  const fs = S.funds.filter(f=>f.bt);
+  once('mx', fs.map(f=>f.slug+f.bt.ret).join()+S.focus+!!S.pageErr, ()=>{
+    if(S.pageErr){ $('mx').innerHTML = stateBox('paused'); return; }
+    if(!fs.length){ $('mx').innerHTML = skelRows(6,22); return; }
+    const periods = uniq(fs.flatMap(f=>f.bt.per.map(p=>p.p))).sort();
+    const maxAbs = Math.max(0.01, ...fs.flatMap(f=>f.bt.per.filter(p=>p.e!=null).map(p=>Math.abs(p.e))));
+    let h = '<table class="mx"><thead><tr><th>Manager</th>' + periods.map(p=>`<th style="text-align:center">${esc(qshort(p))} book</th>`).join('') + '<th class="n">Beat index</th></tr></thead><tbody>';
+    fs.slice().sort((a,b)=>b.bt.excess-a.bt.excess).forEach(f=>{
+      const by = new Map(f.bt.per.map(p=>[p.p,p]));
+      h += `<tr class="${f.slug===S.focus?'me':''}"><td class="l"><span class="sw" style="background:${col(f.color)}"></span><span class="nm">${esc(f.short)}</span></td>`;
+      periods.forEach(pp=>{
+        const p = by.get(pp);
+        if(!p || p.e==null){ h += '<td><div class="cell"><span class="co">—</span></div></td>'; return; }
+        const it = Math.round(8+30*Math.min(1, Math.abs(p.e)/maxAbs)), good = p.e>=0;
+        h += `<td title="${esc(qlab(p.p))} book, held ${esc(fdate(p.d0))} → ${esc(fdate(p.d1))}: portfolio ${spct(p.r)}, index ${spct(p.b)}">`
+          + `<div class="cell ${sgn(p.e)}" style="background:color-mix(in srgb,var(${good?'--pos':'--neg'}) ${it}%,transparent)">${spct(p.e)}</div></td>`;
+      });
+      const v = f.bt.per.filter(p=>p.e!=null);
+      h += `<td class="n"><b>${v.filter(p=>p.e>0).length}</b><span class="co"> of ${v.length}</span></td></tr>`;
+    });
+    $('mx').innerHTML = h + '</tbody></table>';
+  });
+}
+
+/* ================================================================== current book */
+const nameOf = x => (x.ticker && SEC[x.ticker] && SEC[x.ticker].n) || titleCase(x.issuer);
+const secOf = x => (x.ticker && SEC[x.ticker] && SEC[x.ticker].s) || null;
+let bookAll = false;
+function renderBook(){
+  const f = focusFund(), qs = f.qs, q = qs && qs[qs.length-1], pq = qs && qs[qs.length-2];
+  const nsec = Object.keys(SEC).length;
+  once('book', [f.slug, q&&q.acc, nsec, bookAll, !!f.holdErr, !!S.pageErr].join('|'), ()=>{
+    $('book-h').textContent = q ? `${f.short}’s ${qlab(q.p)} book` : 'The current book';
+    if(S.pageErr){ $('book').innerHTML = stateBox('paused'); $('book-lede').textContent=''; $('exits').textContent=''; return; }
+    if(!q){ $('book').innerHTML = f.holdErr ? stateBox('err', f.holdErr) : skelRows(8,18); return; }
+    const pm = new Map((pq ? pq.pos : []).map(x=>[x.k,x]));
+    const acts = q.pos.map(x=>pq ? actionOf(x, pm.get(x.k)) : 'HOLD');
+    const cnt = k => acts.filter(a=>a===k).length;
+    const cur = new Set(q.pos.map(x=>x.k));
+    const exits = pq ? pq.pos.filter(x=>!cur.has(x.k)) : [];
+    $('book-lede').innerHTML = `Quarter ending <b>${fdate(q.p)}</b>, filed <b>${fdate(q.f)}</b>: <b>${q.n}</b> positions worth <b>${usd(q.total)}</b>. `
+      + (pq ? `Against ${qlab(pq.p)}: <b>${cnt('NEW')}</b> new, <b>${cnt('ADD')}</b> added to, <b>${cnt('TRIM')}</b> trimmed and <b>${exits.length}</b> sold out. The action is read from the change in share count; a move inside ±2% reads as held.`
+             : 'This is the earliest quarter FocusAlpha holds, so there is nothing to compare against.')
+      + (q.amended ? ' An amendment was also filed for this quarter; the original filing is shown.' : '');
+    const maxW = q.pos[0].w, list = bookAll ? q.pos : q.pos.slice(0,30);
+    let h = '<table><thead><tr><th class="n">#</th><th>Position</th><th>Sector</th><th class="n">Weight</th><th class="n">Value</th>'
+      + '<th class="n">Shares</th><th class="n">Δ shares</th><th>Action</th><th class="n">Prior weight</th></tr></thead><tbody>';
+    list.forEach((x,i)=>{
+      const p = pm.get(x.k), a = acts[i];
+      const chg = p && p.shares>0 ? x.shares/p.shares-1 : null;
+      h += `<tr><td class="n co">${i+1}</td><td><span class="tk">${esc(x.ticker||'—')}</span><span class="sub2">${esc(nameOf(x))}</span></td>`
+        + `<td class="co">${esc(secOf(x) || (x.ticker && !SEC[x.ticker] ? '…' : '—'))}</td>`
+        + `<td class="n bar"><i style="width:${(x.w/maxW*100).toFixed(1)}%"></i><span><b>${pct(x.w,1)}</b></span></td>`
+        + `<td class="n">${usd(x.value)}</td><td class="n">${intf(x.shares)}</td>`
+        + `<td class="n ${a==='NEW'?'':sgn(chg)}">${a==='NEW' ? '<span class="co">new</span>' : spct(chg,0)}</td>`
+        + `<td><span class="tag ${a}">${a==='HOLD'?'Held':a==='NEW'?'New':a==='ADD'?'Added':'Trimmed'}</span></td>`
+        + `<td class="n co">${p ? pct(p.w,1) : '—'}</td></tr>`;
+    });
+    h += '</tbody></table>';
+    if(q.pos.length>30) h += `<div style="padding:12px 16px;border-top:1px solid var(--line)"><button class="chip" type="button" id="b-book">${bookAll ? 'Show the top 30' : `Show all ${q.pos.length} positions`}</button></div>`;
+    $('book').innerHTML = h;
+    const bb = $('b-book'); if(bb) bb.addEventListener('click', ()=>{ bookAll = !bookAll; renderSoon(); });
+    exits.sort((a,b)=>b.w-a.w);
+    $('exits').innerHTML = exits.length
+      ? `<b>Sold out since ${qlab(pq.p)}:</b> ` + exits.slice(0,14).map(x=>`${esc(x.ticker ? x.ticker : titleCase(x.issuer))} <span class="co">(${pct(x.w,1)})</span>`).join(', ') + (exits.length>14 ? `, and ${exits.length-14} more.` : '.')
+      : (pq ? 'No position was sold out entirely this quarter.' : '');
+  });
+}
+
+/* ================================================================== attribution */
+function renderContrib(){
+  const f = focusFund(), bt = f.bt, H = $('c-contrib'), w = H.clientWidth, nsec = Object.keys(SEC).length;
+  once('contrib', [f.slug, bt&&bt.ret, w, nsec>0, !!f.btErr, !!S.pageErr].join('|'), ()=>{
+    $('contrib-h').textContent = `What carried ${f.short}’s book, and what cost it`;
+    if(S.pageErr){ chartState(H, stateBox('paused')); $('hit').textContent=''; return; }
+    if(!bt){ chartState(H, f.btErr ? stateBox('err', f.btErr) : null, 300); $('hit').textContent=''; return; }
+    const rows = bt.top.concat(bt.bot.slice().reverse());
+    if(!rows.length){ chartState(H, `<div class="state">No position moved the book.</div>`); return; }
+    const TP = $('t-contrib');
+    const rh = 26, F = frame(H, {h:rows.length*rh+34, ml:70, mr:16, mt:8, mb:26});
+    const m = Math.max(...rows.map(r=>Math.abs(r.c)));
+    const nt = niceTicks(-m, m, 4);
+    const X = v => F.ml+(v-nt.lo)/(nt.hi-nt.lo)*F.iw;
+    const g = svgEl('g',{class:'grid'}), ax = svgEl('g',{class:'axis'});
+    nt.ticks.forEach(v=>{ g.appendChild(svgEl('line',{x1:X(v), x2:X(v), y1:F.mt, y2:F.mt+F.ih}));
+      const t = svgEl('text',{x:X(v), y:F.mt+F.ih+16, 'text-anchor':'middle'}); t.textContent = (v>0?'+':'')+(v*100).toFixed(1)+'%'; ax.appendChild(t); });
+    F.svg.appendChild(g); F.svg.appendChild(ax);
+    F.svg.appendChild(svgEl('line',{class:'zero', x1:X(0), x2:X(0), y1:F.mt, y2:F.mt+F.ih}));
+    rows.forEach((r,i)=>{
+      const y = F.mt+i*rh+4, hgt = rh-8, x0 = X(0), x1 = X(r.c);
+      const lab = svgEl('text',{class:'endlab', x:F.ml-10, y:y+hgt/2+4, 'text-anchor':'end'}); lab.textContent = r.t; F.svg.appendChild(lab);
+      F.svg.appendChild(svgEl('rect',{x:Math.min(x0,x1), y, width:Math.max(2,Math.abs(x1-x0)), height:hgt, rx:4, fill: r.c>=0 ? 'var(--pos)' : 'var(--neg)', opacity:.82}));
+      const hit = svgEl('rect',{x:F.ml, y:y-2, width:F.iw, height:rh, fill:'transparent'});
+      hit.addEventListener('mouseenter', ()=>{ TP.innerHTML = tipHTML(r.t, [{k:(SEC[r.t]&&SEC[r.t].n)||titleCase(r.issuer), v:''},
+          {k:'Contribution', v:spct(r.c,2), cls:sgn(r.c)}, {k:'Books held in', v:String(r.q)}]);
+        const rr = F.svg.getBoundingClientRect(); placeTip(TP, H, X(r.c)/F.w*H.clientWidth, (y+hgt)/F.h*rr.height); });
+      hit.addEventListener('mouseleave', ()=>TP.classList.remove('on'));
+      F.svg.appendChild(hit);
+    });
+    const hits = bt.per.filter(p=>p.e!=null && p.e>0).length;
+    $('hit').innerHTML = `<b>${hits} of ${bt.nper}</b> holding periods beat the index, and the book beat it on <b>${pct(bt.win,0)}</b> of trading days. Top ${bt.top.length} and bottom ${bt.bot.length} names shown.`;
+  });
+}
+
+/* ================================================================== sectors heat grid */
+function renderSectors(){
+  const f = focusFund(), qs = f.qs, nsec = Object.keys(SEC).length;
+  once('sectors', [f.slug, qs&&qs.length, qs&&qs[qs.length-1].acc, nsec, !!f.holdErr, !!S.pageErr].join('|'), ()=>{
+    if(S.pageErr){ $('sectors').innerHTML = stateBox('paused'); return; }
+    if(!qs){ $('sectors').innerHTML = f.holdErr ? stateBox('err', f.holdErr) : skelRows(8,22); return; }
+    const need = uniq(qs.flatMap(q=>q.pos.map(x=>x.ticker)).filter(Boolean));
+    const have = need.filter(t=>SEC[t]).length;
+    if(!have){ $('sectors').innerHTML = stateBox(`Resolving sectors · 0 of ${need.length} tickers`); return; }
+    const byQ = qs.map(q=>{ const m = {}; q.pos.forEach(x=>{ const s = secOf(x) || 'Unresolved'; m[s] = (m[s]||0)+x.w; }); return m; });
+    const last = byQ[byQ.length-1];
+    const secs = uniq(byQ.flatMap(m=>Object.keys(m))).sort((a,b)=> a==='Unresolved' ? 1 : b==='Unresolved' ? -1 : (last[b]||0)-(last[a]||0));
+    const maxW = Math.max(...byQ.flatMap(m=>Object.entries(m).filter(([k])=>k!=='Unresolved').map(([,v])=>v)), 0.01);
+    let h = '<table class="heat"><thead><tr><th>Sector</th>' + qs.map(q=>`<th style="text-align:center">${esc(qshort(q.p))}</th>`).join('') + '</tr></thead><tbody>';
+    secs.forEach(s=>{
+      h += `<tr><td class="l${s==='Unresolved'?' co':''}">${esc(s)}</td>`;
+      byQ.forEach((m,i)=>{
+        const v = m[s]||0, it = s==='Unresolved' ? 0 : Math.round(6+72*Math.min(1, v/maxW));
+        const bg = v<0.005 ? 'transparent' : s==='Unresolved' ? 'var(--sunk)' : `color-mix(in srgb,var(--accent) ${it}%,transparent)`;
+        h += `<td title="${esc(s)} · ${esc(qlab(qs[i].p))}: ${pct(v,1)} of the book"><div class="c" style="background:${bg};color:${it>=48?'#fff':'var(--ink2)'}">${v<0.005 ? '<span class="co">·</span>' : pct(v,0)}</div></td>`;
+      });
+      h += '</tr>';
+    });
+    h += '</tbody></table>';
+    if(have<need.length) h += `<div class="state" style="padding:10px 16px">Resolving sectors · ${have} of ${need.length} tickers</div>`;
+    $('sectors').innerHTML = h;
+  });
+}
+
+/* ================================================================== history + tenure */
+function renderHist(){
+  const fs = S.funds.filter(f=>f.qs), H = $('c-hist'), w = H.clientWidth;
+  once('hist', fs.map(f=>f.slug+f.qs.length+f.qs[f.qs.length-1].acc).join()+S.focus+w+!!S.pageErr, ()=>{
+    if(S.pageErr){ chartState(H, stateBox('paused')); $('lg-hist').innerHTML=''; return; }
+    if(!fs.length){ chartState(H, null, 300); return; }
+    const xs = uniq(fs.flatMap(f=>f.qs.map(q=>q.p))).sort();
+    const series = fs.map(f=>{ const m = new Map(f.qs.map(q=>[q.p,q.total/1e9])); return {name:f.name, short:f.short, color:f.color, focus:f.slug===S.focus, vals:xs.map(p=>m.has(p)?m.get(p):null)}; });
+    lineChart({host:'c-hist', tip:'t-hist', legend:'lg-hist', xs, series, bench:null, h:320, cat:true, dots:true, zeroBase:true,
+      xlab:i=>qshort(xs[i]), yfmt:v=>'$'+(v>=10||v===0?v.toFixed(0):v.toFixed(1))+'B', tipTitle:i=>'Quarter ending '+fdate(xs[i]),
+      tipv:v=>'$'+v.toFixed(2)+'B'});
+  });
+}
+
+function renderTenure(){
+  const f = focusFund(), qs = f.qs, nsec = Object.keys(SEC).length;
+  once('tenure', [f.slug, qs&&qs.length, qs&&qs[qs.length-1].acc, nsec, !!f.holdErr, !!S.pageErr].join('|'), ()=>{
+    $('ten-h').textContent = `What ${f.short} has held the longest`;
+    if(S.pageErr){ $('tenure').innerHTML = stateBox('paused'); return; }
+    if(!qs){ $('tenure').innerHTML = f.holdErr ? stateBox('err', f.holdErr) : skelRows(6,18); return; }
+    $('ten-lede').innerHTML = `Positions carried through the most of the <b>${qs.length} quarters</b> FocusAlpha holds for ${esc(f.short)} (${qlab(qs[0].p)} to ${qlab(qs[qs.length-1].p)}), with the largest weight each reached. A filled dot is a quarter the name was in the book.`;
+    const m = new Map();
+    qs.forEach((q,i)=>q.pos.forEach(x=>{ const e = m.get(x.k) || {x, n:0, held:new Array(qs.length).fill(false), maxW:0, first:q.p, cur:0};
+      e.n++; e.held[i] = true; e.maxW = Math.max(e.maxW, x.w); e.x = x; if(i===qs.length-1) e.cur = x.w; m.set(x.k, e); }));
+    const rows = [...m.values()].sort((a,b)=>b.n-a.n || b.cur-a.cur || b.maxW-a.maxW).slice(0,15);
+    let h = '<table><thead><tr><th>Position</th><th>Sector</th><th>Quarters held</th><th class="n">First seen</th><th class="n">Peak weight</th><th class="n">Weight now</th></tr></thead><tbody>';
+    rows.forEach(r=>{
+      const dots = r.held.map(b=>`<i style="display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:3px;background:${b?'var(--green)':'transparent'};border:1.5px solid ${b?'var(--green)':'var(--line2)'}"></i>`).join('');
+      h += `<tr><td><span class="tk">${esc(r.x.ticker||'—')}</span><span class="sub2">${esc(nameOf(r.x))}</span></td><td class="co">${esc(secOf(r.x)||'—')}</td>`
+        + `<td><span style="white-space:nowrap">${dots}</span> <span class="co">${r.n}/${qs.length}</span></td><td class="n">${esc(qshort(r.first))}</td>`
+        + `<td class="n">${pct(r.maxW,1)}</td><td class="n">${r.cur ? '<b>'+pct(r.cur,1)+'</b>' : '<span class="co">exited</span>'}</td></tr>`;
+    });
+    $('tenure').innerHTML = h + '</tbody></table>';
+  });
+}
+
+/* ================================================================== notes */
+function renderNotes(){
+  const fs = S.funds.filter(f=>f.bt);
+  const sig = [S.calls.d, S.loading, fs.map(f=>f.slug+f.bt.cov).join(), S.focus, !!S.bench].join('|');
+  once('notes', sig, ()=>{
+    const by = S.calls.by, tl = Object.keys(by).map(k=>`<code>${esc(k)}</code> ×${by[k]}`).join(', ');
+    const cov = fs.map(f=>`${esc(f.short)} ${pct(f.bt.cov,0)}${f.bt.full ? ' (every position with a ticker)' : ''}`).join(' · ');
+    const reps = fs.reduce((s,f)=>s+(f.bt.repairs||0), 0);
+    const f = focusFund();
+    $('notes').innerHTML = [
+      ['adv', 'Where each number comes from', `<ul><li><b>Form ADV</b> — size, staff, brochure style and fees: <code>get_institution_profile</code>. ADV figures are self-reported to the SEC.</li>`
+        + `<li><b>13F books</b> — every quarter since ${esc(fdate(HOLD_START))}: <code>get_institutional_holdings</code>. Long share positions only; option and bond lines are left out.</li>`
+        + `<li><b>Prices</b> — daily adjusted closes from <code>get_market_data</code>; the index is <code>${esc(BENCH.symbol)}</code> from <code>get_benchmark_prices</code>.</li>`
+        + `<li><b>Sectors and names</b> — the FocusAlpha company registry via <code>search_companies</code>.</li></ul>`],
+      ['px', 'The replicating portfolio', `Each 13F book is bought, value-weighted, at the close of the first trading day after it was filed, and held without trading until the next filing. No costs, cash earns nothing, and a name that stops trading is held at its last price. `
+        + `${esc(f.short)} is priced on every position; the other managers on the names that make up 95% of each book (at most 60), reweighted. `
+        + (cov ? `<br><br>Share of book value priced: ${cov}.` : '')
+        + (reps ? ` ${reps} split or adjustment glitch${reps===1?' was':'es were'} repaired by falling back to the raw close for that day.` : '')],
+      ['13f', 'What this window can’t show', `FocusAlpha keeps about eight quarters of 13F filings and daily prices from ${esc(fdate(PRICE_START))}, so the replication covers roughly a year. A 13F lands up to 45 days after quarter-end and discloses only long US-listed equity — no shorts, no non-US listings, no swaps. `
+        + `A manager running 2:1 gross leverage with a short book looks nothing like its 13F, which is why this is not the fund’s performance.`],
+      ['adv', 'Reading the style columns', `The brochure’s value/growth bucket is what the firm <i>says</i>; the 13F tier is what its book’s weighted P/B and P/E <i>read as</i>. Brochure tags are deliberately conservative, so an empty field means the brochure doesn’t say — not that the firm doesn’t do it.`]
+    ].map(n=>`<div class="note src-${n[0]}"><h3><span class="tri sm"><i></i><i></i><i></i></span>${n[1]}</h3>${n[2]}</div>`).join('');
+    const ats = S.funds.flatMap(x=>[x.profAt, x.holdAt]).concat([S.benchAt]).filter(Boolean);
+    $('foot').innerHTML = S.calls.q ? `This load: ${S.calls.d} of ${S.calls.q} FocusAlpha calls answered${S.calls.err ? `, ${S.calls.err} failed or empty` : ''}${tl ? ' — '+tl : ''}. Oldest data fetched ${ago(ats.length?Math.min(...ats):0)}. All figures are public filing and market data; none of it is investment advice.`
+      : 'All figures are public filing and market data; none of it is investment advice.';
+  });
+}
+
+/* ================================================================== render */
+function render(){
+  renderHero(); renderBanner(); renderTiles(); renderPeers(); renderDvr(); renderFees();
+  renderCurve(); renderScatter(); renderMatrix(); renderBook(); renderContrib(); renderSectors();
+  renderHist(); renderTenure(); renderNotes();
+}
+
+/* ================================================================== UI wiring */
+function wire(){
+  $('chips').addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    if(b.dataset.rm){ removeCustom(); return; }
+    if(b.dataset.slug) setFocus(b.dataset.slug);
+  });
+  $('b-refresh').addEventListener('click', ()=>{ if(S.mcp && !S.loading) loadAll(true); });
+  const inp = $('q'), res = $('q-res');
+  let t = null, g = 0, rows = [];
+  const show = html => { res.innerHTML = html; res.hidden = false; };
+  const hide = () => { res.hidden = true; };
+  inp.addEventListener('input', ()=>{
+    clearTimeout(t); const v = inp.value.trim();
+    if(v.length<2){ hide(); return; }
+    t = setTimeout(async ()=>{
+      if(!S.mcp){ show('<div class="msg">Search needs the FocusAlpha connector in claude.ai.</div>'); return; }
+      const my = ++g; show('<div class="msg">Searching the SEC adviser roster…</div>');
+      try{
+        const r = await call(T.inst, {q:v, has_style:true, limit:8}, {pri:0});
+        if(my!==g) return;
+        rows = ((r.data && r.data.data) || []).filter(x=>x.cik);
+        if(!rows.length){ show('<div class="msg">No 13F filer matches that name.</div>'); return; }
+        show(rows.map((x,i)=>`<button type="button" data-i="${i}"><span><b>${esc(niceFirm(x.business_name||x.legal_name))}</b><br><small>${esc(titleCase(x.main_office_city||''))}${x.main_office_state?', '+esc(x.main_office_state):''} · ${esc(x.firm_type||'adviser')}</small></span><small>${usd(+x.aum_total)}</small></button>`).join(''));
+      }catch(e){ if(my!==g) return; const [tt,b] = errCopy(e); show(`<div class="msg"><b>${esc(tt)}</b><br>${esc(b)}</div>`); }
+    }, 350);
+  });
+  res.addEventListener('click', e=>{
+    const b = e.target.closest('button[data-i]'); if(!b) return;
+    const x = rows[+b.dataset.i]; hide(); inp.value = '';
+    if(x) addCustom(x);
+  });
+  inp.addEventListener('keydown', e=>{ if(e.key==='Escape'){ hide(); inp.blur(); } });
+  document.addEventListener('click', e=>{ if(!e.target.closest('.search')) hide(); });
+  window.addEventListener('hashchange', ()=>{ const h = location.hash.slice(1); if(fundBy(h)) setFocus(h); });
+  let lastW = window.innerWidth, rt = null;
+  window.addEventListener('resize', ()=>{ clearTimeout(rt); rt = setTimeout(()=>{
+    if(Math.abs(window.innerWidth-lastW)<8) return; lastW = window.innerWidth;
+    ['curve','scatter','contrib','hist','bars'].forEach(k=>delete SIG[k]); renderSoon(); }, 150); });
+  setInterval(()=>{ delete SIG.conn; delete SIG.notes; renderSoon(); }, 30000);
+}
+
+async function boot(){
+  const h = (location.hash||'').slice(1);
+  if(fundBy(h)) S.focus = h;
+  else if(/^cik\d{3,10}$/.test(h)){
+    const cik = String(parseInt(h.slice(3),10));
+    S.funds.push(mkFund({slug:'cik'+cik, name:'CIK '+cik, short:'CIK '+cik, cik, crd:null}, 6, true));
+    S.focus = 'cik'+cik;
+  } else { const v = store.raw('fa:focus'); if(v && fundBy(v)) S.focus = v; }
+  wire();
+  render();
+  let mcp = null;
+  try{ mcp = (window.claude && typeof window.claude.use==='function') ? await window.claude.use('mcp') : null; }catch(e){ mcp = null; }
+  if(!mcp){ S.mcpState = 'absent'; S.pageErr = {code:'no_mcp'}; renderSoon(); return; }
+  S.mcp = mcp; S.mcpState = 'ready';
+  loadAll(false);
+}
+boot();
+})();
+</script>
+
+</body></html>

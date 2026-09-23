@@ -226,7 +226,7 @@ details.wu li{margin:3px 0}
     <div class="livebox">
       <span class="status" id="status">Snapshot</span>
       <button class="btn" id="liveBtn" hidden>Connect live data</button>
-      <button class="fa-own" id="ownBtn" type="button">Build my own <span class="arw">→</span></button>
+      <a class="fa-gh" href="https://github.com/focusAlpha/dashboards/tree/main/monitor-dashboard" target="_blank" rel="noopener" title="This page's source on GitHub (MIT)">Source on GitHub</a><button class="fa-own" id="ownBtn" type="button">Build my own <span class="arw">→</span></button>
     </div>
   </div>
 
@@ -769,6 +769,16 @@ build(); render();
 .fa-own:focus-visible{outline:2px solid #6644C9;outline-offset:3px}
 .fa-own .arw{font-size:15px;line-height:1;opacity:.9}
 @media (max-width:560px){.fa-own{padding:9px 15px;font-size:13px}}
+/* Source on GitHub — sits beside Build my own on every page; outlined so the purple stays the one call to action */
+.fa-gh{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:9px;margin-right:8px;
+  font:500 13px/1 system-ui,-apple-system,"Segoe UI",sans-serif;color:#4F2FB0;background:transparent;border:1px solid rgba(79,47,176,.45);
+  text-decoration:none;white-space:nowrap;letter-spacing:.01em}
+.fa-gh::before{content:"";width:14px;height:14px;background:currentColor;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/></svg>") center/contain no-repeat}
+.fa-gh:hover{background:rgba(79,47,176,.08);border-color:#4F2FB0}
+.fa-gh:focus-visible{outline:2px solid #6644C9;outline-offset:3px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fa-gh{color:#B9A6F2;border-color:rgba(185,166,242,.5)}:root:not([data-theme="light"]) .fa-gh:hover{background:rgba(185,166,242,.12);border-color:#B9A6F2}}
+:root[data-theme="dark"] .fa-gh{color:#B9A6F2;border-color:rgba(185,166,242,.5)}:root[data-theme="dark"] .fa-gh:hover{background:rgba(185,166,242,.12);border-color:#B9A6F2}
+@media (max-width:560px){.fa-gh{padding:7px 10px;font-size:12px}}
 .fa-scrim{position:fixed;inset:0;background:rgba(8,12,18,.62);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;
   /* Its OWN palette. The three demos each name their tokens differently
      (--surface / --card / --shell), so inheriting them left the dialog with an
@@ -808,6 +818,7 @@ build(); render();
   background:var(--fa-wash);color:var(--fa-brand);border:1px solid color-mix(in srgb,var(--fa-brand) 35%,transparent);
   font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;vertical-align:1px}
 .fa-link:hover{background:var(--fa-brand);color:#fff;border-color:var(--fa-brand)}
+.fa-src{color:var(--fa-brand);font-weight:600;text-decoration:underline;text-underline-offset:2px}
 .fa-pbox{position:relative;background:var(--fa-bg2);border:1px solid var(--fa-line);border-radius:10px}
 .fa-pbox pre{margin:0;padding:14px 16px;font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-word;max-height:42vh;overflow:auto;color:var(--fa-ink)}
@@ -823,8 +834,10 @@ build(); render();
     <div class="fa-mh">
       <div>
         <h2 id="faTitle">Build your own, on your own data</h2>
-        <p>This page is a frozen snapshot. Paste the prompt below into Claude and it will pull live
-           FocusAlpha data through the connector — your universe, your filters, your account.</p>
+        <p>This page is a frozen snapshot. Its source is public on
+           <a class="fa-src" href="https://github.com/focusAlpha/dashboards/tree/main/monitor-dashboard" target="_blank" rel="noopener">GitHub</a>.
+           Paste the prompt below into Claude: it fetches that source and republishes it reading live
+           FocusAlpha data through your connector — your universe, your filters, your account.</p>
       </div>
       <button class="fa-x" id="faX" aria-label="Close">×</button>
     </div>
@@ -833,49 +846,42 @@ build(); render();
         <li>Connect <b>FocusAlpha</b> in your preferred AI, if you haven’t already <a class="fa-link" href="https://focusalpha.ai/start" target="_blank" rel="noopener">Connect →</a></li>
         <li><b>Copy</b> the prompt below and paste it into a new conversation</li>
         <li>Edit the conditions at the bottom — that last block is yours to change</li>
+        <li>Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions</li>
       </ol>
       <div class="fa-pbox">
         <button class="fa-copy" id="faCopy">Copy</button>
-        <pre id="faPrompt">Build me a monitoring dashboard like https://focusalpha.ai/monitor-dashboard, on my own watchlist.
-Sample page: https://focusalpha.ai/monitor-dashboard  ·  its full source: https://github.com/focusAlpha/dashboards/blob/main/monitor-dashboard/index.html
-The sample's data is frozen as of 2026-09-23. Mine must fetch live, through the connector.
+        <pre id="faPrompt">Build me a live news monitor from the FocusAlpha sample at https://focusalpha.ai/monitor-dashboard, on my own watchlist.
 
-FIRST look at the data, before writing any page:
-1. Call get_company_events({ company: "NVDA", relation: "both", min_impact: 40 }) once and read
-   the rows. "direct" rows are events that name the company; "knock_on" rows are events that
-   never mention it but reach it through a filed relationship, and they carry peak_magnitude
-   rather than peak_impact.
-2. Call get_market_data for one symbol and read a row, so the price line uses the real fields.
+The page is open source. Fetch this ONE file and use it verbatim as the page:
+  https://raw.githubusercontent.com/focusAlpha/dashboards/main/monitor-dashboard/live.html
+It is a single self-contained HTML file, under 100 KB, no build step, no dependencies. Download it
+exactly as it is, with curl or your fetch tool. Do not summarise it, retype it, or rebuild it from
+memory. The sample on focusalpha.ai is this same page with a week of events frozen on 2026-09-23
+baked in; live.html ships with an empty snapshot and fills itself through the FocusAlpha connector:
+the last 7 days of events and articles for every company on the list, and 3 months of prices.
 
-THEN build it as an artifact that FETCHES ITS OWN DATA LIVE — not a page with the rows you
-just pasted into it. That part is what makes it a dashboard instead of a screenshot:
+Then, in this order:
+1. Publish the file as an artifact, declaring the connector:
+     capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["get_company_events", "get_company_news", "get_market_data"] }] }, sample: {} }
+   If the connector is listed in your tools as "focusalpha", use that spelling for server. The
+   sample capability is optional; it lets the page translate Asian-language headlines on demand.
+   Without the mcp declaration window.claude.use('mcp') resolves null and the page can never fetch.
+2. Open it. Click "Connect live data" if that button shows, then check the status line counts
+   events, articles and prices for every company. If the page says the connector is not available,
+   I have to connect FocusAlpha first: https://focusalpha.ai/start
+3. Now change the watchlist. It is the SNAP.companies list at the top of the script, one line per
+   company: key, name, region (US, TW, KR, JP, CN), symbol, currency. Call search_companies for each
+   name on my list to get the symbol FocusAlpha uses ("2330.TW", "005930.KS", "6758.T", ...).
+   Replace the list with mine, republish, and send me the link. If I need a region the page does
+   not have, add it to REGIONS.
 
-- declare the connector when you publish the artifact:
-    capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["get_company_events", "get_company_news", "get_market_data"] }] } }
-  Without this declaration window.claude.use('mcp') resolves null and the page can never fetch.
-- in the page:
-    const mcp = await window.claude.use('mcp');
-  It also resolves null for a viewer with no FocusAlpha connector — say that on the page
-  rather than rendering an empty table.
-- call a tool with:
-    const r = await mcp.callTool("FocusAlpha", "&lt;tool&gt;", input, { cache: { staleTime: 120000 } });
-    const payload = r.payload;
-  Failures reject with an error carrying a code; render a sentence per code (not connected,
-  needs sign-in, rate limited) instead of a blank screen.
-- every control re-runs the call, debounced about 200ms, with a visible loading state.
-
-What the page needs:
-- company cards down the left: 7-day news volume, 1-week price move, net sentiment, a sparkline
-- a time-ordered event feed on the right, each row with the event type, direction, impact score
-  and the one-line reason
-- filters for region, direction, event type and impact floor, all re-running the call
-- get_company_news only when I open an event and want the individual write-ups
-
-Three things the page must say plainly, and must never blur together:
-- direction and impact_score are FocusAlpha's MODEL reading an article. They are not reporting,
-  not a measurement, and not a price forecast.
+Rules for any change:
+- Keep the data layer exactly as it is: every row arrives through MCP.watchTool or MCP.callTool.
+  Never paste rows into the page. The point of this page is that it fetches its own data.
+- direction and impact_score are FocusAlpha's model reading an article, not reporting, not a
+  measurement, not a price forecast. The page says so; keep it.
 - knock_on rows are inferences drawn from filed relationships, not something anyone published.
-- filings are NOT in this stream. 8-K, TDnet, DART and HKEX come through get_company_disclosures.
+- Filings are NOT in this stream. 8-K, TDnet, DART and HKEX come through get_company_disclosures.
 
 My watchlist (edit this):
   NVDA, MU, 2330.TW, 005930.KS, 6758.T, ASML</pre>
