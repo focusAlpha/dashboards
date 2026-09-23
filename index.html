@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Financial Data Dashboards for Claude &amp; AI | FocusAlpha</title>
+<meta name="description" content="Three working dashboards on the FocusAlpha financial data API: a global stock screener, a semiconductor news monitor and a hedge fund profile — each one buildable in Claude.">
+<link rel="canonical" href="https://focusalpha.ai/dashboards/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FocusAlpha">
+<meta property="og:title" content="Financial Data Dashboards for Claude &amp; AI | FocusAlpha">
+<meta property="og:description" content="Three working dashboards on the FocusAlpha financial data API: a global stock screener, a semiconductor news monitor and a hedge fund profile.">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+  :root{--brand:#4F2FB0;--brand-2:#6644C9;--brand-wash:#F2EEFC}
+  .demos{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-top:30px}
+  .demo{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    box-shadow:var(--shadow);overflow:hidden;text-decoration:none;color:inherit;transition:border-color .15s,transform .15s}
+  .demo:hover{border-color:var(--brand);transform:translateY(-2px)}
+  .demo .top{padding:17px 19px 15px;flex:1}
+  .demo h2{margin:0 0 6px}
+  .demo p{margin:0;color:var(--muted);font-size:13px;line-height:1.55}
+  .demo .bot{padding:11px 19px;border-top:1px solid var(--line2);background:var(--surface2);display:flex;gap:8px;flex-wrap:wrap}
+  .own{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff;border:0;border-radius:11px;
+    padding:11px 20px;font-weight:600;font-size:14px;line-height:1;text-decoration:none;
+    box-shadow:0 1px 2px rgba(31,17,74,.22),0 10px 22px -10px rgba(79,47,176,.65)}
+  .own:hover{background:var(--brand-2)}
+</style>
+</head>
+<body>
+
+<header class="mast"><div class="mast-in">
+  <a class="brand" href="./">FocusAlpha <span>Dashboards</span></a>
+  <div class="mast-r"><span class="snap">Sample data · <b>2026-09-23</b> · not live</span></div>
+</div></header>
+
+<div class="wrap">
+  <p class="eyebrow">Samples · data as of 2026-09-23</p>
+  <h1>Three public dashboards</h1>
+  <p class="sub lede">Each one is a page we already publish, with its data frozen to a single day's
+     snapshot — no network calls, no API key, nothing a visitor can spend. Every page carries a
+     <b>Build my own</b> button that hands over a prompt: paste it into Claude with the FocusAlpha
+     connector and the live version builds itself, on the visitor's own universe and account.</p>
+
+  <div class="demos">
+    <a class="demo" href="screener-dashboard/">
+      <div class="top">
+        <h2>screener-dashboard</h2>
+        <p>The Screening Terminal. Ten filter axes, sortable columns and the per-company drawer all
+           still work — 2,613 companies frozen into the page, with filtering and sorting running in
+           the browser.</p>
+      </div>
+      <div class="bot"><span class="tool">screen_companies</span><span class="tool">2,613 companies</span></div>
+    </a>
+    <a class="demo" href="monitor-dashboard/">
+      <div class="top">
+        <h2>monitor-dashboard</h2>
+        <p>The Semiconductor News Board. 36 companies and 901 events across the US, Taiwan, Korea,
+           Japan and China. <b>Outlet names are stripped</b> — each item keeps its link to the
+           original.</p>
+      </div>
+      <div class="bot"><span class="tool">get_company_events</span><span class="tool">901 events</span></div>
+    </a>
+    <a class="demo" href="manager-profile-dashboard/">
+      <div class="top">
+        <h2>manager-profile-dashboard</h2>
+        <p>The Lone Pine fund dashboard. What the firm reports on Form ADV against what its 13F
+           actually holds, plus a replicating portfolio — six peers, 324 price series, all computed
+           in the page.</p>
+      </div>
+      <div class="bot"><span class="tool">get_institution_profile</span><span class="tool">get_institutional_holdings</span></div>
+    </a>
+  </div>
+
+  <div class="note blue">
+    <b>These pages never update themselves.</b> They are samples: the data inside them was frozen on
+    2026-09-23 and each page prints that date on its face. For current data, connect FocusAlpha in
+    your AI and build your own — the button on every page hands you the prompt.
+  </div>
+</div>
+
+<footer class="foot"><div class="foot-in">
+  <div>
+    <h3>Current data</h3>
+    <p>Every figure here is a sample frozen on 2026-09-23. For live data, connect FocusAlpha in your AI —
+       <a href="https://focusalpha.ai/start">focusalpha.ai/start</a> — and use the <b>Build my own</b> prompt on any page.</p>
+  </div>
+  <p class="disc">Every figure on these pages comes from public filings or market data, and none of
+     it is investment advice. On the news board, direction and impact score are FocusAlpha's model
+     reading an article — not reporting, and not a price forecast.</p>
+</div></footer>
+
+</body>
+</html>
