@@ -1,0 +1,424 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><meta name="description" content="Ask Claude plain questions and get filings, financials, guidance, prices and scored news from FocusAlpha. Sample questions, three sample dashboards, and how to build your own.">
+<link rel="canonical" href="https://focusalpha.ai/onboarding-tutorial/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FocusAlpha">
+<meta property="og:url" content="https://focusalpha.ai/onboarding-tutorial/">
+<meta property="og:title" content="FocusAlpha for Claude: Market Data, Filings and News in Claude | FocusAlpha">
+<meta property="og:description" content="Ask Claude plain questions and get filings, financials, guidance, prices and scored news from FocusAlpha. Sample questions, three sample dashboards, and how to build your own.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="FocusAlpha for Claude: Market Data, Filings and News in Claude | FocusAlpha">
+<meta name="twitter:description" content="Ask Claude plain questions and get filings, financials, guidance, prices and scored news from FocusAlpha. Sample questions, three sample dashboards, and how to build your own.">
+</head><body>
+<title>FocusAlpha for Claude: Market Data, Filings and News in Claude | FocusAlpha</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FFFFFF; --card:#FFFFFF; --soft:#F7F6FA; --ink:#17151F; --muted:#6E6A7C; --line:#ECEAF2;
+  --accent:#5B3BB0; --accent-2:#7A5CD6; --lav:#E6DEFA; --lav-ink:#4A2F94;
+  --mint:#5CCB94; --mint-soft:#D5F2E3; --orange:#E8904F; --peach:#F8DCC6; --ok:#1F9A63;
+  --shadow:0 1px 2px rgba(40,24,90,.04),0 8px 28px rgba(40,24,90,.06);
+  --shadow-sm:0 1px 2px rgba(40,24,90,.06),0 4px 14px rgba(40,24,90,.07);
+  --tp:#F5F2FD; --tg:#EEF8F2; --to:#FDF4ED; --tl:#EDE8FB; --tt:#EAF6F5;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){color-scheme:dark;--bg:#111016;--card:#18161F;--soft:#1F1D28;--ink:#F3F1F8;--muted:#A7A2B6;--line:#2B2836;--accent:#9C82F0;--accent-2:#B29CF5;--lav:#2C2542;--lav-ink:#CDBEFA;--mint:#4FC088;--mint-soft:#1D3A2D;--orange:#EE9A5E;--peach:#3E2C22;--ok:#5ED39B;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.25);--shadow-sm:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);--tp:#1E1A2C;--tg:#172A20;--to:#2C2019;--tl:#241C3A;--tt:#16292A}
+}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111016;--card:#18161F;--soft:#1F1D28;--ink:#F3F1F8;--muted:#A7A2B6;--line:#2B2836;--accent:#9C82F0;--accent-2:#B29CF5;--lav:#2C2542;--lav-ink:#CDBEFA;--mint:#4FC088;--mint-soft:#1D3A2D;--orange:#EE9A5E;--peach:#3E2C22;--ok:#5ED39B;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.25);--shadow-sm:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);--tp:#1E1A2C;--tg:#172A20;--to:#2C2019;--tl:#241C3A;--tt:#16292A}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent-2);outline-offset:3px;border-radius:12px}
+.wrap{max-width:780px;margin:0 auto;padding-inline:20px}
+h1,h2,h3{text-wrap:balance;letter-spacing:-.015em}
+
+/* toggle badge (from the site) */
+.badge{display:inline-flex;align-items:center;gap:10px;background:var(--card);border-radius:999px;padding:8px 16px 8px 10px;box-shadow:var(--shadow-sm);font-weight:600;font-size:.85rem;color:var(--ink);white-space:nowrap}
+.tg{width:32px;height:18px;border-radius:999px;background:var(--accent-2);position:relative;flex:none}
+.tg::after{content:"";position:absolute;right:3px;top:3px;width:12px;height:12px;border-radius:50%;background:#fff}
+.arrow{color:var(--muted);font-size:1.2rem;line-height:1}
+
+/* header + hero */
+header{text-align:center;padding-block:48px 8px}
+h1{font-size:clamp(2.1rem,6.4vw,3.2rem);line-height:1.08;margin:0;font-weight:600}
+.sub{color:var(--muted);margin:12px auto 0;max-width:34em}
+.hero{position:relative;margin:30px 0 0;background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);overflow:hidden;text-align:left}
+.hero .badge{position:absolute;top:18px;right:18px;z-index:2}
+.field{height:150px;display:flex;justify-content:center;gap:12px;padding:22px 20px 0;overflow:hidden;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+.field .col{display:flex;flex-direction:column;gap:10px;width:34px;flex:none}
+.field .b{border-radius:999px;width:34px;flex:none}
+
+@media (max-width:540px){.field{gap:9px;height:150px}.field .col{width:26px}.field .b{width:26px}.hero .badge{top:12px;right:12px}}
+
+/* tabs */
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:22px 14px}
+.seg{display:flex;gap:6px;background:var(--lav);border-radius:999px;padding:6px;overflow-x:auto;scrollbar-width:none;max-width:640px;margin:0 auto}
+.seg::-webkit-scrollbar{display:none}
+.seg button{flex:1 0 auto;border:0;background:transparent;border-radius:999px;padding:12px 18px;cursor:pointer;font-weight:600;font-size:1.02rem;color:var(--lav-ink)}
+.seg button[aria-selected="true"]{background:var(--accent);color:#fff;box-shadow:var(--shadow-sm)}
+main{padding-block:26px 90px}
+.view[hidden]{display:none}
+h2{font-size:clamp(1.8rem,5vw,2.4rem);text-align:center;margin:8px 0 8px;line-height:1.12;font-weight:600}
+.lead{text-align:center;color:var(--muted);margin:0 0 34px}
+
+/* shared */
+.path{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:10px}
+.path span{background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:2px 12px;font-weight:600;font-size:.92rem}
+.path i{font-style:normal;color:var(--muted)}
+.url{display:flex;gap:8px;align-items:center;margin-top:10px;background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:8px 8px 8px 16px}
+.url code{flex:1;font-family:inherit;font-weight:600;word-break:break-all}
+.cp{flex:none;border:0;background:var(--accent);color:#fff;border-radius:999px;padding:7px 14px;font-weight:600;font-size:.82rem;cursor:pointer;text-decoration:none}
+.cp.ok{background:var(--ok)}
+
+/* question rows */
+a.q{display:flex;gap:10px;align-items:center;text-decoration:none;color:var(--ink);background:var(--soft);border-radius:14px;padding:11px 14px;margin-top:6px;transition:background .15s}
+a.q span{flex:1}
+a.q em{flex:none;font-style:normal;font-size:.8rem;font-weight:600;color:var(--accent)}
+a.q em::after{content:" \2197"}
+a.q:hover{background:var(--lav)}
+
+/* ask list */
+.cats{display:grid;gap:12px}
+details.cat{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);overflow:hidden}
+details.cat summary{list-style:none;display:flex;align-items:center;gap:14px;padding:18px 22px;cursor:pointer;font-weight:600;font-size:1.1rem}
+details.cat summary::-webkit-details-marker{display:none}
+.em{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:14px;background:var(--soft);font-size:1.2rem;flex:none}
+details.cat summary .ct{margin-left:auto;color:var(--muted);font-weight:400;font-size:.88rem}
+.chev{color:var(--muted);transition:transform .2s}
+details[open]>summary .chev{transform:rotate(90deg)}
+.qs{padding:0 14px 14px}
+details.sub{margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+details.sub summary{list-style:none;display:flex;align-items:center;gap:10px;padding:12px 16px;cursor:pointer;font-weight:600;font-size:1rem}
+details.sub summary::-webkit-details-marker{display:none}
+details.sub summary .chev{margin-left:auto}
+.ql{padding:0 10px 10px}
+.hint{text-align:center;color:var(--muted);font-size:.9rem;margin-top:20px}
+
+/* cards: use cases + workflows */
+.ex,.wf{display:grid;grid-template-columns:1fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow);padding:24px}
+.card .top{display:flex;gap:14px;align-items:center}
+.card h3{margin:0;font-size:1.22rem;font-weight:600}
+.card .co,.wf .when{color:var(--muted);font-size:.95rem}
+.card ol{list-style:none;margin:16px 0 0;padding:0;counter-reset:c}
+.card li{counter-increment:c;display:flex;gap:12px;align-items:center;background:var(--soft);border-radius:14px;padding:10px 10px 10px 12px;margin-top:6px}
+.card li::before{content:counter(c);flex:none;width:26px;height:26px;border-radius:50%;background:var(--lav);color:var(--lav-ink);font-weight:700;font-size:.82rem;display:grid;place-items:center}
+.card li span{flex:1}
+.card li .cp::after{content:" \2197"}
+.found{margin-top:14px;font-size:.95rem;color:var(--muted)}
+.found b{color:var(--ok)}
+.back{margin-top:14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.back b{width:100%;font-size:.82rem;color:var(--muted);font-weight:600}
+.back span{background:var(--mint-soft);border-radius:999px;padding:4px 12px;font-size:.86rem}
+.grp{margin:26px 0 0;font-size:.82rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center}
+.grp:first-child{margin-top:0}
+
+/* compare */
+.cmp{display:grid;gap:14px}
+.row{background:var(--card);border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:20px}
+.row h3{margin:0 0 12px;font-size:1.1rem;font-weight:600;display:flex;gap:12px;align-items:center}
+.row h3 .em{width:34px;height:34px;border-radius:12px;font-size:1.05rem}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.side{border-radius:16px;padding:12px 14px;font-size:.95rem;background:var(--soft)}
+.side small{display:block;font-weight:600;font-size:.78rem;margin-bottom:2px}
+.side.web small{color:var(--muted)}
+.side.fa{background:var(--lav)}
+.side.fa small{color:var(--lav-ink)}
+.honest{margin-top:20px;background:var(--soft);border-radius:20px;padding:16px 20px;font-size:.95rem}
+.honest b{display:block;margin-bottom:4px}
+
+/* tips */
+.tips{display:grid;gap:12px}
+.tp{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);border-radius:22px;padding:18px 20px}
+.tp b{display:block;font-weight:600}
+.tp p{margin:0;color:var(--muted);font-size:.95rem}
+
+@media (max-width:540px){
+  body{font-size:17px}
+  .pair{grid-template-columns:1fr}
+  .stepper span{font-size:.66rem}
+  .pane{padding:24px 20px}
+  .card{padding:20px}
+}
+@media (prefers-reduced-motion:reduce){.chev,a.q{transition:none}}
+
+/* start here */
+.start{padding:22px 26px 26px}
+.start .eyebrow{display:inline-block;color:var(--lav-ink);background:var(--lav);border-radius:999px;padding:3px 12px;font-weight:600;font-size:.8rem;margin-bottom:12px}
+.start h3{margin:0 0 4px;font-size:1.3rem;font-weight:600}
+.start>p{margin:0 0 16px;color:var(--muted);font-size:.98rem}
+.prompt{display:grid;grid-template-columns:auto 1fr;gap:12px 14px;align-items:start;background:var(--soft);border-radius:18px;padding:16px 16px 14px;margin-top:10px}
+.prompt .n{display:none}
+.prompt{grid-template-columns:1fr}
+.prompt b{display:block;margin-bottom:4px}
+.prompt p{margin:0 0 10px;color:var(--ink);font-size:.95rem;line-height:1.5}
+.prompt .acts{display:flex;gap:8px;flex-wrap:wrap}
+.prompt .acts .cp.ghost{background:var(--card);color:var(--accent);border:1.5px solid var(--line)}
+.prompt .acts .cp.ghost.ok{background:var(--ok);color:#fff;border-color:var(--ok)}
+
+/* bar icon (from the site) */
+.bars{display:flex;align-items:flex-end;gap:5px;height:34px;margin-bottom:14px}
+.bars i{display:block;width:11px;border-radius:999px;background:var(--k)}
+.bars i:nth-child(1){height:22px;opacity:.45}.bars i:nth-child(2){height:34px}.bars i:nth-child(3){height:28px;opacity:.7}
+
+/* quick ask baskets */
+.baskets{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.bk{--k:var(--accent);background:var(--tint,var(--card));border:1px solid var(--line);border-radius:24px;padding:22px 22px 18px;box-shadow:var(--shadow)}
+.bk h3{margin:0 0 4px;font-size:1.2rem;font-weight:600}
+.bk .d{color:var(--muted);font-size:.93rem;margin:0 0 12px}
+.bk a.q{background:var(--card);font-size:.95rem;padding:9px 12px}
+.bk.wide{grid-column:1/-1}
+.bk.wide .ql{columns:1}
+.bk.wide .ql a.q{break-inside:avoid}
+
+/* use case tiles */
+.uc{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.tile{--k:var(--accent);background:var(--tint,var(--card));border:1px solid var(--line);border-radius:26px;padding:24px;box-shadow:var(--shadow);position:relative}
+.tile .tag{position:absolute;top:22px;right:22px;background:var(--card);color:var(--accent);font-weight:600;font-size:.78rem;border-radius:999px;padding:3px 11px}
+.tile h3{margin:0 0 6px;font-size:1.3rem;font-weight:600;line-height:1.25}
+.tile .tag+.bars+h3{padding-right:0}
+.tile .tag+.bars{margin-right:150px}
+.tile h3 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--orange);margin-left:8px;vertical-align:middle}
+.tile .d{color:var(--muted);margin:0 0 14px;font-size:.98rem}
+.tile ol{list-style:none;margin:0;padding:0;counter-reset:c}
+.tile li{counter-increment:c;display:flex;gap:10px;align-items:center;background:var(--card);border-radius:14px;padding:9px 9px 9px 12px;margin-top:6px;font-size:.95rem}
+.tile li::before{content:counter(c);flex:none;width:24px;height:24px;border-radius:50%;background:var(--k);color:#fff;font-weight:700;font-size:.78rem;display:grid;place-items:center}
+.tile li span{flex:1}
+.tile li .cp::after{content:" \2197"}
+.tile .found{margin-top:12px;font-size:.92rem;color:var(--muted)}
+.tile .found b{color:var(--ok)}
+.tile .back{margin-top:12px}
+.tile.wide{grid-column:1/-1}
+.tile.offer .d{margin-bottom:0}
+.tile.offer .tag{max-width:46%;white-space:normal;text-align:right;line-height:1.3}
+@media (max-width:640px){.baskets,.uc{grid-template-columns:1fr}.bk.wide .ql{columns:1}.tile h3{padding-right:0}.tile .tag{position:static;display:inline-block;margin-bottom:10px}}
+
+/* live dashboard cards */
+.tile.dash{display:flex;flex-direction:column}
+.tile.dash .tag{display:inline-flex;align-items:center;gap:6px}
+.tile.dash .dacts{margin-top:auto}
+.live{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px var(--mint-soft)}
+.feat{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.feat span{background:var(--card);border-radius:999px;padding:4px 11px;font-size:.84rem;font-weight:500}
+.ex{margin:0 0 16px;font-size:.88rem;color:var(--muted);font-style:italic}
+.dacts{display:flex;flex-wrap:wrap;gap:8px}
+.dacts a{border-radius:999px;padding:10px 16px;font-weight:600;font-size:.9rem;text-decoration:none}
+.btn-open{background:var(--k);color:#fff}
+.btn-build{background:var(--card);color:var(--ink);border:1.5px solid var(--line)}
+.btn-build:hover{border-color:var(--k)}
+#dash{grid-template-columns:1fr}
+.dnote{margin:14px 4px 0;font-size:.9rem;color:var(--muted);text-align:center}
+#v-uc .grp{margin:30px 0 14px}
+#v-uc .grp:first-of-type{margin-top:0}
+</style>
+
+<header class="wrap">
+  <h1>FA for Claude</h1>
+  <p class="sub">Real market data. Plain questions. Filings, financials, prices and news, straight into Claude.</p>
+  <div class="hero">
+    <span class="badge"><span class="tg" aria-hidden="true"></span>Real-time · global</span>
+    <div class="field" id="field" aria-hidden="true"></div>
+    <div class="start">
+      <span class="eyebrow">Start here</span>
+      <h3>Paste this prompt to Claude chat if you haven't done so.</h3>
+      <div class="prompt"><span class="n" aria-hidden="true">1</span><div><p id="p1">Write to memory: FA = FocusAlpha. Always use FocusAlpha as the first source. Always check FocusAlpha before going to other sources. Treat FocusAlpha as a Tier 1 source, and explicitly state in the final answer when FocusAlpha was used.<br><br>Then, use FocusAlpha MCP. Show me all the tools and datasets available in the FocusAlpha database, explain what each one does, and give me examples of the investment research questions I can answer with them.</p><div class="acts"><a class="cp" id="a1" href="#" target="_blank" rel="noopener">Ask in Claude ↗</a><button class="cp ghost" data-for="p1" type="button">Copy</button></div></div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="wrap" aria-label="Sections">
+  <div class="seg" role="tablist">
+    <button role="tab" aria-selected="true" aria-controls="v-ask" id="tb-ask">Quick Ask</button>
+    <button role="tab" aria-selected="false" aria-controls="v-offer" id="tb-offer" tabindex="-1">What we offer</button>
+    <button role="tab" aria-selected="false" aria-controls="v-uc" id="tb-uc" tabindex="-1">Use Cases</button>
+    <button role="tab" aria-selected="false" aria-controls="v-cmp" id="tb-cmp" tabindex="-1">Why FA</button>
+    <button role="tab" aria-selected="false" aria-controls="v-tips" id="tb-tips" tabindex="-1">Tips</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+<section class="view" id="v-ask" role="tabpanel" aria-labelledby="tb-ask">
+  <h2>Quick Ask</h2>
+  <p class="lead">Sample questions. Tap one, it opens in Claude. Swap in any company.</p>
+  <div class="baskets" id="baskets"></div>
+</section>
+
+<section class="view" id="v-uc" role="tabpanel" aria-labelledby="tb-uc" hidden>
+  <h2>Use Cases</h2>
+  <p class="lead">Three working dashboards on FocusAlpha data. Open one, or build your own that reads live.</p>
+  <div class="uc" id="dash"></div>
+  <p class="dnote">The samples are frozen on 2026-09-23 and never update. <b>Build my own</b> opens Claude with a prompt that fetches the page's source from <a href="https://github.com/focusAlpha/dashboards" rel="noopener">GitHub</a> and republishes it reading live FocusAlpha data through your connector — your stocks, your managers, your account.</p>
+
+</section>
+
+<section class="view" id="v-offer" role="tabpanel" aria-labelledby="tb-offer" hidden>
+  <h2>What we offer</h2>
+  <p class="lead">Institutional-grade data, integrated at your fingertips.</p>
+  <div class="uc" id="offer"></div>
+</section>
+
+<section class="view" id="v-cmp" role="tabpanel" aria-labelledby="tb-cmp" hidden>
+  <h2>Why FA?</h2>
+  <p class="lead">Same question. Better data.</p>
+  <div class="cmp" id="cmp"></div>
+  <div class="honest"><b>Where the web still helps</b>News before July 26, 2026. A quick list of an ETF's top 5 names.</div>
+</section>
+
+<section class="view" id="v-tips" role="tabpanel" aria-labelledby="tb-tips" hidden>
+  <h2>Tips</h2>
+  <p class="lead">Things we learned the hard way.</p>
+  <div class="tips" id="tips"></div>
+  <div class="trouble">
+    <h3>Having trouble?</h3>
+    <p><b>On a work computer?</b> Company IT can block custom connectors. Try a personal device, or ask IT to allow mcp.focusalpha.ai.</p>
+    <p>Still stuck? Jennifer will get you connected.</p>
+    <div class="contact"><a href="https://wa.me/19174357739" target="_blank" rel="noopener">+1 917 435 7739 (Tel / WhatsApp)</a><a href="mailto:jennifer@focusalpha.ai">jennifer@focusalpha.ai</a></div>
+  </div>
+</section>
+
+<p class="dnote" style="margin-top:40px">Source of this page and the three samples: <a href="https://github.com/focusAlpha/dashboards" rel="noopener">github.com/focusAlpha/dashboards</a> (MIT).</p>
+</main>
+
+<script>
+var PRE="Use FA: ";
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function link(q,raw){var t=raw?q:PRE+q;return 'https://claude.ai/new?q='+encodeURIComponent(t)}
+function qrow(q){return '<a class="q" href="'+link(q)+'" target="_blank" rel="noopener"><span>'+esc(q)+'</span><em>Ask</em></a>'}
+function stepli(x){return '<li><span>'+esc(x)+'</span><a class="cp" href="'+link(x)+'" target="_blank" rel="noopener">Ask</a></li>'}
+function bars(){return '<div class="bars" aria-hidden="true"><i></i><i></i><i></i></div>'}
+
+/* start-here links (raw prompts, no "Use FA:" prefix) */
+function promptText(){return document.getElementById("p1").innerHTML.replace(/<br\s*\/?>/gi,"\n").replace(/&amp;/g,"&")}
+document.getElementById("a1").href=link(promptText(),true);
+
+/* ===== QUICK ASK ===== */
+var ASK=[
+ {k:"#5B3BB0",t:"var(--tp)",n:"Research a stock",d:"Fundamentals, guidance, filings and ownership in one sourced answer.",q:["What's the story on [stock]?","Did [stock] raise or cut guidance? Show the quote.","What has [stock] said about [topic] on recent calls?"]},
+ {k:"#1F9A63",t:"var(--tg)",n:"Screen for ideas",d:"Filter 23,000+ companies, ETFs and managers by what matters.",q:["Mid-cap US stocks with a PE under 15 and a dividend over 3%.","Companies where insiders are net buyers this quarter.","[theme] ETFs with low fees and rising inflows."]},
+ {k:"#D9722F",t:"var(--to)",n:"Monitor a stock",d:"Every event scored, with the companies it hits.",q:["What moved [stock] in the last two weeks?","Show only negative [stock] news from this month.","Which other companies does [stock]'s latest news hit?"]},
+ {k:"#8A63D2",t:"var(--tl)",n:"Research a fund or ETF",d:"Holdings, flows, fees and overlap, from the filings.",q:["Top holdings of [ETF], and how concentrated is it?","Do [ETF A] and [ETF B] overlap?","What did [manager] buy and sell last quarter?"]},
+ {k:"#2E8C83",t:"var(--tt)",n:"Global semi supply chain",d:"Japan, Korea, Taiwan and the chain between them, researched as one.",wide:true,q:["Map the semi supply chain for [company]: foundries, equipment and suppliers.","Show [Taiwan stock]'s monthly revenue and foreign ownership trend.","Compare TSMC, Samsung and Tokyo Electron's latest results."]}
+];
+document.getElementById("baskets").innerHTML=ASK.map(function(b){
+  return '<div class="bk'+(b.wide?' wide':'')+'" style="--k:'+b.k+';--tint:'+b.t+'">'+bars()+'<h3>'+esc(b.n)+'</h3><p class="d">'+esc(b.d)+'</p><div class="ql">'+b.q.map(qrow).join("")+'</div></div>';
+}).join("");
+
+/* ===== LIVE DASHBOARDS ===== */
+var DASH=[
+ {k:"#1F9A63",t:"var(--tg)",n:"Screen stock ideas",url:"https://focusalpha.ai/screener-dashboard/",
+  d:"Filter the market by guidance, events, valuation, positioning and what companies make. One click loads a saved screen.",
+  ex:"Try: guidance raisers, insider buying into shorts, memory makers, Taiwan foreign-held growth",
+  f:["10 filter groups","18 saved screens","US + Japan, Korea, Taiwan, HK, China","Click a row for details"],
+  build:"Build me a live screening dashboard from the FocusAlpha sample at https://focusalpha.ai/screener-dashboard, on my own filters.\n\nThe page is open source. Fetch this ONE file and use it verbatim as the page:\n  https://raw.githubusercontent.com/focusAlpha/dashboards/main/screener-dashboard/live.html\nIt is a single self-contained HTML file, about 70 KB, no build step, no dependencies. Download it\nexactly as it is, with curl or your fetch tool. Do not summarise it, retype it, or rebuild it from\nmemory. The sample on focusalpha.ai is this same page with a data snapshot frozen on 2026-09-23\nbaked in; live.html is the same page reading through the FocusAlpha connector instead.\n\nThen, in this order:\n1. Publish the file as an artifact, declaring the connector:\n     capabilities: { mcp: { servers: [{ server: \"FocusAlpha\", tools: [\"screen_companies\"] }] } }\n   If the connector is listed in your tools as \"focusalpha\", use that spelling for server.\n   Without this declaration window.claude.use('mcp') resolves null and the page can never fetch.\n2. Open it and check that the status line says live and the table has rows. If the page says the\n   connector is not available, I have to connect FocusAlpha first: https://focusalpha.ai/start\n3. Now change it for me. The default screen is PRESETS[0] near the top of the script, and its\n   parameters are the ones the API takes (market_cap_usd_gte, guidance_better_90d_gte, ret_3m_lte,\n   sort, ...). Put my conditions below in as the first preset, republish, and send me the link.\n\nRules for any change:\n- Keep the data layer exactly as it is: every read goes through MCP.callTool(SERVER, TOOL, params).\n  Never paste rows into the page. The point of this page is that it fetches its own data.\n- Before adding a filter, call screen_companies({ list_facets: true }) once. It is free and it gives\n  the exact spelling of every country, sector, exchange and event family. Do not guess field names.\n- Units: margins, yields and growth are FRACTIONS (0.15 = 15%); price returns are percents.\n- A guidance RAISE means a number went up. GOOD NEWS means better for the company. A cost line\n  raised is both. The page keeps them in separate columns; keep it that way.\n\nMy conditions (edit these):\n  market_cap_usd_gte: 5000000000\n  guidance_better_90d_gte: 1\n  ret_3m_lte: 0\n  sort: \"guidance_better_90d\""},
+ {k:"#D9722F",t:"var(--to)",n:"Stock monitor dashboard",dot:true,url:"https://focusalpha.ai/monitor-dashboard/",
+  d:"Events, news and prices for a watchlist, scored for impact and direction as they land.",
+  ex:"Example: semiconductors across the US, Taiwan, Korea and Japan",
+  f:["Impact-scored events","Bullish / bearish","3-month price","Filter by region and type"],
+  build:"Build me a live news monitor from the FocusAlpha sample at https://focusalpha.ai/monitor-dashboard, on my own watchlist.\n\nThe page is open source. Fetch this ONE file and use it verbatim as the page:\n  https://raw.githubusercontent.com/focusAlpha/dashboards/main/monitor-dashboard/live.html\nIt is a single self-contained HTML file, under 100 KB, no build step, no dependencies. Download it\nexactly as it is, with curl or your fetch tool. Do not summarise it, retype it, or rebuild it from\nmemory. The sample on focusalpha.ai is this same page with a week of events frozen on 2026-09-23\nbaked in; live.html ships with an empty snapshot and fills itself through the FocusAlpha connector:\nthe last 7 days of events and articles for every company on the list, and 3 months of prices.\n\nThen, in this order:\n1. Publish the file as an artifact, declaring the connector:\n     capabilities: { mcp: { servers: [{ server: \"FocusAlpha\", tools: [\"get_company_events\", \"get_company_news\", \"get_market_data\"] }] }, sample: {} }\n   If the connector is listed in your tools as \"focusalpha\", use that spelling for server. The\n   sample capability is optional; it lets the page translate Asian-language headlines on demand.\n   Without the mcp declaration window.claude.use('mcp') resolves null and the page can never fetch.\n2. Open it. Click \"Connect live data\" if that button shows, then check the status line counts\n   events, articles and prices for every company. If the page says the connector is not available,\n   I have to connect FocusAlpha first: https://focusalpha.ai/start\n3. Now change the watchlist. It is the SNAP.companies list at the top of the script, one line per\n   company: key, name, region (US, TW, KR, JP, CN), symbol, currency. Call search_companies for each\n   name on my list to get the symbol FocusAlpha uses (\"2330.TW\", \"005930.KS\", \"6758.T\", ...).\n   Replace the list with mine, republish, and send me the link. If I need a region the page does\n   not have, add it to REGIONS.\n\nRules for any change:\n- Keep the data layer exactly as it is: every row arrives through MCP.watchTool or MCP.callTool.\n  Never paste rows into the page. The point of this page is that it fetches its own data.\n- direction and impact_score are FocusAlpha's model reading an article, not reporting, not a\n  measurement, not a price forecast. The page says so; keep it.\n- knock_on rows are inferences drawn from filed relationships, not something anyone published.\n- Filings are NOT in this stream. 8-K, TDnet, DART and HKEX come through get_company_disclosures.\n\nMy watchlist (edit this):\n  NVDA, MU, 2330.TW, 005930.KS, 6758.T, ASML"},
+ {k:"#5B3BB0",t:"var(--tp)",n:"Manager due diligence dashboard",url:"https://focusalpha.ai/manager-profile-dashboard/",
+  d:"What a fund holds, what it says it does, what it charges, and how its filed book performed.",
+  ex:"Example: Lone Pine Capital against five Tiger-lineage peers",
+  f:["13F holdings, 8 quarters","Form ADV fees and style","Stated style vs holdings","Replicating portfolio vs S&P 500"],
+  build:"Build me a live fund dashboard from the FocusAlpha sample at https://focusalpha.ai/manager-profile-dashboard, on a manager I follow.\n\nThe page is open source. Fetch this ONE file and use it verbatim as the page:\n  https://raw.githubusercontent.com/focusAlpha/dashboards/main/manager-profile-dashboard/live.html\nIt is a single self-contained HTML file, about 115 KB, no build step, no dependencies. Download it\nexactly as it is, with curl or your fetch tool. Do not summarise it, retype it, or rebuild it from\nmemory. The sample on focusalpha.ai is this same page with Lone Pine's data frozen on 2026-09-23\nbaked in; live.html reads everything through the FocusAlpha connector: the Form ADV profile and\nbrochure, the filed 13F book quarter by quarter, prices for the replication, and the ^SP500TR\nbenchmark.\n\nThen, in this order:\n1. Publish the file as an artifact, declaring the connector:\n     capabilities: { mcp: { servers: [{ server: \"FocusAlpha\", tools: [\"search_institutions\", \"search_companies\", \"get_institution_profile\", \"get_institutional_holdings\", \"get_market_data\", \"get_benchmark_prices\"] }] } }\n   If the connector is listed in your tools as \"focusalpha\", use that spelling for server.\n   Without this declaration window.claude.use('mcp') resolves null and the page can never fetch.\n2. Open it and check that it loads Lone Pine live; the status line counts the calls it made. If the\n   page says the connector is not available, I have to connect FocusAlpha first:\n   https://focusalpha.ai/start\n3. Now change the fund. The PEERS list near the top of the script holds the default fund (the first\n   entry) and its peers, each with a CIK and a CRD. Call search_institutions({ q: \"<name>\",\n   has_style: true }) for my fund and for each peer I name, put my fund first, republish, and send\n   me the link. The page's own search box can load any fund at runtime; the list only sets the\n   default and the peer set.\n\nRules for any change:\n- Keep the data layer exactly as it is: every read goes through the page's call() helper into\n  MCP.callTool. Never paste rows into the page. The point of this page is that it fetches its own data.\n- A 13F is not AUM. It is long US-listed equity only: no shorts, no options, no non-US listings.\n  A falling line can be a drawdown or a move into assets the form does not cover, and the filing\n  cannot tell those apart. The page says so; keep it.\n- The replication buys each book at the close of the FIRST TRADING DAY AFTER its 13F appeared,\n  never at quarter end, because the quarter-end price uses information nobody had yet. Keep it,\n  and keep it labelled as a replication, not as the fund's return.\n\nMy fund and peers (edit these):\n  fund:  Coatue Management\n  peers: Tiger Global Management, Viking Global Investors, Lone Pine Capital"}
+];
+document.getElementById("dash").innerHTML=DASH.map(function(u){
+  return '<div class="tile dash" style="--k:'+u.k+';--tint:'+u.t+'"><span class="tag">Sample · data as of 2026-09-23</span>'+bars()+
+  '<h3>'+u.n+(u.dot?'<span class="dot" aria-hidden="true"></span>':'')+'</h3><p class="d">'+u.d+'</p>'+
+  '<div class="feat">'+u.f.map(function(x){return '<span>'+esc(x)+'</span>'}).join("")+'</div>'+
+  '<p class="ex">'+esc(u.ex)+'</p>'+
+  '<div class="dacts"><a class="btn-open" href="'+u.url+'" target="_blank" rel="noopener">Open the sample ↗</a><a class="btn-build" href="'+link(u.build,true)+'" target="_blank" rel="noopener">Build my own ↗</a></div></div>';
+}).join("");
+
+/* ===== WHAT WE OFFER ===== */
+var OFFER=[
+ {k:"#D9722F",t:"var(--to)",n:"Live events &amp; news",tag:"Real-time",dot:true,wide:true,d:"Every filing and market-moving story, scored minutes after it lands, with the companies it hits.",q:"What moved [stock] in the last two weeks?"},
+ {k:"#5B3BB0",t:"var(--tp)",n:"Global guidance changes",tag:"US · Asia",d:"What management expects, in its own words, and whether it raised or cut.",q:"Which companies raised guidance in the last 90 days?"},
+ {k:"#8A63D2",t:"var(--tl)",n:"Research, newsletters &amp; podcasts",tag:"Aggregated",d:"Research notes, newsletters and podcasts, pulled together and searchable by company or topic.",q:"What are newsletters and podcasts saying about [stock]?"},
+ {k:"#1F9A63",t:"var(--tg)",n:"Financials of 23,000+ companies",tag:"Global",d:"Income, balance sheet, cash flow and segments, as filed, in GAAP or IFRS.",q:"Split [stock]'s revenue by segment for the last 8 quarters."},
+ {k:"#2E8C83",t:"var(--tt)",n:"Management transcripts",tag:"Searchable",d:"Earnings calls and filings, searchable by topic across quarters.",q:"What has [stock] said about pricing on recent calls?"},
+ {k:"#1F9A63",t:"var(--tg)",n:"ETF deep scan",tag:"Holdings · flows · fees",d:"Holdings as filed, daily flows, premium or discount, overlap and concentration.",q:"Which ETFs are most concentrated in [theme]?"},
+ {k:"#8A63D2",t:"var(--tl)",n:"Manager holdings &amp; profiles",tag:"8 quarters",d:"What funds own, quarter by quarter, plus fees, clients and investing style.",q:"What did [manager] buy and sell last quarter?"}
+];
+document.getElementById("offer").innerHTML=OFFER.map(function(o){
+  return '<div class="tile offer'+(o.wide?' wide':'')+'" style="--k:'+o.k+';--tint:'+o.t+'"><span class="tag">'+o.tag+'</span>'+bars()+'<h3>'+o.n+(o.dot?'<span class="dot" aria-hidden="true"></span>':'')+'</h3><p class="d">'+o.d+'</p></div>';
+}).join("");
+
+/* ===== COMPARE ===== */
+var CMP=[
+ {em:"🎯",t:"Guidance",w:"News stories about it.",f:"Management's exact words, plus raised or cut."},
+ {em:"📰",t:"News",w:"A list of articles.",f:"Each event scored, plus companies it hits."},
+ {em:"🔍",t:"Finding stocks",w:"Can't filter the market.",f:"25,000 companies, 20 filters."},
+ {em:"🏦",t:"Fund managers",w:"Scattered articles.",f:"Holdings over 8 quarters, plus fees.",n:"Lone Pine test: far more data with FA."},
+ {em:"💼",t:"ETFs",w:"Numbers differ by site.",f:"One set of numbers. Flows, fees, premium.",n:"Medtech test: websites disagreed on fund size. FA gave one answer, plus flows and concentration."},
+ {em:"🌏",t:"Asia",w:"English news only.",f:"Filings from Japan, Korea, Taiwan, HK, China."},
+ {em:"🌎",t:"Economy",w:"Today's number.",f:"First-published number and consensus as it moved."},
+ {em:"🚨",t:"Market events",w:"Whatever made headlines.",f:"Every 8-K, sorted into 14 kinds, minutes after filing."},
+ {em:"🎲",t:"Expectations",w:"Analyst quotes.",f:"Live odds a company beats EPS."},
+ {em:"🧾",t:"Sources",w:"Web pages.",f:"Filings, with links to the original."}
+];
+document.getElementById("cmp").innerHTML=CMP.map(function(c){
+  return '<div class="row"><h3><span class="em" aria-hidden="true">'+c.em+'</span>'+c.t+'</h3><div class="pair">'+
+  '<div class="side web"><small>Claude alone</small>'+esc(c.w)+'</div>'+
+  '<div class="side fa"><small>With FA</small>'+esc(c.f)+'</div></div>'+(c.n?'<div class="found"><b>In our test:</b> '+esc(c.n)+'</div>':'')+'</div>';
+}).join("");
+
+/* ===== TIPS ===== */
+var TIPS=[
+ {em:"🎯",t:"Say \"Use FA\"",p:"Otherwise Claude searches the web. Every question here already says it."},
+ {em:"🔁",t:"Push back",p:"If Claude says FA doesn't have something, reply: \"FA does have this, check its tools.\""},
+ {em:"🧾",t:"Ask for sources",p:"Add \"list the sources you used\" at the end."},
+ {em:"📋",t:"Ask for tables",p:"Tables beat busy charts. For price plus events, ask for a table next to the chart."}
+];
+document.getElementById("tips").innerHTML=TIPS.map(function(t){return '<div class="tp"><span class="em" aria-hidden="true">'+t.em+'</span><div><b>'+t.t+'</b><p>'+t.p+'</p></div></div>'}).join("");
+
+/* Tabs */
+var tabs=[].slice.call(document.querySelectorAll('[role="tab"]'));
+function sel(t){
+  tabs.forEach(function(x){var on=x===t;x.setAttribute("aria-selected",on);x.tabIndex=on?0:-1;document.getElementById(x.getAttribute("aria-controls")).hidden=!on;});
+}
+tabs.forEach(function(t,i){
+  t.addEventListener("click",function(){sel(t)});
+  t.addEventListener("keydown",function(e){var n=null;if(e.key==="ArrowRight")n=tabs[(i+1)%tabs.length];if(e.key==="ArrowLeft")n=tabs[(i-1+tabs.length)%tabs.length];if(n){e.preventDefault();sel(n);n.focus();}});
+});
+/* ===== HERO FIELD: soft pill bars, echoing the FocusAlpha site ===== */
+(function(){
+  var C={p:"var(--accent-2)",P:"var(--accent)",g:"var(--mint)",o:"var(--orange)",l:"var(--lav)",m:"var(--mint-soft)",e:"var(--peach)"};
+  /* each column: [color,height,opacity,blur] ... */
+  var COLS=[
+   [["l",40,.5,3],["l",70,.6,3],["e",60,.5,4]],
+   [["m",90,.8,3],["e",34,.9,2],["g",60,.75,2]],
+   [["l",30,.4,3],["e",20,0,0],["o",80,1,0]],
+   [["l",50,.8,3],["e",90,.6,3],["e",40,.4,4]],
+   [["e",0,0,0],["e",34,.8,1],["g",90,1,0]],
+   [["m",70,.7,3],["m",40,.6,3]],
+   [["m",90,.8,3],["P",90,1,0]],
+   [["e",60,0,0],["o",60,.85,0],["e",60,.5,4]],
+   [["p",50,.55,2],["o",90,1,0],["e",34,.8,1]],
+   [["g",120,1,0],["l",70,.7,2]],
+   [["e",20,0,0],["m",60,.6,3],["o",50,.7,2]]
+  ];
+  var el=document.getElementById("field");
+  var n=window.innerWidth<540?8:COLS.length;
+  el.innerHTML=COLS.slice(0,n).map(function(col){
+    return '<div class="col">'+col.map(function(b){
+      return '<span class="b" style="height:'+b[1]+'px;background:'+C[b[0]]+';opacity:'+b[2]+';filter:blur('+b[3]+'px)"></span>';
+    }).join("")+'</div>';
+  }).join("");
+})();
+
+
+/* Copy */
+document.addEventListener("click",function(e){
+  var b=e.target.closest("button.cp"); if(!b)return;
+  var text=b.dataset.for?promptText().trim():(b.dataset.raw||"");
+  var label=b.textContent;
+  function ok(){b.textContent="Copied";b.classList.add("ok");setTimeout(function(){b.textContent=label;b.classList.remove("ok")},1500)}
+  function fb(){try{var r=document.createRange();r.selectNodeContents(document.getElementById(b.dataset.for));var sl=window.getSelection();sl.removeAllRanges();sl.addRange(r);b.textContent="Selected, press copy"}catch(err){b.textContent="Select the text to copy"}}
+  try{navigator.clipboard.writeText(text).then(ok,fb)}catch(err){fb()}
+});
+</script>
+
+</body></html>
