@@ -1,0 +1,670 @@
+<!doctype html><html><head>
+<!--
+  FocusAlpha · ETF screener · LIVE SOURCE
+  The same page as https://focusalpha.ai/etf-screener-dashboard with no data baked in: every number is read
+  through the viewer's FocusAlpha connector (MCP) when the page opens. Opened as a plain web
+  page, without a connector, it shows only its empty state.
+
+  To use it: publish this file as a claude.ai artifact with the connector declared —
+    capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["screen_etfs"] }] } }
+  Where to edit: PRESETS[0] near the top of the script is the default screen; its keys are the screen_etfs parameters (min_aum, max_expense_ratio, segment, tier, taxonomy_prefix, min_flow_20d, max_premium, sort, ...).
+  Source and licence (MIT): https://github.com/focusAlpha/dashboards
+-->
+<meta name="robots" content="noindex">
+<meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>FocusAlpha ETF Screening Terminal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#F2F3F6; --surface:#FFFFFF; --surface2:#F7F8FA; --ink:#151A22; --muted:#5B6472; --faint:#8B93A1; --line:#DCDFE6; --line2:#EBEDF2;
+  --accent:#1E4ED8; --accent-ink:#FFFFFF; --accent-soft:#E6ECFB;
+  --up:#157A4A; --up-soft:#E3F3EA; --down:#C2363B; --down-soft:#FBE6E7; --warn:#A8690C; --warn-soft:#FBF0DC;
+  --bar:#6F86C9; --sel:#EEF2FC; --shadow:0 8px 24px rgba(21,26,34,.10);
+  --src-sec:#1E4ED8; --src-jp:#B0466A; --src-kr:#3B7D74; --src-hk:#8A5A2B; --src-cn:#B7412B; --src-news:#5C5F8A;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0E1116; --surface:#151A21; --surface2:#1A2029; --ink:#E8EAEF; --muted:#9AA3B2; --faint:#6E7788; --line:#2A313C; --line2:#222833;
+  --accent:#7A9BFF; --accent-ink:#0E1116; --accent-soft:#1D2740;
+  --up:#3DBB7A; --up-soft:#173224; --down:#F0656A; --down-soft:#3A1E20; --warn:#E0A030; --warn-soft:#3A2D16;
+  --bar:#5F7ACF; --sel:#1B2233; --shadow:0 8px 24px rgba(0,0,0,.45);
+  --src-sec:#7A9BFF; --src-jp:#E07C9E; --src-kr:#5FBFB2; --src-hk:#D9A066; --src-cn:#F08A6E; --src-news:#A6A9E0;
+}}
+:root[data-theme="dark"]{
+  --bg:#0E1116; --surface:#151A21; --surface2:#1A2029; --ink:#E8EAEF; --muted:#9AA3B2; --faint:#6E7788; --line:#2A313C; --line2:#222833;
+  --accent:#7A9BFF; --accent-ink:#0E1116; --accent-soft:#1D2740;
+  --up:#3DBB7A; --up-soft:#173224; --down:#F0656A; --down-soft:#3A1E20; --warn:#E0A030; --warn-soft:#3A2D16;
+  --bar:#5F7ACF; --sel:#1B2233; --shadow:0 8px 24px rgba(0,0,0,.45);
+  --src-sec:#7A9BFF; --src-jp:#E07C9E; --src-kr:#5FBFB2; --src-hk:#D9A066; --src-cn:#F08A6E; --src-news:#A6A9E0;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.num{font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+a{color:var(--accent)}
+.app{display:grid;grid-template-rows:auto 1fr;height:100vh;min-height:0}
+/* masthead */
+.mast{display:flex;align-items:center;gap:18px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--surface)}
+.brand{font-family:"IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;font-weight:600;font-size:17px;letter-spacing:.01em;display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.brand small{font-family:"IBM Plex Mono",monospace;font-weight:400;font-size:11px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.status{display:flex;gap:18px;margin-left:auto;font-size:11.5px;color:var(--muted);white-space:nowrap;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.status b{color:var(--ink);font-weight:500}
+/* layout */
+.main{display:grid;grid-template-columns:296px minmax(0,1fr);min-height:0}
+.rail{border-right:1px solid var(--line);background:var(--surface);overflow:auto;min-height:0}
+.center{display:flex;flex-direction:column;min-height:0;min-width:0}
+/* rail */
+.rail-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px 6px;position:sticky;top:0;background:var(--surface);z-index:2;border-bottom:1px solid var(--line2)}
+.rail-head h2{margin:0;font-family:"IBM Plex Sans Condensed",sans-serif;font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);flex:1}
+.linkbtn{background:none;border:0;color:var(--accent);padding:2px 4px;font-size:12px}
+.railclose{display:none}
+.axis{border-bottom:1px solid var(--line2)}
+.axis>summary{list-style:none;display:flex;align-items:center;gap:8px;padding:9px 14px;cursor:pointer;user-select:none}
+.axis>summary::-webkit-details-marker{display:none}
+.axis>summary .n{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--faint);width:14px}
+.axis>summary .t{font-weight:600;font-size:12.5px;flex:1}
+.axis>summary .active{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--accent);background:var(--accent-soft);padding:1px 6px;border-radius:3px}
+.axis>summary .chev{color:var(--faint);transition:transform .15s}
+.axis[open]>summary .chev{transform:rotate(90deg)}
+.axis .body{padding:2px 14px 12px;display:flex;flex-direction:column;gap:9px}
+.axis .hint{font-size:11px;color:var(--muted);line-height:1.4;margin:0}
+.ctl{display:grid;grid-template-columns:104px 1fr;align-items:center;gap:6px}
+.ctl label{font-size:11.5px;color:var(--muted)}
+.ctl label .api{display:block;font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--faint);letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ctl .pair{display:flex;gap:4px;align-items:center}
+.ctl input[type=number],.ctl input[type=date],.ctl input[type=text],.ctl select{width:100%;min-width:0;padding:4px 6px;border:1px solid var(--line);border-radius:4px;background:var(--surface2);font-family:"IBM Plex Mono",monospace;font-size:11.5px}
+.ctl .pair span{font-size:10px;color:var(--faint)}
+.ctl .unit{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint);padding-left:2px}
+.tri{display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.tri button{flex:1;border:0;background:var(--surface2);padding:4px 0;font-size:11px;color:var(--muted)}
+.tri button+button{border-left:1px solid var(--line)}
+.tri button.on{background:var(--accent);color:var(--accent-ink)}
+.multi{border:1px solid var(--line);border-radius:4px;background:var(--surface2)}
+.multi input.search{width:100%;border:0;border-bottom:1px solid var(--line);background:transparent;padding:5px 7px;font-size:11.5px;font-family:"IBM Plex Mono",monospace}
+.multi .opts{max-height:168px;overflow:auto}
+.multi .opt{display:flex;align-items:center;gap:6px;padding:3px 7px;font-size:11.5px;cursor:pointer}
+.multi .opt:hover{background:var(--sel)}
+.multi .opt input{margin:0}
+.multi .opt .v{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.multi .opt .cnt{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--faint)}
+.multi .more{padding:3px 7px;font-size:10.5px;color:var(--faint)}
+.srcdot{display:inline-block;width:6px;height:6px;border-radius:50%;flex:none}
+.exbtn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;text-align:left;padding:7px 9px;border:1px solid var(--line);border-radius:5px;background:var(--surface2)}
+.exbtn.on{border-color:var(--accent);background:var(--accent-soft)}
+.exbtn .k{font-family:"IBM Plex Mono",monospace;font-size:11px;word-break:break-word}
+.exbtn .d{font-size:11px;color:var(--muted)}
+/* presets */
+.presets{padding:10px 18px 0;border-bottom:1px solid var(--line);background:var(--surface)}
+.presets .lbl{font-family:"IBM Plex Sans Condensed",sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.pstrip{display:flex;gap:6px;overflow-x:auto;padding-bottom:10px;scrollbar-width:thin}
+.pchip{flex:none;display:flex;flex-direction:column;gap:2px;text-align:left;padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface2);min-width:150px;max-width:200px}
+.pchip .pn{font-weight:600;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pchip .pd{font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pchip .pg{font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--faint);letter-spacing:.04em;text-transform:uppercase}
+.pchip.on{border-color:var(--accent);background:var(--accent-soft)}
+.pchip.on .pg{color:var(--accent)}
+/* query */
+.qbar{padding:12px 18px;border-bottom:1px solid var(--line);background:var(--bg)}
+.qbox{background:var(--surface);border:1px solid var(--line);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.qbox .qh{display:flex;align-items:center;gap:10px;padding:6px 10px;border-bottom:1px solid var(--line2);font-size:11px;color:var(--muted)}
+.qbox .qh .tab{background:none;border:0;padding:2px 6px;border-radius:3px;color:var(--muted);font-size:11px}
+.qbox .qh .tab.on{background:var(--accent-soft);color:var(--accent)}
+.qbox .qh .cp{margin-left:auto}
+.qbox pre{margin:0;padding:8px 10px;font-family:"IBM Plex Mono",monospace;font-size:11.5px;line-height:1.5;overflow:auto;flex:1;max-height:170px;white-space:pre-wrap;word-break:break-word}
+.qbox pre .k{color:var(--accent)} .qbox pre .s{color:var(--up)} .qbox pre .d{color:var(--muted)}
+/* table bar + live state */
+.tbar{display:flex;align-items:center;gap:10px;padding:8px 18px;border-bottom:1px solid var(--line);background:var(--surface);flex-wrap:wrap}
+.tbar .lb{font-size:11px;color:var(--muted)}
+.cg{display:flex;gap:4px;flex-wrap:wrap}
+.cg button{border:1px solid var(--line);background:var(--surface2);border-radius:12px;padding:2px 9px;font-size:11px;color:var(--muted)}
+.cg button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tbar .sortsel{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);flex-wrap:wrap}
+.tbar select{padding:3px 6px;border:1px solid var(--line);border-radius:4px;background:var(--surface2);font-family:"IBM Plex Mono",monospace;font-size:11px}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);white-space:nowrap;margin-right:4px}
+.live .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.live.ok .dot{background:var(--up)}
+.live.loading .dot{background:var(--warn);animation:pulse 1s ease-in-out infinite}
+.live.error .dot{background:var(--down)}
+@keyframes pulse{50%{opacity:.3}}
+.banner{display:flex;align-items:center;gap:10px;padding:7px 18px;border-bottom:1px solid var(--line);background:var(--warn-soft);font-size:12px;flex-wrap:wrap}
+.banner[hidden],.linkbtn[hidden]{display:none}
+.banner b{font-weight:600}
+.banner .act{margin-left:auto}
+.twrap{overflow:auto;flex:1;min-height:0;background:var(--surface)}
+.twrap.loading tbody{opacity:.45;transition:opacity .15s}
+table{border-collapse:separate;border-spacing:0;width:100%;min-width:900px}
+th{position:sticky;top:0;background:var(--surface);z-index:1;text-align:left;font-weight:500;font-size:10.5px;color:var(--muted);letter-spacing:.03em;padding:7px 8px;border-bottom:1px solid var(--line);white-space:nowrap;user-select:none}
+th[data-sort]{cursor:pointer}
+th.r,td.r{text-align:right}
+th.sorted{color:var(--accent)}
+th .arr{font-size:9px;margin-left:3px}
+td{padding:6px 8px;border-bottom:1px solid var(--line2);vertical-align:middle;white-space:nowrap;max-width:260px;overflow:hidden;text-overflow:ellipsis}
+tr.row{cursor:pointer}
+tr.row:hover td{background:var(--sel)}
+tr.row.on td{background:var(--accent-soft)}
+td .tk{font-family:"IBM Plex Mono",monospace;font-weight:500}
+td .nm{color:var(--muted);font-size:11.5px}
+.pos{color:var(--up)} .neg{color:var(--down)}
+.gpill{display:inline-flex;align-items:center;gap:3px;font-family:"IBM Plex Mono",monospace;font-size:11px;padding:1px 6px;border-radius:3px}
+.gpill.up{background:var(--up-soft);color:var(--up)} .gpill.dn{background:var(--down-soft);color:var(--down)} .gpill.z{color:var(--faint)}
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:3px;background:var(--surface2);border:1px solid var(--line);margin-right:3px;color:var(--muted);max-width:170px;overflow:hidden;text-overflow:ellipsis;vertical-align:middle}
+.tag.hit{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.tag.m{color:var(--ink)}
+.tag.risk{border-color:var(--down);color:var(--down);background:var(--down-soft)}
+.sbadge{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:2px;vertical-align:-1px}
+.dim{color:var(--faint)}
+.sus{color:var(--warn);font-size:9px;vertical-align:super}
+.pager{display:flex;align-items:center;gap:10px;padding:7px 18px;border-top:1px solid var(--line);background:var(--surface);font-size:11.5px;color:var(--muted);flex-wrap:wrap}
+.pager button{border:1px solid var(--line);background:var(--surface2);border-radius:4px;padding:2px 9px;font-size:11.5px}
+.pager button:disabled{opacity:.4;cursor:default}
+.state{padding:44px 20px;text-align:center;color:var(--muted);max-width:540px;margin:0 auto;white-space:normal}
+.state h4{margin:0 0 6px;font-family:"IBM Plex Sans Condensed",sans-serif;font-size:16px;font-weight:600;color:var(--ink)}
+.state p{margin:0 0 12px;font-size:12.5px;line-height:1.5}
+.state .msg{font-family:"IBM Plex Mono",monospace;font-size:11px;background:var(--surface2);border:1px solid var(--line);border-radius:4px;padding:6px 8px;text-align:left;word-break:break-word}
+.btn{border:1px solid var(--line);background:var(--surface2);border-radius:4px;padding:4px 11px;font-size:12px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+/* drawer */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:440px;max-width:100vw;background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow);transform:translateX(100%);transition:transform .18s ease;z-index:20;display:flex;flex-direction:column}
+.drawer.open{transform:none}
+@media (prefers-reduced-motion:reduce){.drawer{transition:none}.axis>summary .chev{transition:none}.live.loading .dot{animation:none}}
+.dh{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.dh .tk{font-family:"IBM Plex Mono",monospace;font-size:16px;font-weight:500}
+.dh .nm{font-family:"IBM Plex Sans Condensed",sans-serif;font-size:17px;font-weight:600;line-height:1.15;text-wrap:balance}
+.dh .meta{font-size:11.5px;color:var(--muted);margin-top:3px}
+.dh .x{margin-left:auto;background:none;border:1px solid var(--line);border-radius:4px;width:26px;height:26px;color:var(--muted);flex:none}
+.db{overflow:auto;padding:6px 16px 20px;flex:1}
+.sec{padding:10px 0;border-bottom:1px solid var(--line2)}
+.sec h3{margin:0 0 6px;font-family:"IBM Plex Sans Condensed",sans-serif;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;align-items:baseline;gap:8px}
+.sec h3 .src{font-family:"IBM Plex Mono",monospace;font-weight:400;letter-spacing:0;text-transform:none;color:var(--faint);font-size:10px}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px}
+.kv .it{display:flex;justify-content:space-between;gap:8px;font-size:12px;padding:2px 0;border-bottom:1px dotted var(--line2)}
+.kv .it .k{color:var(--muted)} .kv .it .v{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums;text-align:right}
+.tags{display:flex;flex-wrap:wrap;gap:3px}
+.tags .tag{margin:0;max-width:100%}
+.snip{background:var(--surface2);border:1px solid var(--line);border-radius:5px;padding:7px 9px;font-family:"IBM Plex Mono",monospace;font-size:11px;line-height:1.55;white-space:pre-wrap;word-break:break-word;margin:0}
+.snip .c{color:var(--muted)}
+.note{font-size:11px;color:var(--muted);line-height:1.45}
+@media (max-width:980px){
+  .main{grid-template-columns:1fr}
+  .rail{display:none}
+  .rail.show{display:block;position:fixed;inset:0;z-index:15}
+  .railclose{display:inline-block}
+  .mast .status span{display:none}
+  .mast{padding:10px 16px;gap:10px}
+  .brand small{display:none}
+  .brand{min-width:0}
+  .presets,.qbar,.tbar,.pager,.banner{padding-left:16px;padding-right:16px}
+  .kv{grid-template-columns:1fr}
+}
+.railtoggle{display:none;border:1px solid var(--line);background:var(--surface2);border-radius:4px;padding:3px 9px;font-size:11.5px}
+@media (max-width:980px){.railtoggle{display:inline-block}}
+@media (max-width:520px){.brand>span{display:none}}
+.dark-toggle{border:1px solid var(--line);background:var(--surface2);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--muted)}
+</style>
+
+
+<div class="app">
+  <header class="mast">
+    <div class="brand">FocusAlpha <span>ETF Screening Terminal</span><small>screen_etfs · live</small></div>
+    <button class="railtoggle" id="railToggle">Filters</button>
+    <div class="status">
+      <span>data through <b id="stRef">—</b></span>
+      <span>universe <b id="stUni">—</b> funds</span>
+      <span>holdings profile <b id="stHold">—</b></span>
+      <button class="dark-toggle" id="themeBtn" title="Toggle theme">Theme</button>
+    </div>
+  </header>
+  <div class="main">
+    <aside class="rail" id="rail">
+      <div class="rail-head"><h2>Filters · seven axes</h2><button class="linkbtn" id="clearAll">Clear all</button><button class="linkbtn railclose" id="railClose">Done</button></div>
+      <div id="axes"></div>
+      <div style="padding:12px 14px 20px" class="note">Every control is one parameter of <span class="mono">screen_etfs</span>, sent live to FocusAlpha with your connector. Fees are typed in basis points and sent as decimals (20 bp = 0.002); weights typed in % and sent as fractions; dollars typed in $M and sent in USD. The call above the table is exactly what the page sends. Vocabulary counts are across the whole universe.</div>
+    </aside>
+    <section class="center">
+      <div class="presets">
+        <p class="lbl">Saved screens · click to load</p>
+        <div class="pstrip" id="pstrip"></div>
+      </div>
+      <div class="qbar">
+        <div class="qbox">
+          <div class="qh"><span>Live call · what this page sends</span>
+            <button class="tab on" data-q="mcp">MCP</button><button class="tab" data-q="rest">REST</button>
+            <button class="linkbtn cp" id="copyQ">Copy</button></div>
+          <pre id="qecho"></pre>
+        </div>
+      </div>
+      <div class="tbar">
+        <span class="lb">Columns</span><div class="cg" id="colgroups"></div>
+        <div class="sortsel">
+          <span class="live" id="live" aria-live="polite"><span class="dot"></span><span id="liveTxt">connecting…</span></span>
+          <button class="linkbtn" id="refresh" hidden title="Fetch this page again from FocusAlpha, skipping the cache">Refresh</button>
+          <span>sort</span><select id="sortSel"></select><select id="orderSel"><option value="desc">desc</option><option value="asc">asc</option></select>
+        </div>
+      </div>
+      <div class="banner" id="banner" hidden></div>
+      <div class="twrap" id="twrap"><table id="tbl"><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+      <div class="pager"><button id="prev">‹ Prev</button><span id="pinfo"></span><button id="next">Next ›</button><span id="dropnote" style="margin-left:auto"></span></div>
+    </section>
+  </div>
+</div>
+<aside class="drawer" id="drawer" aria-label="Fund detail"></aside>
+
+<script>
+(function(){
+const SERVER='FocusAlpha', TOOL='screen_etfs';
+const CACHE_ROWS={staleTime:120000,gcTime:1800000}, CACHE_FACETS={staleTime:300000,gcTime:86400000};
+const $=s=>document.querySelector(s);
+/* ---------- the nine wrapper tiers: what kind of thing a fund is ---------- */
+const TIERS=[
+ {v:'plain_beta',l:'Plain beta',c:'var(--accent)'},{v:'leveraged_inverse',l:'Leveraged / inverse',c:'var(--down)'},
+ {v:'structured_outcome',l:'Structured outcome',c:'var(--warn)'},{v:'option_income',l:'Option income',c:'var(--src-jp)'},
+ {v:'physical_commodity',l:'Physical commodity',c:'var(--src-kr)'},{v:'futures_commodity',l:'Futures commodity',c:'var(--src-hk)'},
+ {v:'crypto',l:'Crypto',c:'var(--src-cn)'},{v:'currency',l:'Currency',c:'var(--src-news)'},{v:'alternative',l:'Alternative',c:'var(--muted)'}];
+const tierOf=v=>TIERS.find(t=>t.v===v)||{v:v||'',l:v||'—',c:'var(--faint)'};
+const SORTS=['aum','net_expense_ratio','flow_20d','top10_share','premium_discount','ticker'];
+const defOrder=s=>(s==='net_expense_ratio'||s==='ticker')?'asc':'desc';
+const DENIAL=new Set(['needs_reauth','server_not_connected','server_not_found','selection_required','not_in_manifest','blocked_by_policy','approval_required','consent_required','not_granted','capability_disabled','capability_removed']);
+
+/* ---------- live vocabulary (list_facets) ---------- */
+let FAC={}, TOTALS=null, FAC_STATE='idle', COVER=null;
+const fopts=k=>(FAC[k]||[]).map(f=>({v:f.value,n:f.funds}));
+const cnt=k=>Object.fromEntries((FAC[k]||[]).map(f=>[f.value,f.funds]));
+
+/* ---------- filter schema: one control = one API parameter ---------- */
+function axes(){return [
+ {n:'1',t:'What it is',hint:'Two label sets that are not the same question. The wrapper tier says what kind of thing the fund is; the four-level classification (asset class › category › segment › specializations) is computed from holdings once a month. Codes are dotted paths — copy them from the vocabulary, never guess one.',c:[
+   {type:'list',p:'tier',l:'Wrapper tier',opts:TIERS,counts:()=>cnt('tier')},
+   {type:'select',p:'asset_class',l:'Asset class',opts:fopts('asset_class')},
+   {type:'select',p:'category',l:'Category',opts:fopts('category')},
+   {type:'combo',p:'segment',l:'Segment',opts:fopts('segment')},
+   {type:'text',p:'specializations',l:'Specializations',ph:'code, code · matches ANY'},
+   {type:'text',p:'taxonomy_prefix',l:'Path prefix',ph:'equity.sector'},
+   {type:'text',p:'q',l:'Name contains',ph:'fund name'},
+   {type:'select',p:'exchange',l:'Exchange',opts:fopts('exchange')},
+   {type:'ex',p:'taxonomy_prefix',v:'equity.sector',d:'Every sector fund at once — a prefix matches any level of the path'},
+   {type:'ex',p:'specializations',v:'equity.sector.health_care.biotechnology',d:'Biotech funds — the L4 code, matched against the list each fund carries'}]},
+ {n:'2',t:'Size',hint:'AUM is the CLASS-level figure: filed net assets, or NAV × shares on a multi-class pool. A pool-level number is never served as one fund\'s size, so a multi-class fund with no class figure has no AUM and ranks on nothing for it.',c:[
+   {type:'range',p:'aum',l:'AUM',unit:'$M',scale:1e6}]},
+ {n:'3',t:'Fees',hint:'The newest prospectus fee table per class, net of a waiver where the filing printed a waiver line. No fee row is not a zero fee: unit investment trusts (SPY, GLD) file none and cannot be fee-ranked.',c:[
+   {type:'range',p:'expense_ratio',l:'Net expense ratio',unit:'bp',scale:1e-4}]},
+ {n:'4',t:'NAV & pricing',hint:'NAV, shares and net assets are the newest daily row, each number with its own date and a status: published, converted (rescaled across a split), derived (rebuilt from net assets) or withheld (basis unmeasured, so null on purpose). Premium / discount is as published, in percent of NAV. NAV is a column, not a filter.',c:[
+   {type:'range',p:'premium',l:'Premium / discount',unit:'%'}]},
+ {n:'5',t:'Flows',hint:'Creations and redemptions in USD, computed as the change in split-adjusted shares × the previous split-adjusted NAV. A day that fails the shares × NAV = net assets check carries no flow rather than an invented one. Only the 20-day window has a filter; 1-day and 5-day are columns.',c:[
+   {type:'range',p:'flow_20d',l:'20-day net flow',unit:'$M',scale:1e6}]},
+ {n:'6',t:'Holdings profile',hint:'Measured from the newest holdings day, not labels. Sector funds carry no cap-band label, so "large-cap biotech" is the sector label plus a measured large-cap share. Funds with no holdings feed have nulls here and drop out of these filters.',c:[
+   {type:'min',p:'n_holdings',l:'Holdings ≥',unit:'n'},
+   {type:'range',p:'top10_share',l:'Top-10 weight',unit:'%',frac:true},
+   {type:'range',p:'large_share',l:'Large-cap share',unit:'%',frac:true},
+   {type:'min',p:'small_share',l:'Small-cap ≥',unit:'%',frac:true},
+   {type:'min',p:'us_share',l:'US share ≥',unit:'%',frac:true},
+   {type:'min',p:'em_share',l:'EM share ≥',unit:'%',frac:true},
+   {type:'min',p:'treasury_share',l:'Treasury share ≥',unit:'%',frac:true},
+   {type:'range',p:'duration',l:'Duration',unit:'yrs'}]},
+ {n:'7',t:'Structure',hint:'The fund\'s own filed flags. Most funds file none of them, so "no" and "not filed" look alike in a filter — when you mean the wrapper, use the wrapper tier under axis 1 instead.',c:[
+   {type:'tri',p:'is_index',l:'Index fund'},{type:'tri',p:'is_fund_of_fund',l:'Fund of funds'},{type:'tri',p:'multi_inverse',l:'Filed lev/inv flag'},{type:'tri',p:'exposure_hidden',l:'Exposure hidden'}]},
+]}
+const RANGE_KEYS=p=>['min_'+p,'max_'+p];
+
+const dash='<span class="dim">—</span>';
+const COLGROUPS={
+ flows:{l:'Flows',cols:[
+   {k:'f1',h:'Flow 1d',r:1,f:o=>flow(o.f1)},{k:'f5',h:'Flow 5d',r:1,f:o=>flow(o.f5)},{k:'fa',h:'20d / AUM',r:1,f:o=>pctf(o.fa,true,2)}]},
+ fees:{l:'Fees',cols:[
+   {k:'gx',h:'Gross fee',r:1,f:o=>bp(o.gx)},{k:'nf',h:'Waiver line',f:o=>o.nx==null?dash:o.nf?'filed':'<span class="dim">none</span>'}]},
+ nav:{l:'NAV',cols:[
+   {k:'vd',h:'NAV date',f:o=>dateCell(o)},{k:'sh',h:'Shares',r:1,f:o=>shares(o.sh,o.ss)},{k:'na',h:'Net assets',r:1,f:o=>cap(o.na)},{k:'nl',h:'Level',f:o=>levelTag(o)}]},
+ holdings:{l:'Holdings',cols:[
+   {k:'nh',h:'Lines',r:1,f:o=>o.nh==null?dash:o.nh.toLocaleString()},{k:'t1',h:'Top 1',r:1,f:o=>pctf(o.t1)},{k:'t10',h:'Top 10',r:1,f:o=>pctf(o.t10)},
+   {k:'us',h:'US',r:1,f:o=>pctf(o.us)},{k:'em',h:'EM',r:1,f:o=>pctf(o.em)},{k:'lg',h:'Large',r:1,f:o=>pctf(o.lg)},{k:'sm',h:'Small',r:1,f:o=>pctf(o.sm)},
+   {k:'du',h:'Duration',r:1,f:o=>n1(o.du,'y')},{k:'tr',h:'Treasury',r:1,f:o=>pctf(o.tr)},{k:'ha',h:'Holdings as of',f:o=>o.ha||dash}]},
+ labels:{l:'Labels',cols:[
+   {k:'ac',h:'Asset class',f:o=>esc(o.ac||'')},{k:'cat',h:'Category',f:o=>`<span class="nm mono">${esc(o.cat||'')}</span>`},{k:'sp',h:'Specializations',f:o=>spTags(o,3)},
+   {k:'ix',h:'Index',f:o=>o.ix==null?'<span class="dim">n/f</span>':o.ix?'yes':'no'},{k:'to',h:'Turnover',r:1,f:o=>pctf(o.to,false,0)},{k:'scc',h:'Classes',r:1,f:o=>o.scc==null?dash:o.scc}]},
+};
+const BASE=[
+ {k:'t',h:'Ticker',f:o=>`<span class="tk">${esc(o.t||'—')}</span>`},{k:'n',h:'Fund',f:o=>`<span class="nm">${esc(o.n||'')}</span>`},
+ {k:'tier',h:'Wrapper',f:o=>tierTag(o.tier)},{k:'seg',h:'Classification',f:o=>segCell(o)},
+ {k:'aum',h:'AUM',r:1,f:o=>cap(o.aum)},{k:'nx',h:'Net fee',r:1,f:o=>bp(o.nx)},{k:'nav',h:'NAV',r:1,f:o=>navCell(o)},{k:'pd',h:'Prem/disc',r:1,f:o=>prem(o.pd)},{k:'f20',h:'Flow 20d',r:1,f:o=>flow(o.f20)}];
+
+const PRESETS=[
+ {id:'largest',g:'Size',n:'Largest funds',d:'Class-level AUM, biggest first',p:{},sort:'aum',cols:['flows']},
+ {id:'inflows',g:'Flows',n:'Biggest 20-day inflows',d:'Net creations over 20 trading days, funds ≥ $1B',p:{min_aum:1e9},sort:'flow_20d',cols:['flows']},
+ {id:'outflows',g:'Flows',n:'Biggest 20-day outflows',d:'Net redemptions, largest first, funds ≥ $1B',p:{min_aum:1e9},sort:'flow_20d',order:'asc',cols:['flows']},
+ {id:'levbleed',g:'Flows × wrapper',n:'Leveraged funds bleeding assets',d:'tier=leveraged_inverse, 20-day flow ≤ −$10M',p:{tier:['leveraged_inverse'],max_flow_20d:-1e7},sort:'flow_20d',order:'asc',cols:['flows','labels']},
+ {id:'cheapus',g:'Fees',n:'Cheapest US broad equity',d:'segment=equity.size_style.us, net fee ≤ 10 bp',p:{segment:'equity.size_style.us',max_expense_ratio:0.001},sort:'net_expense_ratio',order:'asc',cols:['fees']},
+ {id:'sector',g:'Fees',n:'Sector funds under 20 bp',d:'taxonomy_prefix=equity.sector — every sector at once',p:{taxonomy_prefix:'equity.sector',max_expense_ratio:0.002},sort:'aum',cols:['fees','labels']},
+ {id:'pricey',g:'Fees',n:'Most expensive, ≥ $1B',d:'Net expense ratio, highest first',p:{min_aum:1e9},sort:'net_expense_ratio',order:'desc',cols:['fees','flows']},
+ {id:'shortust',g:'Fixed income',n:'Short Treasuries under 10 bp',d:'IG government, duration ≤ 2y, net fee ≤ 10 bp',p:{segment:'fixed_income.government.investment_grade',max_duration:2,max_expense_ratio:0.001},sort:'aum',cols:['fees','holdings']},
+ {id:'hy',g:'Fixed income',n:'High-yield corporate bond',d:'segment=fixed_income.corporate.high_yield',p:{segment:'fixed_income.corporate.high_yield'},sort:'aum',cols:['fees','flows','holdings']},
+ {id:'btc',g:'Crypto',n:'Spot bitcoin',d:'segment=crypto.physical.bitcoin — premium and flows',p:{segment:'crypto.physical.bitcoin'},sort:'aum',cols:['nav','flows']},
+ {id:'lcbio',g:'Sector × measured',n:'Large-cap biotech',d:'Health-care segment + biotechnology code + measured large-cap share ≥ 50%',p:{segment:'equity.sector.health_care',specializations:'equity.sector.health_care.biotechnology',min_large_share:0.5},sort:'aum',cols:['holdings','labels']},
+ {id:'conc',g:'Holdings',n:'Concentrated books',d:'Top-10 ≥ 60% of weight, plain beta, ≥ $1B',p:{min_top10_share:0.6,min_aum:1e9,tier:['plain_beta']},sort:'top10_share',cols:['holdings']},
+ {id:'disc',g:'NAV',n:'Trading at a discount',d:'Published premium / discount ≤ −0.5%',p:{max_premium:-0.5},sort:'premium_discount',order:'asc',cols:['nav']},
+ {id:'prem',g:'NAV',n:'Trading at a premium',d:'Published premium ≥ +0.5%',p:{min_premium:0.5},sort:'premium_discount',cols:['nav']},
+ {id:'optinc',g:'Wrapper',n:'Option-income funds',d:'tier=option_income, by size',p:{tier:['option_income']},sort:'aum',cols:['fees','flows']},
+ {id:'ai',g:'Thematic',n:'AI & robotics',d:'segment=equity.thematic.ai_robotics',p:{segment:'equity.thematic.ai_robotics'},sort:'aum',cols:['fees','flows','holdings']},
+ {id:'em',g:'Geography',n:'EM-heavy equity',d:'Measured EM share ≥ 70%, from holdings',p:{min_em_share:0.7},sort:'aum',cols:['holdings','fees']},
+];
+
+/* ---------- state ---------- */
+let S={}, SORT='aum', ORDER='desc', COLS=new Set(['flows']), PAGE=0, PAGESIZE=100, SEL=null, QMODE='mcp', ACTIVE_PRESET=null;
+let MCP=null, LIVE='boot', ERR=null, LOADING=false, FETCHED=null, SEQ=0, CTRL=null, DEB=null, UNRANKED=null;
+let ROWS=[], ROWS_KEY=null, NEXT=null, CURSORS=[null];
+const DEFAULT_AUM=1e8;   // $100M floor on every saved screen; Clear all keeps it, the Size axis removes it
+
+/* ---------- formatting ---------- */
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function cap(v){if(v==null)return dash;const a=Math.abs(v);if(a>=1e12)return '$'+(v/1e12).toFixed(2)+'T';if(a>=1e9)return '$'+(v/1e9).toFixed(1)+'B';if(a>=1e6)return '$'+(v/1e6).toFixed(0)+'M';return '$'+(v/1e3).toFixed(0)+'K'}
+function flow(v){if(v==null)return dash;const a=Math.abs(v),s=v>0?'+':v<0?'−':'';const t=a>=1e9?(a/1e9).toFixed(2)+'B':a>=1e6?(a/1e6).toFixed(0)+'M':(a/1e3).toFixed(0)+'K';return `<span class="${v>0?'pos':v<0?'neg':'dim'}">${s}$${t}</span>`}
+function bp(v){if(v==null)return '<span class="dim" title="no fee row in the newest prospectus filing — not a zero fee">not filed</span>';const b=v*1e4;return (Math.abs(b-Math.round(b))<0.05?String(Math.round(b)):b.toFixed(1))+' bp'}
+function n1(v,u){return v==null?dash:v.toFixed(1)+u}
+function pctf(v,s,dp){if(v==null)return dash;const p=v*100,d=dp==null?1:dp;return s?`<span class="${p>0?'pos':p<0?'neg':''}">${p>0?'+':''}${p.toFixed(d)}%</span>`:p.toFixed(d)+'%'}
+function prem(v){if(v==null)return dash;return `<span class="${v>0?'pos':v<0?'neg':''}">${v>0?'+':''}${v.toFixed(2)}%</span>`}
+function navCell(o){if(o.nav==null)return dash;const st=o.ns&&o.ns!=='published'?`<span class="sus" title="nav status: ${esc(o.ns)}">${esc(o.ns[0])}</span>`:'';return o.nav.toFixed(2)+st}
+function dateCell(o){if(!o.vd)return dash;return o.old?`<span class="dim" title="older than the universe's newest valuation date">${esc(o.vd)}</span><span class="sus" title="stale">!</span>`:esc(o.vd)}
+function shares(v,st){if(v==null)return dash;const s=v>=1e9?(v/1e9).toFixed(2)+'B':v>=1e6?(v/1e6).toFixed(1)+'M':(v/1e3).toFixed(0)+'K';return s+(st&&st!=='published'?`<span class="sus" title="shares status: ${esc(st)}">${esc(st[0])}</span>`:'')}
+function levelTag(o){if(!o.nl)return dash;return o.nl==='portfolio'?`<span class="tag risk" title="filed net assets are pool-level (all share classes together); AUM shown is the class figure only when one could be derived">pool</span>`:`<span class="tag m" title="filed net assets are this share class's own">class</span>`}
+function tierTag(v){const t=tierOf(v);return `<span class="tag m" title="tier: ${esc(t.v)}"><span class="sbadge" style="background:${t.c}"></span>${esc(t.l)}</span>`}
+function segCell(o){const s=o.seg||o.cat||o.ac||'';return `<span class="nm mono" title="${esc([o.ac,o.cat,o.seg].filter(Boolean).join(' › '))}${o.sp.length?' · '+esc(o.sp.join(', ')):''}">${esc(s)}</span>`}
+function spTags(o,max){if(!o.sp.length)return dash;const sel=new Set(String(S.specializations||'').split(',').map(x=>x.trim()).filter(Boolean));const shown=max?o.sp.slice(0,max):o.sp;return shown.map(c=>`<span class="tag ${sel.has(c)?'hit':'m'}" title="${esc(c)}">${esc(c.split('.').pop())}</span>`).join('')+(max&&o.sp.length>max?`<span class="dim">+${o.sp.length-max}</span>`:'')}
+function hm(ts){if(!ts)return '';const d=new Date(ts),now=new Date();const t=d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});return d.toDateString()===now.toDateString()?t:d.toLocaleDateString([],{month:'short',day:'numeric'})+' '+t}
+const nz=v=>{if(v==null||v==='')return null;const x=typeof v==='number'?v:parseFloat(v);return isFinite(x)?x:null};
+const tri=v=>v===true?1:v===false?0:null;
+const day=s=>s?String(s).slice(0,10):null;
+
+/* ---------- API row → compact row ---------- */
+function mapRow(r){
+  const o={id:r.etf_id,pid:r.portfolio_id,t:r.ticker,n:r.name,x:r.exchange,ccy:r.currency,scc:nz(r.series_class_count),sole:r.is_sole_class===true,
+    tier:r.tier,eh:r.exposure_hidden===true,ac:r.asset_class,cat:r.category,seg:r.segment,sp:Array.isArray(r.specializations)?r.specializations:[],mt:Array.isArray(r.measured_tags)?r.measured_tags:[],lab:day(r.labels_holdings_as_of),
+    ix:tri(r.is_index),fof:tri(r.is_fund_of_fund),mi:tri(r.is_multi_inverse_index),to:nz(r.turnover),
+    aum:nz(r.aum),ad:r.aum_is_derived===true,na:nz(r.net_assets),nl:r.net_assets_level,nad:day(r.net_assets_as_of),
+    vd:day(r.valuation_date),nav:nz(r.nav),ns:r.nav_status,sh:nz(r.shares_outstanding),ss:r.shares_status,pd:nz(r.premium_discount),
+    gx:nz(r.gross_expense_ratio),nx:nz(r.net_expense_ratio),nf:r.net_is_filed===true,
+    ha:day(r.holdings_as_of),nh:nz(r.n_holdings),t1:nz(r.top1_share),t10:nz(r.top10_share),us:nz(r.us_share),em:nz(r.em_share),lg:nz(r.large_share),md:nz(r.mid_share),sm:nz(r.small_share),du:nz(r.duration),my:nz(r.maturity_years),tr:nz(r.treasury_share),co:nz(r.corporate_share),
+    f1:nz(r.flow_1d),f5:nz(r.flow_5d),f20:nz(r.flow_20d)};
+  o.fa=o.f20!=null&&o.aum?o.f20/o.aum:null;
+  const thru=TOTALS&&TOTALS.refreshed_through;
+  o.old=!!(o.vd&&thru&&(Date.parse(thru)-Date.parse(o.vd))>10*864e5);
+  return o;
+}
+
+/* ---------- rail ---------- */
+function buildRail(){
+  const root=$('#axes');const open=new Set([...root.querySelectorAll('details.axis[open]')].map(d=>d.dataset.axis));const first=!root.children.length;
+  root.innerHTML='';
+  axes().forEach((ax,i)=>{
+    const det=document.createElement('details');det.className='axis';det.open=first?i<1:open.has(ax.t);det.dataset.axis=ax.t;
+    det.innerHTML=`<summary><span class="n">${ax.n}</span><span class="t">${ax.t}</span><span class="active" hidden></span><span class="chev">›</span></summary><div class="body"><p class="hint">${ax.hint}</p></div>`;
+    const body=det.querySelector('.body');
+    ax.c.forEach(c=>body.appendChild(control(c)));
+    root.appendChild(det);
+  });
+}
+// typed value ↔ API value: $M × 1e6, bp × 1e-4, % ÷ 100
+const toApi=(c,raw)=>{let v=raw;if(v==null||!isFinite(v))return null;if(c.scale)v=+(v*c.scale).toPrecision(12);if(c.frac)v=+(v/100).toPrecision(12);return v};
+const fromApi=(c,v)=>{if(v==null)return '';if(c.scale)v=+(v/c.scale).toPrecision(10);if(c.frac)v=+(v*100).toFixed(4);return v};
+function control(c){
+  const w=document.createElement('div');w.className='ctl';w.dataset.p=c.p;
+  const apiName=c.type==='range'?`min_${c.p} / max_${c.p}`:c.type==='min'?`min_${c.p}`:(c.api||c.p);
+  const lab=`<label>${c.l||''}<span class="api" title="${esc(apiName)}">${esc(apiName)}</span></label>`;
+  let type=c.type;
+  if(type==='select'&&!c.opts.length)type='combo';   // vocabulary not loaded: let people type the value
+  if(type==='range'||type==='min'){
+    const keys=type==='range'?RANGE_KEYS(c.p):['min_'+c.p];
+    w.innerHTML=lab+`<div class="pair">${keys.map((k,i)=>`${i?'<span>–</span>':''}<input type="number" step="any" placeholder="${k.startsWith('min')?'min':'max'}" data-k="${k}">`).join('')}<span class="unit">${c.unit||''}</span></div>`;
+    w.querySelectorAll('input').forEach(inp=>{inp.addEventListener('change',()=>{const raw=inp.value===''?null:parseFloat(inp.value);setParam(inp.dataset.k,toApi(c,raw))})});
+    w._sync=()=>{w.querySelectorAll('input').forEach(inp=>{inp.value=fromApi(c,S[inp.dataset.k])})};
+  }else if(type==='select'){
+    w.innerHTML=lab+`<select><option value="">any</option>${c.opts.map(o=>`<option value="${esc(o.v)}">${esc(o.v)}${o.n!=null?' · '+o.n.toLocaleString():''}</option>`).join('')}</select>`;
+    const sel=w.querySelector('select');sel.addEventListener('change',()=>setParam(c.p,sel.value||null));
+    w._sync=()=>{const v=S[c.p]||'';if(v&&![...sel.options].some(o=>o.value===v)){const o=document.createElement('option');o.value=v;o.textContent=v;sel.appendChild(o)}sel.value=v};
+  }else if(type==='combo'||type==='text'){
+    const id='dl_'+c.p;
+    w.innerHTML=lab+`<div class="pair"><input type="text" ${type==='combo'?`list="${id}"`:''} placeholder="${esc(c.ph||(type==='combo'?(c.opts.length?'type to search':'type a value'):''))}" spellcheck="false" autocomplete="off">${type==='combo'?`<datalist id="${id}">${c.opts.map(o=>`<option value="${esc(o.v)}">${o.n!=null?o.n.toLocaleString():''}</option>`).join('')}</datalist>`:''}</div>`;
+    const inp=w.querySelector('input');inp.addEventListener('change',()=>setParam(c.p,inp.value.trim()||null));
+    w._sync=()=>{inp.value=Array.isArray(S[c.p])?S[c.p].join(','):(S[c.p]||'')};
+  }else if(type==='tri'){
+    w.innerHTML=lab+`<div class="tri"><button data-v="">any</button><button data-v="true">yes</button><button data-v="false">no</button></div>`;
+    w.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setParam(c.p,b.dataset.v===''?null:b.dataset.v==='true')));
+    w._sync=()=>{w.querySelectorAll('button').forEach(b=>b.classList.toggle('on',(S[c.p]==null&&b.dataset.v==='')||(S[c.p]===true&&b.dataset.v==='true')||(S[c.p]===false&&b.dataset.v==='false')))};
+  }else if(type==='list'){
+    w.style.gridTemplateColumns='1fr';
+    w.innerHTML=`<label>${c.l}<span class="api">${apiName} · matches ANY</span></label><div class="multi"><div class="opts" style="max-height:none"></div></div>`;
+    const opts=w.querySelector('.opts');
+    w._sync=()=>{const sel=new Set(S[c.p]||[]);const n=c.counts?c.counts():{};
+      opts.innerHTML=c.opts.map(o=>`<label class="opt" title="tier: ${esc(o.v)}"><input type="checkbox" value="${esc(o.v)}" ${sel.has(o.v)?'checked':''}><span class="srcdot" style="background:${o.c}"></span><span class="v">${esc(o.l)}</span><span class="cnt">${n[o.v]!=null?n[o.v].toLocaleString():''}</span></label>`).join('');
+      opts.querySelectorAll('input').forEach(cb=>cb.addEventListener('change',()=>{const cur=new Set(S[c.p]||[]);cb.checked?cur.add(cb.value):cur.delete(cb.value);setParam(c.p,c.opts.map(o=>o.v).filter(v=>cur.has(v)))}))};
+  }else if(type==='ex'){
+    w.style.gridTemplateColumns='1fr';w.dataset.p='';
+    w.innerHTML=`<button class="exbtn"><span class="k">${c.p}: <b>${esc(c.v)}</b></span><span class="d">${c.d}</span></button>`;
+    const b=w.querySelector('button');b.addEventListener('click',()=>{const on=S[c.p]===c.v;S[c.p]=on?null:c.v;ACTIVE_PRESET=null;COLS.add('labels');buildColGroups();syncRail();run()});
+    w._sync=()=>{b.classList.toggle('on',S[c.p]===c.v)};
+  }
+  return w;
+}
+function setParam(k,v){S[k]=v;ACTIVE_PRESET=null;syncRail();run()}
+function syncRail(){
+  document.querySelectorAll('.ctl').forEach(w=>w._sync&&w._sync());
+  document.querySelectorAll('.axis').forEach(det=>{const ps=[...det.querySelectorAll('.ctl')].map(w=>w.dataset.p).filter(Boolean);
+    const n=Object.keys(S).filter(k=>S[k]!=null&&S[k]!==''&&!(Array.isArray(S[k])&&!S[k].length)&&ps.some(p=>k===p||k==='min_'+p||k==='max_'+p)).length;
+    const a=det.querySelector('.active');a.hidden=!n;a.textContent=n+' set';if(n)det.open=true});
+  document.querySelectorAll('.pchip').forEach(b=>b.classList.toggle('on',b.dataset.id===ACTIVE_PRESET));
+  $('#sortSel').value=SORT;$('#orderSel').value=ORDER;
+  try{localStorage.setItem('fa_etf_screen_state',JSON.stringify({S,SORT,ORDER,COLS:[...COLS],ACTIVE_PRESET}))}catch(e){}
+}
+
+/* ---------- presets ---------- */
+function buildPresets(){
+  const st=$('#pstrip');st.innerHTML='';
+  PRESETS.forEach(p=>{const b=document.createElement('button');b.className='pchip';b.dataset.id=p.id;b.innerHTML=`<span class="pg">${p.g}</span><span class="pn">${p.n}</span><span class="pd">${p.d}</span>`;b.title=p.d;b.addEventListener('click',()=>loadPreset(p));st.appendChild(b)});
+}
+function loadPreset(p){
+  S={min_aum:DEFAULT_AUM};Object.assign(S,p.p);SORT=p.sort||'aum';ORDER=p.order||defOrder(SORT);COLS=new Set(p.cols||[]);ACTIVE_PRESET=p.id;
+  syncRail();buildColGroups();run();
+}
+
+/* ---------- the call ---------- */
+function apiParams(){const o={};for(const k in S){const v=S[k];if(v==null||v===''||(Array.isArray(v)&&!v.length))continue;if(k==='q'&&String(v).length<2)continue;o[k]=Array.isArray(v)?v.join(','):v}
+  if(SORT!=='aum')o.sort=SORT;if(ORDER!==defOrder(SORT))o.order=ORDER;return o}
+function callParams(){const p=apiParams();p.limit=PAGESIZE;if(CURSORS[PAGE])p.cursor=CURSORS[PAGE];return p}
+function renderQuery(){
+  const p=apiParams();let html;
+  if(QMODE==='mcp'){const lines=Object.entries(p).map(([k,v])=>`  <span class="k">${k}</span>: ${typeof v==='string'?`<span class="s">"${esc(v)}"</span>`:esc(v)}`);html=`<span class="d">// MCP tool · FocusAlpha</span>\nscreen_etfs({\n${lines.join(',\n')}${lines.length?',\n':''}  <span class="k">limit</span>: ${PAGESIZE}\n})`}
+  else{const qs=Object.entries(p).map(([k,v])=>`${k}=${esc(encodeURIComponent(v))}`).join('&\n    &');html=`<span class="d">// REST</span>\nGET /v1/etfs/screen?${qs}${qs?'\n    &':''}limit=${PAGESIZE}\n<span class="d">// vocabulary: GET /v1/etfs/screen/facets · codes: GET /v1/etfs/taxonomy (both free)</span>`}
+  $('#qecho').innerHTML=html;
+}
+$('#copyQ').addEventListener('click',()=>{const t=$('#qecho').innerText;try{navigator.clipboard.writeText(t);$('#copyQ').textContent='Copied';setTimeout(()=>$('#copyQ').textContent='Copy',1200)}catch(e){}});
+document.querySelectorAll('.qh .tab').forEach(b=>b.addEventListener('click',()=>{QMODE=b.dataset.q;document.querySelectorAll('.qh .tab').forEach(x=>x.classList.toggle('on',x===b));renderQuery()}));
+
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function normErr(e){if(!e||typeof e!=='object')return {code:'upstream_error',message:String(e||'')};return {code:e.code||'upstream_error',message:e.message||'',retryable:!!e.retryable,server:e.server}}
+async function call(input,cache,signal){
+  for(let attempt=0;;attempt++){
+    try{const opts={cache};if(signal)opts.signal=signal;return await MCP.callTool(SERVER,TOOL,input,opts)}
+    catch(e){
+      if(attempt===0&&e&&e.retryable&&!(signal&&signal.aborted)){
+        await sleep(Math.min(60000,e.retryAfterMs||1500)+Math.random()*700);
+        if(signal&&signal.aborted)throw {code:'cancelled'};continue;
+      }
+      throw e;
+    }
+  }
+}
+function run(){PAGE=0;CURSORS=[null];NEXT=null;renderQuery();renderTable();clearTimeout(DEB);DEB=setTimeout(()=>fetchRows(false),200)}
+async function fetchRows(refresh){
+  if(!MCP){renderLive();renderTable();return}
+  const my=++SEQ;if(CTRL)CTRL.abort();const ctrl=CTRL=new AbortController();
+  const input=callParams(),key=JSON.stringify(input);
+  LOADING=true;renderLive();renderTable();
+  let res;
+  try{res=await call(input,refresh?Object.assign({},CACHE_ROWS,{refresh:true}):CACHE_ROWS,ctrl.signal)}
+  catch(e){
+    if(my!==SEQ||(e&&e.code==='cancelled'))return;
+    LOADING=false;
+    if(e&&e.code==='user_changed'){LIVE='gone';ROWS=[];NEXT=null;renderLive();renderBanner();renderTable();return}
+    ERR=normErr(e);LIVE='error';
+    // keep last-good rows only for a transient failure of the SAME call; anything else retracts them
+    if(DENIAL.has(ERR.code)||ROWS_KEY!==key||ERR.code==='tool_error'||ERR.code==='bad_request'||ERR.code==='transform_error'){ROWS=[];ROWS_KEY=null;NEXT=null}
+    renderLive();renderBanner();renderTable();return;
+  }
+  if(my!==SEQ)return;
+  LOADING=false;
+  const pl=res&&res.payload;
+  if(!pl||typeof pl!=='object'||!Array.isArray(pl.data)){
+    ERR={code:'bad_shape',message:typeof pl==='string'?pl.slice(0,300):'The answer did not contain a list of funds.'};LIVE='error';ROWS=[];ROWS_KEY=null;NEXT=null;
+    renderLive();renderBanner();renderTable();return;
+  }
+  ROWS=pl.data.filter(r=>r&&typeof r==='object').map(mapRow);ROWS_KEY=key;NEXT=pl.next_cursor||null;if(pl.coverage)COVER=pl.coverage;
+  // An empty first page can carry an `unranked` block: N funds matched but none has a value for the sort column.
+  UNRANKED=(!ROWS.length&&pl.unranked&&typeof pl.unranked==='object')?pl.unranked:null;
+  FETCHED=(res.cache&&res.cache.storedAt)||Date.now();ERR=null;LIVE='ok';
+  renderLive();renderBanner();renderClocks();renderTable();
+  if(SEL&&!ROWS.some(o=>o.id===SEL))closeDrawer();
+  if(FAC_STATE==='idle'||FAC_STATE==='error')fetchFacets();
+}
+async function fetchFacets(){
+  FAC_STATE='loading';
+  try{
+    const res=await call({list_facets:true},CACHE_FACETS);const d=res&&res.payload&&res.payload.data;
+    if(!d||!d.facets)throw {code:'bad_shape'};
+    FAC=d.facets;TOTALS=d.totals||null;
+    if(!COVER&&res.payload.coverage)COVER=res.payload.coverage;FAC_STATE='ok';
+  }catch(e){FAC_STATE='error'}
+  ROWS.forEach(o=>{const thru=TOTALS&&TOTALS.refreshed_through;o.old=!!(o.vd&&thru&&(Date.parse(thru)-Date.parse(o.vd))>10*864e5)});
+  buildRail();syncRail();renderClocks();renderTable();
+}
+
+/* ---------- live status ---------- */
+function renderLive(){
+  const el=$('#live');el.className='live '+(LOADING?'loading':LIVE==='ok'?'ok':LIVE==='error'?'error':'');
+  let t;if(LOADING)t='loading from FocusAlpha…';else if(LIVE==='ok')t='live · fetched '+hm(FETCHED);else if(LIVE==='error')t='last call failed';else if(LIVE==='nomcp')t='no connector in this view';else if(LIVE==='gone')t='signed out';else t='connecting…';
+  $('#liveTxt').textContent=t;$('#refresh').hidden=!MCP||LOADING;
+}
+function renderClocks(){
+  $('#stRef').textContent=TOTALS&&TOTALS.refreshed_through?TOTALS.refreshed_through:'—';
+  $('#stUni').textContent=TOTALS&&TOTALS.active!=null?TOTALS.active.toLocaleString():'—';
+  $('#stHold').textContent=TOTALS&&TOTALS.with_holdings_profile!=null?TOTALS.with_holdings_profile.toLocaleString()+' funds':'—';
+}
+function renderBanner(){
+  const b=$('#banner');
+  if(LIVE==='error'&&ROWS.length&&ERR){b.hidden=false;b.innerHTML=`<span><b>FocusAlpha didn't answer the refresh.</b> Showing the rows fetched ${esc(hm(FETCHED))}.</span><button class="btn act" data-act="retry">Retry</button>`}
+  else{b.hidden=true;b.innerHTML=''}
+}
+$('#banner').addEventListener('click',e=>{if(e.target.closest('[data-act="retry"]'))fetchRows(false)});
+function errView(e){
+  const code=e.code, name=esc(e.server||SERVER);
+  const V={
+    server_not_connected:['FocusAlpha isn\'t connected for you',`Add the ${name} connector in claude.ai Settings → Connectors, then try again.`,'Try again'],
+    server_not_found:['FocusAlpha isn\'t connected for you',`That ${name} connection no longer exists. Add it again in claude.ai Settings → Connectors.`,'Try again'],
+    needs_reauth:['FocusAlpha needs you to sign in again',`Reconnect ${name} in claude.ai Settings → Connectors, then try again.`,'Try again'],
+    selection_required:['Pick which FocusAlpha connection to use',`You have more than one ${name} connector. Choose one in the prompt claude.ai shows, then try again.`,'Try again'],
+    not_in_manifest:['FocusAlpha is turned off for this page','The connector was declined or switched off for this page. Allow it in the page\'s connector settings to load live rows.',null],
+    consent_required:['Allow FocusAlpha for this page','The page calls screen_etfs as you, and needs your OK first.','Allow and load'],
+    blocked_by_policy:['Your organization blocks this call','Connector policy blocks screen_etfs for your account here.',null],
+    approval_required:['This call needs approval','Your organization requires per-call approval for screen_etfs, which pages can\'t request yet.',null],
+    server_unavailable:['FocusAlpha didn\'t answer','It was tried twice. The service may be busy — try again in a moment.','Retry'],
+    rate_limited:['Too many calls just now','Wait a few seconds, then try again.','Retry'],
+    tool_error:['FocusAlpha couldn\'t run this screen','It answered with the message below. Adjust the filter it names — a misspelled label code returns an empty page, not an error, so an error here is about a value or a sort.',null],
+    bad_request:['The page sent a call FocusAlpha couldn\'t take','Reset the filters with Clear all, or pick a saved screen.',null],
+    transform_error:['The page sent a call FocusAlpha couldn\'t take','Reset the filters with Clear all, or pick a saved screen.',null],
+    bad_shape:['FocusAlpha answered in an unexpected shape','The page expected a list of funds.','Retry'],
+    not_granted:['Live rows aren\'t available in this view','Connectors weren\'t granted to this page here. Open it on claude.ai, signed in with FocusAlpha connected.',null],
+    capability_disabled:['Live rows aren\'t available in this view','This view can\'t reach connectors. Open the page on claude.ai, signed in with FocusAlpha connected.',null],
+    capability_removed:['Live rows aren\'t available in this view','This view can\'t reach connectors. Open the page on claude.ai, signed in with FocusAlpha connected.',null],
+  };
+  const v=V[code]||['FocusAlpha didn\'t answer','Something went wrong between the page and the connector.','Retry'];
+  const showMsg=e.message&&(code==='tool_error'||code==='bad_request'||code==='transform_error'||code==='bad_shape'||!V[code]);
+  return `<div class="state"><h4>${v[0]}</h4><p>${v[1]}</p>${showMsg?`<p class="msg">${esc(e.message)}</p>`:''}${v[2]?`<button class="btn primary" data-act="retry">${v[2]}</button>`:''}</div>`;
+}
+function stateView(){
+  if(LIVE==='nomcp')return `<div class="state"><h4>Live rows need the FocusAlpha connector</h4><p>This view can't reach connectors. Open the page on claude.ai, signed in with FocusAlpha connected. The call above is exactly what it will send.</p></div>`;
+  if(LIVE==='gone')return '';
+  if(LOADING||LIVE==='boot')return `<div class="state"><h4>Loading from FocusAlpha…</h4><p>Running the screen above against the live universe.</p></div>`;
+  if(LIVE==='error'&&ERR)return errView(ERR);
+  if(UNRANKED)return `<div class="state"><h4>${esc((UNRANKED.funds||0).toLocaleString())} funds match, none can be ranked on ${esc(UNRANKED.sort||SORT)}</h4><p>${esc(UNRANKED.note||'Sorting drops every fund with no value for the sort column.')}</p><button class="btn primary" data-act="ticker">List them by ticker</button></div>`;
+  return `<div class="state"><h4>No fund matches</h4><p>Loosen a filter. Label codes are exact dotted paths — a misspelled one matches nothing rather than erroring — and funds without a value for the sort column are left out.</p></div>`;
+}
+
+/* ---------- table ---------- */
+function buildColGroups(){
+  const g=$('#colgroups');g.innerHTML='';Object.entries(COLGROUPS).forEach(([k,v])=>{const b=document.createElement('button');b.textContent=v.l;b.classList.toggle('on',COLS.has(k));b.addEventListener('click',()=>{COLS.has(k)?COLS.delete(k):COLS.add(k);buildColGroups();renderTable();syncRail()});g.appendChild(b)});
+}
+function columns(){let c=[...BASE];for(const k of Object.keys(COLGROUPS))if(COLS.has(k))c=c.concat(COLGROUPS[k].cols);return c}
+const SORT_OF_COL={t:'ticker',aum:'aum',nx:'net_expense_ratio',pd:'premium_discount',f20:'flow_20d',t10:'top10_share'};
+function renderTable(){
+  const cols=columns();
+  $('#thead').innerHTML='<tr>'+cols.map(c=>{const s=SORT_OF_COL[c.k];const sorted=s&&s===SORT;return `<th class="${c.r?'r':''} ${sorted?'sorted':''}" ${s?`data-sort="${s}" title="sort by ${s}"`:''}>${c.h}${sorted?`<span class="arr">${ORDER==='asc'?'▲':'▼'}</span>`:''}</th>`}).join('')+'</tr>';
+  $('#thead').querySelectorAll('th[data-sort]').forEach(th=>th.addEventListener('click',()=>{const s=th.dataset.sort;if(SORT===s)ORDER=ORDER==='asc'?'desc':'asc';else{SORT=s;ORDER=defOrder(s)}ACTIVE_PRESET=null;syncRail();run()}));
+  $('#twrap').classList.toggle('loading',LOADING&&ROWS.length>0);
+  $('#tbody').innerHTML=ROWS.length?ROWS.map(o=>`<tr class="row ${SEL===o.id?'on':''}" data-id="${esc(o.id)}">${cols.map(c=>`<td class="${c.r?'r num':''}">${c.f(o)}</td>`).join('')}</tr>`).join(''):`<tr><td colspan="${cols.length}">${stateView()}</td></tr>`;
+  const start=PAGE*PAGESIZE;
+  $('#pinfo').textContent=ROWS.length?`page ${PAGE+1} · rows ${(start+1).toLocaleString()}–${(start+ROWS.length).toLocaleString()}${NEXT?'':' · last page'} · ${PAGESIZE} per call`:`page ${PAGE+1}`;
+  $('#prev').disabled=PAGE===0||LOADING;$('#next').disabled=!NEXT||LOADING;
+  $('#dropnote').textContent=SORT!=='ticker'?`funds with no ${SORT} are left out by the API`:'';
+}
+$('#tbody').addEventListener('click',e=>{if(e.target.closest('[data-act="retry"]')){fetchRows(false);return}if(e.target.closest('[data-act="ticker"]')){SORT='ticker';ORDER='asc';ACTIVE_PRESET=null;syncRail();run();return}const tr=e.target.closest('tr.row');if(tr)openDrawer(tr.dataset.id)});
+$('#prev').addEventListener('click',()=>{if(PAGE>0){PAGE--;fetchRows(false);$('#twrap').scrollTop=0}});
+$('#next').addEventListener('click',()=>{if(NEXT){CURSORS[PAGE+1]=NEXT;PAGE++;fetchRows(false);$('#twrap').scrollTop=0}});
+$('#refresh').addEventListener('click',()=>fetchRows(true));
+$('#sortSel').innerHTML=SORTS.map(s=>`<option value="${s}">${s}</option>`).join('');
+$('#sortSel').addEventListener('change',e=>{SORT=e.target.value;ORDER=defOrder(SORT);ACTIVE_PRESET=null;syncRail();run()});
+$('#orderSel').addEventListener('change',e=>{ORDER=e.target.value;ACTIVE_PRESET=null;syncRail();run()});
+
+/* ---------- drawer ---------- */
+function kv(pairs){return `<div class="kv">${pairs.map(([k,v])=>`<div class="it"><span class="k">${k}</span><span class="v">${v==null||v===''?dash:v}</span></div>`).join('')}</div>`}
+const yn=v=>v==null?'<span class="dim">not filed</span>':v?'yes':'no';
+const stat=s=>s?(s==='published'?'published':`<span class="sus" style="font-size:11px;vertical-align:baseline">${esc(s)}</span>`):null;
+function openDrawer(id){
+  const o=ROWS.find(x=>x.id===id);if(!o)return;SEL=id;
+  document.querySelectorAll('tr.row').forEach(tr=>tr.classList.toggle('on',tr.dataset.id===id));
+  const dr=$('#drawer');const ident=o.t||o.id;const tier=tierOf(o.tier);
+  dr.innerHTML=`<div class="dh"><div><div class="tk">${esc(o.t||'—')} <span class="dim" style="font-size:11px">${esc(o.x||'')}${o.ccy&&o.ccy!=='USD'?' · '+esc(o.ccy):''}</span></div><div class="nm">${esc(o.n||'')}</div><div class="meta">${esc(tier.l)} · <span class="mono">${esc(o.seg||o.cat||o.ac||'')}</span> · <span class="mono">${esc(o.id)}</span>${o.pid?` · pool <span class="mono">${esc(o.pid)}</span>`:''}${o.scc!=null&&o.scc>1?` · ${o.scc} share classes`:o.sole?' · sole class':''}</div></div><button class="x" id="dclose" aria-label="Close">×</button></div>
+  <div class="db">
+    <div class="sec"><h3>Classification <span class="src">labels · monthly, from holdings${o.lab?' · as of '+esc(o.lab):''}</span></h3>${kv([['Wrapper tier',tierTag(o.tier)],['Asset class',esc(o.ac)],['Category',`<span class="mono" style="font-size:11px">${esc(o.cat)}</span>`],['Segment',`<span class="mono" style="font-size:11px">${esc(o.seg)}</span>`]])}
+      ${o.sp.length?`<div style="margin-top:6px" class="tags">${o.sp.map(c=>`<span class="tag m" title="${esc(c)}">${esc(c)}</span>`).join('')}</div>`:''}${o.mt.length?`<div style="margin-top:6px" class="tags">${o.mt.map(c=>`<span class="tag hit" title="measured tag">${esc(c)}</span>`).join('')}</div>`:''}
+      <p class="note" style="margin:6px 0 0">The tier is what kind of thing the fund is; the four levels are what its holdings show, recomputed monthly. A fund that drifted mid-month keeps its label until the next run. <span class="mono">get_etf_taxonomy</span> gives the sentence behind every code.</p></div>
+    <div class="sec"><h3>Size &amp; NAV <span class="src">daily${o.vd?' · valuation '+esc(o.vd):''}</span></h3>${kv([['AUM (class)',cap(o.aum)+(o.ad?' <span class="dim">derived</span>':'')],['Net assets filed',cap(o.na)],['Net assets level',o.nl?(o.nl==='portfolio'?'<span class="neg">pool — all classes together</span>':'this share class'):null],['Net assets as of',o.nad],['NAV',o.nav!=null?o.nav.toFixed(4):null],['NAV status',stat(o.ns)],['Shares outstanding',o.sh!=null?o.sh.toLocaleString():null],['Shares status',stat(o.ss)],['Premium / discount',prem(o.pd)],['Valuation date',o.vd?esc(o.vd)+(o.old?' <span class="sus">stale</span>':''):null]])}
+      <p class="note" style="margin:6px 0 0">Read the net-assets level before quoting AUM: class vs pool is a 3–4× difference on a multi-class pool. A withheld NAV is null on purpose — the split basis is unmeasured — not missing data.</p></div>
+    <div class="sec"><h3>Fees <span class="src">newest prospectus fee table</span></h3>${kv([['Gross expense ratio',bp(o.gx)],['Net expense ratio',bp(o.nx)],['Waiver line filed',o.nx==null?null:(o.nf?'yes':'no — net equals gross')]])}
+      <p class="note" style="margin:6px 0 0">No fee row is not a zero fee: unit investment trusts file no fee table and rank on nothing for expense ratio.</p></div>
+    <div class="sec"><h3>Flows <span class="src">creations − redemptions, USD</span></h3>${kv([['1 day',flow(o.f1)],['5 days',flow(o.f5)],['20 days',flow(o.f20)],['20 days / AUM',pctf(o.fa,true,2)]])}
+      <p class="note" style="margin:6px 0 0">Change in split-adjusted shares × the previous split-adjusted NAV. A day whose shares × NAV does not reconcile to filed net assets carries no flow; the daily series is <span class="mono">get_etf_history(series: "flow")</span>.</p></div>
+    <div class="sec"><h3>Holdings profile <span class="src">${o.ha?'measured · holdings as of '+esc(o.ha):'no holdings feed'}</span></h3>${o.ha?kv([['Holdings',o.nh!=null?o.nh.toLocaleString():null],['Top 1 weight',pctf(o.t1)],['Top 10 weight',pctf(o.t10)],['US',pctf(o.us)],['Emerging',pctf(o.em)],['Large cap',pctf(o.lg)],['Mid cap',pctf(o.md)],['Small cap',pctf(o.sm)],['Duration',n1(o.du,' y')],['Maturity',n1(o.my,' y')],['Treasury',pctf(o.tr)],['Corporate',pctf(o.co)]]):'<p class="note">No holdings feed for this fund, so concentration, geography, cap bands and duration are unmeasured here. Empty means "not measured", never "zero".</p>'}</div>
+    <div class="sec"><h3>Structure <span class="src">the fund\'s own filings</span></h3>${kv([['Index fund',yn(o.ix)],['Fund of funds',yn(o.fof)],['Leveraged / inverse flag',yn(o.mi)],['Exposure hidden',o.eh?'yes':'no'],['Turnover',pctf(o.to,false,0)],['Share classes on pool',o.scc]])}</div>
+    <div class="sec"><h3>Go deeper</h3><pre class="snip"><span class="c">// everything on this fund: identity, labels, latest row, fees, structure, splits, distributions</span>
+get_etf({ id: "${esc(ident)}" })
+<span class="c">// daily NAV, shares, net assets, premium — both split bases, each value with its status</span>
+get_etf_history({ id: "${esc(ident)}", series: "nav" })
+<span class="c">// daily creations / redemptions</span>
+get_etf_history({ id: "${esc(ident)}", series: "flow" })
+<span class="c">// the pool\'s holdings lines, newest day</span>
+get_etf_holdings({ id: "${esc(ident)}" })</pre></div>
+  </div>`;
+  dr.classList.add('open');$('#dclose').addEventListener('click',closeDrawer);
+}
+function closeDrawer(){$('#drawer').classList.remove('open');SEL=null;document.querySelectorAll('tr.row.on').forEach(t=>t.classList.remove('on'))}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+
+/* ---------- misc ---------- */
+$('#clearAll').addEventListener('click',()=>{S={min_aum:DEFAULT_AUM};SORT='aum';ORDER='desc';ACTIVE_PRESET=null;syncRail();run()});
+$('#railToggle').addEventListener('click',()=>$('#rail').classList.toggle('show'));
+$('#railClose').addEventListener('click',()=>$('#rail').classList.remove('show'));
+$('#themeBtn').addEventListener('click',()=>{const r=document.documentElement;const cur=r.getAttribute('data-theme');const sys=matchMedia('(prefers-color-scheme: dark)').matches;const now=cur?cur:(sys?'dark':'light');r.setAttribute('data-theme',now==='dark'?'light':'dark')});
+
+/* ---------- boot ---------- */
+buildRail();buildPresets();renderLive();
+let restored=null;try{restored=JSON.parse(localStorage.getItem('fa_etf_screen_state'))}catch(e){}
+if(restored&&restored.S&&typeof restored.S==='object'){S=Object.assign({},restored.S);SORT=SORTS.includes(restored.SORT)?restored.SORT:'aum';ORDER=restored.ORDER==='asc'?'asc':'desc';COLS=new Set(restored.COLS||['flows']);ACTIVE_PRESET=restored.ACTIVE_PRESET||null;syncRail();buildColGroups();run()}
+else loadPreset(PRESETS[0]);
+(async()=>{
+  let m=null;
+  try{m=window.claude&&typeof window.claude.use==='function'?await window.claude.use('mcp'):null}catch(e){m=null}
+  if(!m){LIVE='nomcp';renderLive();renderTable();return}
+  MCP=m;clearTimeout(DEB);fetchRows(false);
+})();
+})();
+</script>

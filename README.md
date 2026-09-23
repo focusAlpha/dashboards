@@ -1,6 +1,6 @@
-# FocusAlpha Dashboards — stock screener, semiconductor news monitor, hedge fund 13F profile
+# FocusAlpha Dashboards — stock screener, ETF screener, semiconductor news monitor, hedge fund 13F profile
 
-Three working financial dashboards built on the [FocusAlpha](https://focusalpha.ai) data API,
+Four working financial dashboards built on the [FocusAlpha](https://focusalpha.ai) data API,
 published as open-source **samples**. Each is one self-contained HTML file. Open it in a browser
 and every control, sort and drawer works, because the data is baked into the page.
 
@@ -10,14 +10,16 @@ and every control, sort and drawer works, because the data is baked into the pag
 | Sample | What it shows | FocusAlpha tools behind it | Files |
 | --- | --- | --- | --- |
 | **Global stock screener** | Screen listed companies across 82 markets on guidance changes, filed events, ownership and fundamentals | `screen_companies` | [sample](https://app.focusalpha.ai/screener-dashboard/) · [source](screener-dashboard/index.html) · [live source](screener-dashboard/live.html) |
+| **ETF screener** | Screen 5,607 US-listed ETFs by classification, expense ratio, NAV and premium, 20-day flows and measured holdings | `screen_etfs` | [sample](https://app.focusalpha.ai/etf-screener-dashboard/) · [source](etf-screener-dashboard/index.html) · [live source](etf-screener-dashboard/live.html) |
 | **Semiconductor news monitor** | News as labelled events (direction, impact, the names each story reaches) for 36 chip companies in the US, Taiwan, Korea, Japan and China | `get_company_events`, `get_company_news`, `get_market_data` | [sample](https://app.focusalpha.ai/monitor-dashboard/) · [source](monitor-dashboard/index.html) · [live source](monitor-dashboard/live.html) |
 | **Hedge fund profile** | What a manager says in its Form ADV brochure against what its 13F holds, with a replicating portfolio and peers | `get_institution_profile`, `get_institutional_holdings`, `get_market_data`, `get_benchmark_prices` | [sample](https://app.focusalpha.ai/manager-profile-dashboard/) · [source](manager-profile-dashboard/index.html) · [live source](manager-profile-dashboard/live.html) |
 | **Onboarding tutorial** | The guide page: the prompt to paste first, sample questions, what the data covers, and the three dashboards above with their Build-my-own prompts | — | [page](https://app.focusalpha.ai/onboarding-tutorial/) · [source](onboarding-tutorial/index.html) |
 
 ## The samples are frozen: data as of 2026-09-23
 
-Every number in the three `index.html` files is **as of 2026-09-23** (the news monitor's events as
-of the evening of 2026-09-22, US Eastern). Nothing in those files calls the API, so nothing in them
+Every number in the `index.html` files is **as of 2026-09-23** (the news monitor's events as
+of the evening of 2026-09-22, US Eastern; the ETF screener's daily rows through 2026-09-03, the
+newest valuation date in the dataset on the day it was frozen). Nothing in those files calls the API, so nothing in them
 will ever update. They exist to show what the data looks like and how a page can use it.
 
 **For current data, connect FocusAlpha in your AI** ([focusalpha.ai/start](https://focusalpha.ai/start))
@@ -42,7 +44,7 @@ same by hand:
 3. Publish it as a claude.ai artifact with the connector declared, e.g.
    `capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["screen_companies"] }] } }`.
    Without the declaration `window.claude.use('mcp')` resolves `null` and the page cannot fetch.
-4. Edit the one block that is yours: `PRESETS[0]` (screener), `SNAP.companies` (monitor),
+4. Edit the one block that is yours: `PRESETS[0]` (stock and ETF screeners), `SNAP.companies` (monitor),
    `PEERS` (fund profile). Each `live.html` says so in a comment at the top.
 
 Opened as a plain web page, without a connector, `live.html` shows only its empty state.
