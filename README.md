@@ -12,7 +12,7 @@ and every control, sort and drawer works, because the data is baked into the pag
 | **Global stock screener** | Screen listed companies across 82 markets on guidance changes, filed events, ownership and fundamentals | `screen_companies` | [sample](https://focusalpha.ai/screener-dashboard/) · [source](screener-dashboard/index.html) · [live source](screener-dashboard/live.html) |
 | **Semiconductor news monitor** | News as labelled events (direction, impact, the names each story reaches) for 36 chip companies in the US, Taiwan, Korea, Japan and China | `get_company_events`, `get_company_news`, `get_market_data` | [sample](https://focusalpha.ai/monitor-dashboard/) · [source](monitor-dashboard/index.html) · [live source](monitor-dashboard/live.html) |
 | **Hedge fund profile** | What a manager says in its Form ADV brochure against what its 13F holds, with a replicating portfolio and peers | `get_institution_profile`, `get_institutional_holdings`, `get_market_data`, `get_benchmark_prices` | [sample](https://focusalpha.ai/manager-profile-dashboard/) · [source](manager-profile-dashboard/index.html) · [live source](manager-profile-dashboard/live.html) |
-| **Get in Claude** | The guide page: the prompt to paste first, sample questions, what the data covers, and the three dashboards above with their Build-my-own prompts | — | [page](https://focusalpha.ai/get-in-claude/) · [source](get-in-claude/index.html) |
+| **Onboarding tutorial** | The guide page: the prompt to paste first, sample questions, what the data covers, and the three dashboards above with their Build-my-own prompts | — | [page](https://focusalpha.ai/onboarding-tutorial/) · [source](onboarding-tutorial/index.html) |
 
 ## The samples are frozen: data as of 2026-09-23
 

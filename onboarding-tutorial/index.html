@@ -1,15 +1,15 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><meta name="description" content="Ask Claude plain questions and get filings, financials, guidance, prices and scored news from FocusAlpha. Sample questions, three sample dashboards, and how to build your own.">
-<link rel="canonical" href="https://focusalpha.ai/get-in-claude">
+<link rel="canonical" href="https://focusalpha.ai/onboarding-tutorial">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="FocusAlpha">
-<meta property="og:url" content="https://focusalpha.ai/get-in-claude">
-<meta property="og:title" content="Get in Claude: FocusAlpha Market Data, Filings and News | FocusAlpha">
+<meta property="og:url" content="https://focusalpha.ai/onboarding-tutorial">
+<meta property="og:title" content="FocusAlpha for Claude: Market Data, Filings and News in Claude | FocusAlpha">
 <meta property="og:description" content="Ask Claude plain questions and get filings, financials, guidance, prices and scored news from FocusAlpha. Sample questions, three sample dashboards, and how to build your own.">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Get in Claude: FocusAlpha Market Data, Filings and News | FocusAlpha">
+<meta name="twitter:title" content="FocusAlpha for Claude: Market Data, Filings and News in Claude | FocusAlpha">
 <meta name="twitter:description" content="Ask Claude plain questions and get filings, financials, guidance, prices and scored news from FocusAlpha. Sample questions, three sample dashboards, and how to build your own.">
 </head><body>
-<title>Get in Claude: FocusAlpha Market Data, Filings and News | FocusAlpha</title>
+<title>FocusAlpha for Claude: Market Data, Filings and News in Claude | FocusAlpha</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -208,6 +208,7 @@ details.sub summary .chev{margin-left:auto}
 .btn-open{background:var(--k);color:#fff}
 .btn-build{background:var(--card);color:var(--ink);border:1.5px solid var(--line)}
 .btn-build:hover{border-color:var(--k)}
+.dacts button.btn-build{border-radius:999px;padding:10px 16px;font-weight:600;font-size:.9rem;cursor:pointer;font-family:inherit;line-height:normal}
 #dash{grid-template-columns:1fr}
 .dnote{margin:14px 4px 0;font-size:.9rem;color:var(--muted);text-align:center}
 #v-uc .grp{margin:30px 0 14px}
@@ -215,7 +216,7 @@ details.sub summary .chev{margin-left:auto}
 </style>
 
 <header class="wrap">
-  <h1>Get in Claude</h1>
+  <h1>FA for Claude</h1>
   <p class="sub">Real market data. Plain questions. Filings, financials, prices and news, straight into Claude.</p>
   <div class="hero">
     <span class="badge"><span class="tg" aria-hidden="true"></span>Real-time · global</span>
@@ -250,7 +251,7 @@ details.sub summary .chev{margin-left:auto}
   <h2>Use Cases</h2>
   <p class="lead">Three working dashboards on FocusAlpha data. Open one, or build your own that reads live.</p>
   <div class="uc" id="dash"></div>
-  <p class="dnote">The samples are frozen on 2026-09-23 and never update. <b>Build my own</b> opens Claude with a prompt that fetches the page's source from <a href="https://github.com/focusAlpha/dashboards" rel="noopener">GitHub</a> and republishes it reading live FocusAlpha data through your connector — your stocks, your managers, your account.</p>
+  <p class="dnote">The samples are frozen on 2026-09-23 and never update. <b>Build my own</b> hands you a prompt to paste into Claude: it fetches the page's source from <a href="https://github.com/focusAlpha/dashboards" rel="noopener">GitHub</a> and republishes it reading live FocusAlpha data through your connector — your stocks, your managers, your account.</p>
 
 </section>
 
@@ -329,9 +330,12 @@ document.getElementById("dash").innerHTML=DASH.map(function(u){
   '<h3>'+u.n+(u.dot?'<span class="dot" aria-hidden="true"></span>':'')+'</h3><p class="d">'+u.d+'</p>'+
   '<div class="feat">'+u.f.map(function(x){return '<span>'+esc(x)+'</span>'}).join("")+'</div>'+
   '<p class="ex">'+esc(u.ex)+'</p>'+
-  '<div class="dacts"><a class="btn-open" href="'+u.url+'" target="_blank" rel="noopener">Open the sample ↗</a><a class="btn-build" href="'+link(u.build,true)+'" target="_blank" rel="noopener">Build my own ↗</a></div></div>';
+  '<div class="dacts"><a class="btn-open" href="'+u.url+'" target="_blank" rel="noopener">Open the sample ↗</a><button class="btn-build" type="button" data-act="own" data-prompt="'+DASH.indexOf(u)+'">Build my own →</button></div></div>';
 }).join("");
 
+/* The Build-my-own modal (appended at the end of the page) shows one prompt; each card
+   sets it to its own before the modal's own click handler opens it. */
+document.addEventListener("click",function(e){var b=e.target.closest("[data-prompt]");if(!b)return;var p=document.getElementById("faPrompt");if(p)p.textContent=DASH[+b.dataset.prompt].build;});
 /* ===== WHAT WE OFFER ===== */
 var OFFER=[
  {k:"#D9722F",t:"var(--to)",n:"Live events &amp; news",tag:"Real-time",dot:true,wide:true,d:"Every filing and market-moving story, scored minutes after it lands, with the companies it hits.",q:"What moved [stock] in the last two weeks?"},
@@ -419,6 +423,169 @@ document.addEventListener("click",function(e){
   function fb(){try{var r=document.createRange();r.selectNodeContents(document.getElementById(b.dataset.for));var sl=window.getSelection();sl.removeAllRanges();sl.addRange(r);b.textContent="Selected, press copy"}catch(err){b.textContent="Select the text to copy"}}
   try{navigator.clipboard.writeText(text).then(ok,fb)}catch(err){fb()}
 });
+</script>
+
+<!-- Build my own — appended to each demo. Uses the page's own tokens, so it
+     inherits whatever design language the page already has. -->
+<style>
+/* Build my own — the one call to action on every demo. FocusAlpha brand purple
+   (#4F2FB0 / #6644C9, straight off the website) rather than each page's own
+   accent, so the button reads as the same button on all three. */
+.fa-own{
+  display:inline-flex;align-items:center;gap:8px;white-space:nowrap;
+  background:#4F2FB0;color:#fff;border:0;border-radius:11px;
+  padding:11px 20px;font-weight:600;font-size:14px;line-height:1;letter-spacing:.005em;
+  cursor:pointer;transition:background .15s,box-shadow .15s,transform .08s;
+  box-shadow:0 1px 2px rgba(31,17,74,.22), 0 10px 22px -10px rgba(79,47,176,.65);
+}
+.fa-own:hover{background:#6644C9;box-shadow:0 1px 2px rgba(31,17,74,.22), 0 14px 28px -10px rgba(79,47,176,.75)}
+.fa-own:active{transform:translateY(1px)}
+.fa-own:focus-visible{outline:2px solid #6644C9;outline-offset:3px}
+.fa-own .arw{font-size:15px;line-height:1;opacity:.9}
+@media (max-width:560px){.fa-own{padding:9px 15px;font-size:13px}}
+/* Source on GitHub — sits beside Build my own on every page; outlined so the purple stays the one call to action */
+.fa-gh{display:inline-flex;align-items:center;gap:6px;padding:8px 13px;border-radius:9px;margin-right:8px;
+  font:500 13px/1 system-ui,-apple-system,"Segoe UI",sans-serif;color:#4F2FB0;background:transparent;border:1px solid rgba(79,47,176,.45);
+  text-decoration:none;white-space:nowrap;letter-spacing:.01em}
+.fa-gh::before{content:"";width:14px;height:14px;background:currentColor;-webkit-mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/></svg>") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'/></svg>") center/contain no-repeat}
+.fa-gh:hover{background:rgba(79,47,176,.08);border-color:#4F2FB0}
+.fa-gh:focus-visible{outline:2px solid #6644C9;outline-offset:3px}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fa-gh{color:#B9A6F2;border-color:rgba(185,166,242,.5)}:root:not([data-theme="light"]) .fa-gh:hover{background:rgba(185,166,242,.12);border-color:#B9A6F2}}
+:root[data-theme="dark"] .fa-gh{color:#B9A6F2;border-color:rgba(185,166,242,.5)}:root[data-theme="dark"] .fa-gh:hover{background:rgba(185,166,242,.12);border-color:#B9A6F2}
+@media (max-width:560px){.fa-gh{padding:7px 10px;font-size:12px}}
+.fa-scrim{position:fixed;inset:0;background:rgba(8,12,18,.62);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;
+  /* Its OWN palette. The three demos each name their tokens differently
+     (--surface / --card / --shell), so inheriting them left the dialog with an
+     undefined background — i.e. transparent — on two pages out of three. */
+  --fa-bg:#FFFFFF; --fa-bg2:#F6F7FA; --fa-ink:#151A22; --fa-muted:#5A6472; --fa-faint:#8B93A1;
+  --fa-line:#E3E5EC; --fa-brand:#4F2FB0; --fa-brand-2:#6644C9; --fa-wash:#F2EEFC;
+  --fa-ok:#157A4A; --fa-ok-soft:#E4F3EA;
+  font-family:"IBM Plex Sans","DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans",sans-serif;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .fa-scrim{
+  --fa-bg:#171A21; --fa-bg2:#1E222B; --fa-ink:#E9EBF0; --fa-muted:#A2AAB8; --fa-faint:#767E8D;
+  --fa-line:#2C323D; --fa-brand:#8B6FF0; --fa-brand-2:#A48FF7; --fa-wash:#231C3D;
+  --fa-ok:#4FBF86; --fa-ok-soft:#15301F;
+}}
+:root[data-theme="dark"] .fa-scrim{
+  --fa-bg:#171A21; --fa-bg2:#1E222B; --fa-ink:#E9EBF0; --fa-muted:#A2AAB8; --fa-faint:#767E8D;
+  --fa-line:#2C323D; --fa-brand:#8B6FF0; --fa-brand-2:#A48FF7; --fa-wash:#231C3D;
+  --fa-ok:#4FBF86; --fa-ok-soft:#15301F;
+}
+.fa-scrim[hidden]{display:none}
+.fa-modal{background:var(--fa-bg);color:var(--fa-ink);border:1px solid var(--fa-line);border-radius:14px;
+  box-shadow:0 30px 70px -22px rgba(0,0,0,.55);max-width:720px;width:100%;max-height:88vh;
+  display:flex;flex-direction:column;overflow:hidden;font-size:14px;line-height:1.5;text-align:left}
+.fa-mh{padding:16px 20px;border-bottom:1px solid var(--fa-line);display:flex;align-items:flex-start;gap:12px;background:var(--fa-bg)}
+.fa-mh h2{margin:0;font-size:18px;font-weight:600;flex:1;color:var(--fa-ink);letter-spacing:-.01em}
+.fa-mh p{margin:5px 0 0;font-size:13px;color:var(--fa-muted)}
+.fa-x{background:none;border:1px solid var(--fa-line);border-radius:7px;width:28px;height:28px;color:var(--fa-muted);flex:none;cursor:pointer;line-height:1;font-size:15px}
+.fa-x:hover{background:var(--fa-bg2);color:var(--fa-ink)}
+.fa-mb{padding:16px 20px;overflow:auto;background:var(--fa-bg)}
+.fa-steps{counter-reset:s;list-style:none;margin:0 0 14px;padding:0}
+.fa-steps li{counter-increment:s;position:relative;padding-left:27px;margin-bottom:7px;font-size:13.5px;color:var(--fa-muted)}
+.fa-steps li::before{content:counter(s);position:absolute;left:0;top:1px;width:19px;height:19px;border-radius:50%;
+  background:var(--fa-wash);color:var(--fa-brand);font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:11px;
+  display:flex;align-items:center;justify-content:center;font-weight:600}
+.fa-steps b{color:var(--fa-ink);font-weight:600}
+.fa-link{display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding:2px 9px;border-radius:999px;
+  background:var(--fa-wash);color:var(--fa-brand);border:1px solid color-mix(in srgb,var(--fa-brand) 35%,transparent);
+  font-size:12px;font-weight:600;text-decoration:none;white-space:nowrap;vertical-align:1px}
+.fa-link:hover{background:var(--fa-brand);color:#fff;border-color:var(--fa-brand)}
+.fa-src{color:var(--fa-brand);font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.fa-pbox{position:relative;background:var(--fa-bg2);border:1px solid var(--fa-line);border-radius:10px}
+.fa-pbox pre{margin:0;padding:14px 16px;font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:12px;line-height:1.65;white-space:pre-wrap;word-break:break-word;max-height:42vh;overflow:auto;color:var(--fa-ink)}
+.fa-copy{position:absolute;top:9px;right:9px;background:var(--fa-bg);border:1px solid var(--fa-line);border-radius:7px;
+  padding:5px 12px;font-size:12px;cursor:pointer;color:var(--fa-ink);font-weight:500}
+.fa-copy:hover{border-color:var(--fa-brand);color:var(--fa-brand)}
+.fa-copy.done{background:var(--fa-ok-soft);color:var(--fa-ok);border-color:var(--fa-ok)}
+.fa-mf{padding:12px 20px;border-top:1px solid var(--fa-line);background:var(--fa-bg2);font-size:12px;color:var(--fa-faint)}
+</style>
+
+<div class="fa-scrim" id="faScrim" hidden>
+  <div class="fa-modal" role="dialog" aria-modal="true" aria-labelledby="faTitle">
+    <div class="fa-mh">
+      <div>
+        <h2 id="faTitle">Build your own, on your own data</h2>
+        <p>Each sample is a frozen snapshot. Its source is public on
+           <a class="fa-src" href="https://github.com/focusAlpha/dashboards/tree/main/onboarding-tutorial" target="_blank" rel="noopener">GitHub</a>.
+           Paste the prompt below into Claude: it fetches that source and republishes it reading live
+           FocusAlpha data through your connector — your universe, your filters, your account.</p>
+      </div>
+      <button class="fa-x" id="faX" aria-label="Close">×</button>
+    </div>
+    <div class="fa-mb">
+      <ol class="fa-steps">
+        <li>Connect <b>FocusAlpha</b> in your preferred AI, if you haven’t already <a class="fa-link" href="https://focusalpha.ai/start" target="_blank" rel="noopener">Connect →</a></li>
+        <li><b>Copy</b> the prompt below and paste it into a new conversation</li>
+        <li>Edit the conditions at the bottom — that last block is yours to change</li>
+        <li>Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions</li>
+      </ol>
+      <div class="fa-pbox">
+        <button class="fa-copy" id="faCopy">Copy</button>
+        <pre id="faPrompt">Build me a live screening dashboard from the FocusAlpha sample at https://focusalpha.ai/screener-dashboard, on my own filters.
+
+The page is open source. Fetch this ONE file and use it verbatim as the page:
+  https://raw.githubusercontent.com/focusAlpha/dashboards/main/screener-dashboard/live.html
+It is a single self-contained HTML file, about 70 KB, no build step, no dependencies. Download it
+exactly as it is, with curl or your fetch tool. Do not summarise it, retype it, or rebuild it from
+memory. The sample on focusalpha.ai is this same page with a data snapshot frozen on 2026-09-23
+baked in; live.html is the same page reading through the FocusAlpha connector instead.
+
+Then, in this order:
+1. Publish the file as an artifact, declaring the connector:
+     capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["screen_companies"] }] } }
+   If the connector is listed in your tools as "focusalpha", use that spelling for server.
+   Without this declaration window.claude.use('mcp') resolves null and the page can never fetch.
+2. Open it and check that the status line says live and the table has rows. If the page says the
+   connector is not available, I have to connect FocusAlpha first: https://focusalpha.ai/start
+3. Now change it for me. The default screen is PRESETS[0] near the top of the script, and its
+   parameters are the ones the API takes (market_cap_usd_gte, guidance_better_90d_gte, ret_3m_lte,
+   sort, ...). Put my conditions below in as the first preset, republish, and send me the link.
+
+Rules for any change:
+- Keep the data layer exactly as it is: every read goes through MCP.callTool(SERVER, TOOL, params).
+  Never paste rows into the page. The point of this page is that it fetches its own data.
+- Before adding a filter, call screen_companies({ list_facets: true }) once. It is free and it gives
+  the exact spelling of every country, sector, exchange and event family. Do not guess field names.
+- Units: margins, yields and growth are FRACTIONS (0.15 = 15%); price returns are percents.
+- A guidance RAISE means a number went up. GOOD NEWS means better for the company. A cost line
+  raised is both. The page keeps them in separate columns; keep it that way.
+
+My conditions (edit these):
+  market_cap_usd_gte: 5000000000
+  guidance_better_90d_gte: 1
+  ret_3m_lte: 0
+  sort: "guidance_better_90d"</pre>
+      </div>
+    </div>
+    <div class="fa-mf">Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.</div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var scrim=document.getElementById('faScrim');
+  function open(){scrim.hidden=false;document.getElementById('faCopy').focus()}
+  function close(){scrim.hidden=true}
+  document.addEventListener('click',function(e){
+    if(e.target.closest('#ownBtn')||e.target.closest('[data-act="own"]')){open();return}
+    if(e.target===scrim||e.target.closest('#faX'))close();
+  });
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!scrim.hidden)close()});
+  document.getElementById('faCopy').addEventListener('click',function(){
+    var b=this,t=document.getElementById('faPrompt').textContent;
+    function done(){b.textContent='Copied';b.classList.add('done');setTimeout(function(){b.textContent='Copy';b.classList.remove('done')},1600)}
+    // A sandboxed or insecure context refuses the clipboard API; select the text
+    // instead of failing silently, so the button always leads somewhere.
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,select)}else select();
+    function select(){
+      var r=document.createRange();r.selectNodeContents(document.getElementById('faPrompt'));
+      var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Press ⌘C';
+    }
+  });
+})();
 </script>
 
 </body></html>
