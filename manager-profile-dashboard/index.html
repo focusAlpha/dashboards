@@ -1923,6 +1923,260 @@ boot();
 })();
 </script>
 
+<!-- fa-i18n -->
+<script>
+/* Strings every sample page shares: the masthead buttons, the Build-my-own modal, the theme toggle. */
+window.FA_I18N_SHARED={es:{
+"Source on GitHub":"Código en GitHub","Build my own":"Construir el mío","Copy":"Copiar","Copied":"Copiado","Press ⌘C":"Pulsa ⌘C","Theme":"Tema","Toggle theme":"Cambiar tema",
+"This page's source on GitHub (MIT)":"El código de esta página en GitHub (MIT)","GitHub":"GitHub","Close":"Cerrar","Language":"Idioma","Refresh":"Actualizar","Done":"Listo","Clear all":"Borrar todo","Clear":"Borrar","Filters":"Filtros","Columns":"Columnas","Next ›":"Siguiente ›","‹ Prev":"‹ Anterior",
+"Build your own, on your own data":"Construye el tuyo, con tus propios datos",
+"This page is a frozen snapshot. Its source is public on":"Esta página es una instantánea congelada. Su código es público en",
+"Each sample is a frozen snapshot. Its source is public on":"Cada muestra es una instantánea congelada. Su código es público en",
+". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":". Pega el prompt de abajo en Claude: descarga ese código y lo vuelve a publicar leyendo datos de FocusAlpha en vivo a través de tu conector: tu universo, tus filtros, tu cuenta.",
+"Connect":"Conecta","in your preferred AI, if you haven’t already":"en tu IA preferida, si aún no lo has hecho","Connect →":"Conectar →",
+"the prompt below and paste it into a new conversation":"el prompt de abajo y pégalo en una conversación nueva",
+"Edit the conditions at the bottom — that last block is yours to change":"Edita las condiciones al final: ese último bloque es tuyo para cambiarlo",
+"Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions":"Claude descarga el código de la página desde GitHub, lo publica con tu conector y aplica tus condiciones",
+"Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.":"Claude lee FocusAlpha con el acceso de tu propio conector. Cada cifra procede de informes públicos o datos de mercado, y nada de esto es asesoramiento de inversión.",
+"Fetch this page again from FocusAlpha, skipping the cache":"Volver a pedir esta página a FocusAlpha, sin usar la caché",
+"Live call · what this page sends":"Llamada en vivo · lo que envía esta página","// MCP tool · FocusAlpha":"// herramienta MCP · FocusAlpha","// REST":"// REST","type to search":"escribe para buscar","any":"cualquiera","yes":"sí","no":"no","Go deeper":"Profundizar","Ticker":"Ticker","Sector":"Sector","Exchange":"Bolsa","Size":"Tamaño","Country":"País","Industry":"Sector detallado","Market cap":"Capitalización","Holdings":"Posiciones","Events":"Eventos","Return":"Rentabilidad","Shares":"Acciones","Weight":"Peso","Value":"Valor","Position":"Posición","Sample:":"Muestra:","FocusAlpha":"FocusAlpha","sort":"ordenar","min":"mín.","max":"máx.","desc":"desc","asc":"asc","Loading…":"Cargando…","filed":"presentado"
+},zh:{
+"Source on GitHub":"GitHub 源码","Build my own":"搭建我自己的","Copy":"复制","Copied":"已复制","Press ⌘C":"请按 ⌘C","Theme":"主题","Toggle theme":"切换主题",
+"This page's source on GitHub (MIT)":"本页在 GitHub 上的源码（MIT）","GitHub":"GitHub","Close":"关闭","Language":"语言","Refresh":"刷新","Done":"完成","Clear all":"全部清除","Clear":"清除","Filters":"筛选","Columns":"列","Next ›":"下一页 ›","‹ Prev":"‹ 上一页",
+"Build your own, on your own data":"用你自己的数据，搭建你自己的看板",
+"This page is a frozen snapshot. Its source is public on":"本页是冻结的快照，源码公开在",
+"Each sample is a frozen snapshot. Its source is public on":"每个样本都是冻结的快照，源码公开在",
+". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":"。把下面的 prompt 粘贴到 Claude：它会拉取源码，重新发布成通过你的连接器读取 FocusAlpha 实时数据的版本——你的股票池、你的条件、你的账户。",
+"Connect":"连接","in your preferred AI, if you haven’t already":"到你常用的 AI，如果还没连的话","Connect →":"去连接 →",
+"the prompt below and paste it into a new conversation":"下面的 prompt，粘贴到一个新对话里",
+"Edit the conditions at the bottom — that last block is yours to change":"修改末尾的条件——最后那一块是留给你改的",
+"Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions":"Claude 从 GitHub 拉取页面源码，用你的连接器发布，再套上你的条件",
+"Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.":"Claude 通过你自己的连接器读取 FocusAlpha。所有数字都来自公开申报或市场数据，都不构成投资建议。",
+"Fetch this page again from FocusAlpha, skipping the cache":"跳过缓存，重新向 FocusAlpha 请求本页",
+"Live call · what this page sends":"实时调用 · 本页发送的请求","// MCP tool · FocusAlpha":"// MCP 工具 · FocusAlpha","// REST":"// REST","type to search":"输入以搜索","any":"不限","yes":"是","no":"否","Go deeper":"深入查看","Ticker":"代码","Sector":"行业","Exchange":"交易所","Size":"规模","Country":"国家","Industry":"细分行业","Market cap":"市值","Holdings":"持仓","Events":"事件","Return":"回报","Shares":"股数","Weight":"权重","Value":"市值","Position":"持仓","Sample:":"样本：","FocusAlpha":"FocusAlpha","sort":"排序","min":"最小","max":"最大","desc":"降序","asc":"升序","Loading…":"加载中…","filed":"已申报"
+}};
+
+</script>
+<script>
+window.FA_I18N_DICT={es:{
+"new":"nueva","added":"ampliada","trimmed":"recortada","held":"mantenida",
+
+"Hedge Fund Profile: 13F Holdings vs Form ADV | FocusAlpha":"Perfil de hedge fund: posiciones 13F frente al Form ADV | FocusAlpha",
+"Institutional holdings · sample data":"Posiciones institucionales · datos de muestra",
+"A sample of what FocusAlpha can build: Lone Pine’s filed 13F holdings, the Form ADV profile behind them, and a replicating portfolio traded only on what had actually been filed — pulled live each time the page opens and set against five Tiger-lineage peers. Use it as a template: search below to swap in any fund you follow.":"Una muestra de lo que FocusAlpha puede construir: las posiciones 13F de Lone Pine, el perfil del Form ADV detrás de ellas y una cartera replicada que solo opera con lo que ya se había presentado, comparada con cinco pares del linaje Tiger. Úsala como plantilla: busca abajo para poner cualquier fondo que sigas.",
+"SEC registered":"Registrado en la SEC","Hedge Fund":"Hedge fund","Growth-Biased book":"Cartera sesgada a crecimiento","Focus manager":"Gestora principal","Search for any 13F filer to swap in":"Busca cualquier emisor de 13F para ponerlo aquí","Swap in any fund — search by name":"Pon cualquier fondo: busca por nombre","Pulling live data…":"Cargando datos en vivo…","Form ADV":"Form ADV","Prices":"Precios","Fetched":"Obtenido",
+"Reads FocusAlpha with your own connector access — every figure is public filing or market data, and none of it is investment advice.":"Lee FocusAlpha con el acceso de tu propio conector: cada cifra procede de informes públicos o datos de mercado, y nada de esto es asesoramiento de inversión.",
+"SEC profile":"Perfil SEC","Regulatory AUM":"AUM regulatorio","13F equity filed":"Renta variable 13F presentada","Concentration":"Concentración","Turnover":"Rotación","Replicated return":"Rentabilidad replicada","Excess over S&P 500 TR":"Exceso sobre S&P 500 TR","Alpha, annualised":"Alpha anualizada",
+"Form ADV (what the firm reports)":"Form ADV (lo que declara la firma)","13F filings (what it holds)":"Informes 13F (lo que tiene)","Replicating portfolio (daily prices)":"Cartera replicada (precios diarios)","Peer set":"Grupo de pares","Six managers, one lineage":"Seis gestoras, un mismo linaje",
+"Size and headcount from Form ADV Part 1; portfolio shape from the filed 13F books; return, beta and alpha from one shared replication against the":"Tamaño y plantilla del Form ADV Parte 1; forma de la cartera de los 13F presentados; rentabilidad, beta y alpha de una misma replicación contra el","S&P 500 Total Return":"S&P 500 Total Return",". Ranked by excess return once every book is priced.":". Ordenadas por exceso de rentabilidad una vez valorada cada cartera.",
+"Manager":"Gestora","Reg. AUM":"AUM reg.","13F book":"Cartera 13F","Names":"Nombres","Top 10":"Top 10","Eff. N":"N efectivo","13F style":"Estilo 13F","Wtd P/E":"PER pond.","Excess":"Exceso","Beta":"Beta","Alpha":"Alpha","Max DD":"Caída máx.","Benchmark ·":"Índice de referencia ·","over the full price window":"en toda la ventana de precios","no manager":"ninguna gestora",
+"Form ADV Part 2A × 13F":"Form ADV Parte 2A × 13F","What they say, against what they hold":"Lo que dicen, frente a lo que tienen",
+"The Part 2A brochure is the only place a manager describes, in its own words, how it invests. A 13F says nothing about intent, only exposure.":"El folleto de la Parte 2A es el único sitio donde una gestora describe, con sus palabras, cómo invierte. Un 13F no dice nada de la intención, solo de la exposición.",
+"Read together they can disagree":"Leídos juntos pueden discrepar","— a firm can describe a blend mandate and run a book whose multiples read as growth.":": una firma puede describir un mandato mixto y llevar una cartera cuyos múltiplos leen como crecimiento.",
+"Brochure says":"El folleto dice","Styles it names":"Estilos que nombra","13F book reads":"La cartera 13F lee como","vg score":"puntuación vg","Wtd P/B":"P/VC pond.","Verdict":"Veredicto","says Blend, holds Growth":"dice mixto, tiene crecimiento","growth biased":"sesgo a crecimiento","no Part 2A in store":"sin Parte 2A en el archivo",
+"The vg score is the book’s weighted P/B and P/E against a large-cap anchor, so it runs opposite to intuition:":"La puntuación vg es el P/VC y el PER ponderados de la cartera frente a un ancla de gran capitalización, así que va al revés de la intuición:","lower is growthier":"más bajo es más crecimiento","(under 0.55 deep growth, about 0.80 blend, 1.35 and up deep value).":"(por debajo de 0,55 crecimiento profundo, en torno a 0,80 mixto, 1,35 o más valor profundo).",
+"describe one style in the brochure and hold a book the multiples read as another. Coatue and Maverick have no Part 2A brochure in FocusAlpha’s store yet, so they can’t be compared.":"describen un estilo en el folleto y tienen una cartera cuyos múltiplos leen como otro. Coatue y Maverick aún no tienen folleto de Parte 2A en el archivo de FocusAlpha, así que no se pueden comparar.",
+"States: fundamental · long horizon · shorts · leverage · derivatives ·":"Declara: fundamental · horizonte largo · cortos · apalancamiento · derivados ·","Open the brochure (PDF)":"Abrir el folleto (PDF)","equity styles":"estilos de renta variable","investment strategy":"estrategia de inversión","Form ADV Part 2A · Item 5":"Form ADV Parte 2A · Item 5",
+"The fee schedule as the brochure prints it. The parsed rate is for scanning;":"El cuadro de comisiones tal como lo imprime el folleto. La tasa extraída sirve para ojear;","where it and the sentence disagree, the sentence wins":"donde ella y la frase discrepan, gana la frase","Who pays":"Quién paga","Fee":"Comisión","Rate":"Tasa","Charged on":"Cobrada sobre","In the brochure’s words":"En palabras del folleto","Management":"Gestión","Performance":"Éxito",
+"Replicating portfolio":"Cartera replicada","Trading only on what had been filed":"Operando solo con lo que ya se había presentado","Each book is bought at the":"Cada cartera se compra al","close of the first trading day after its 13F appeared on EDGAR":"cierre del primer día de negociación después de que su 13F apareciera en EDGAR",
+"and held until the next filing — buying at quarter-end would use information nobody had yet. Long US-listed equity only: no shorts, options or non-US listings, so this is not the fund's own performance.":"y se mantiene hasta el siguiente informe; comprar a fin de trimestre usaría información que nadie tenía aún. Solo largos en renta variable cotizada en EE. UU.: sin cortos, opciones ni cotizaciones fuera de EE. UU., así que no es la rentabilidad del propio fondo.",
+"S&P 500 TR":"S&P 500 TR","The index returned":"El índice rindió",
+"from Jul 14, 2025 to Sep 22, 2026. Each line starts at the first trading day a filed book could be bought, holding whichever 13F was already public. Lone Pine priced 60 of 67 tickers across its books (92% of book value on average).":"del 14 jul 2025 al 22 sep 2026. Cada línea empieza el primer día en que una cartera presentada podía comprarse, manteniendo el 13F que ya fuera público. Lone Pine valoró 60 de 67 tickers en sus carteras (92% del valor de la cartera de media).",
+"Risk-adjusted":"Ajustado por riesgo","How much of the return is just beta":"Cuánto de la rentabilidad es solo beta","Beta against the index, and annualised Jensen alpha (risk-free at zero).":"Beta frente al índice, y alpha de Jensen anualizada (tasa libre de riesgo cero).","Upper right is money made picking stocks":"Arriba a la derecha es dinero ganado eligiendo acciones","; lower right is a rise bought with market exposure.":"; abajo a la derecha es una subida comprada con exposición al mercado.","Beta against the S&P 500 TR":"Beta frente al S&P 500 TR",
+"Attribution":"Atribución","What carried Lone Pine’s book, and what cost it":"Qué sostuvo la cartera de Lone Pine y qué le costó","Each name's contribution to the replicating portfolio — weight times its move while held, summed across holding periods.":"La contribución de cada nombre a la cartera replicada: peso por su movimiento mientras se mantuvo, sumado en los periodos de tenencia.","holding periods beat the index, and the book beat it on":"periodos de tenencia batieron al índice, y la cartera lo batió en","of trading days. Top 6 and bottom 6 names shown.":"de las sesiones. Se muestran los 6 mejores y los 6 peores nombres.",
+"Per filing":"Por informe","Excess return, holding period by holding period":"Exceso de rentabilidad, periodo de tenencia a periodo de tenencia","One cell per filed book, from the day it was bought to the day it was replaced, against the index over the same days. A consistent sign says more than any one big period.":"Una celda por cartera presentada, desde el día en que se compró hasta el día en que se reemplazó, frente al índice en los mismos días. Un signo constante dice más que cualquier periodo grande.","Beat index":"Batió al índice",
+"Latest 13F-HR":"Último 13F-HR","Quarter ending":"Trimestre cerrado el",", filed":", presentado el","positions worth":"posiciones por valor de",". Against Q1 2026:":". Frente al T1 2026:","new,":"nuevas,","added to,":"ampliadas,","trimmed and":"recortadas y","sold out. The action is read from the change in share count; a move inside ±2% reads as held.":"vendidas del todo. La acción se lee del cambio en el número de acciones; un movimiento dentro de ±2% se lee como mantenida.",
+"Δ shares":"Δ acciones","Action":"Acción","Prior weight":"Peso anterior","New":"Nueva","Trimmed":"Recortada","Added":"Ampliada","Held":"Mantenida","Sold out since Q1 2026:":"Vendidas del todo desde el T1 2026:",", and 1 more.":", y 1 más.",
+"Sector weights":"Pesos por sector","Where the weight moved":"Adónde se movió el peso","Share of the filed book by sector, quarter by quarter. Sectors come from the FocusAlpha company registry;":"Cuota de la cartera presentada por sector, trimestre a trimestre. Los sectores vienen del registro de empresas de FocusAlpha;","is holdings it could not match to a company.":"son posiciones que no pudo asociar a una empresa.","Unresolved":"Sin resolver",
+"13F history":"Histórico 13F","Filed US equity, quarter by quarter":"Renta variable de EE. UU. presentada, trimestre a trimestre","This is not AUM":"Esto no es AUM","— only the slice a 13F requires: long US-listed equity. A falling line can be drawdown or a move into assets the form doesn't cover, and the filing can't tell the two apart.":": solo la parte que exige un 13F: largos en renta variable cotizada en EE. UU. Una línea que cae puede ser una caída o un traslado a activos que el formulario no cubre, y el informe no distingue entre ambas.",
+"Tenure":"Permanencia","What Lone Pine has held the longest":"Lo que Lone Pine ha mantenido más tiempo","Positions carried through the most of the":"Posiciones mantenidas durante más de los","FocusAlpha holds for Lone Pine (Q2 2024 to Q2 2026), with the largest weight each reached. A filled dot is a quarter the name was in the book.":"que FocusAlpha guarda de Lone Pine (T2 2024 a T2 2026), con el mayor peso que alcanzó cada una. Un punto relleno es un trimestre en que el nombre estaba en la cartera.","Quarters held":"Trimestres mantenida","First seen":"Primera vez","Peak weight":"Peso máximo","Weight now":"Peso actual",
+"Provenance":"Procedencia","Sources and method":"Fuentes y método","Where each number comes from":"De dónde sale cada cifra","— size, staff, brochure style and fees:":": tamaño, plantilla, estilo del folleto y comisiones:",". ADV figures are self-reported to the SEC.":". Las cifras del ADV las declara la propia firma a la SEC.","13F books":"Carteras 13F","— every quarter since Jun 1, 2024:":": cada trimestre desde el 1 jun 2024:",". Long share positions only; option and bond lines are left out.":". Solo posiciones largas en acciones; se excluyen líneas de opciones y bonos.","— daily adjusted closes from":": cierres diarios ajustados de","; the index is":"; el índice es","Sectors and names":"Sectores y nombres","— the FocusAlpha company registry via":": el registro de empresas de FocusAlpha vía","The replicating portfolio":"La cartera replicada",
+"Each 13F book is bought, value-weighted, at the close of the first trading day after it was filed, and held without trading until the next filing. No costs, cash earns nothing, and a name that stops trading is held at its last price. Lone Pine is priced on every position; the other managers on the names that make up 95% of each book (at most 60), reweighted.":"Cada cartera 13F se compra, ponderada por valor, al cierre del primer día de negociación después de presentarse, y se mantiene sin operar hasta el siguiente informe. Sin costes, el efectivo no rinde, y un nombre que deja de cotizar se mantiene a su último precio. Lone Pine se valora en todas sus posiciones; las demás gestoras en los nombres que forman el 95% de cada cartera (como máximo 60), reponderados.",
+"What this window can’t show":"Lo que esta ventana no puede mostrar",
+"FocusAlpha keeps about eight quarters of 13F filings and daily prices from Jul 14, 2025, so the replication covers roughly a year. A 13F lands up to 45 days after quarter-end and discloses only long US-listed equity — no shorts, no non-US listings, no swaps. A manager running 2:1 gross leverage with a short book looks nothing like its 13F, which is why this is not the fund’s performance.":"FocusAlpha guarda unos ocho trimestres de informes 13F y precios diarios desde el 14 jul 2025, así que la replicación cubre aproximadamente un año. Un 13F llega hasta 45 días después del cierre del trimestre y solo revela largos en renta variable cotizada en EE. UU.: sin cortos, sin cotizaciones fuera de EE. UU., sin swaps. Una gestora con apalancamiento bruto 2:1 y una cartera corta no se parece en nada a su 13F, y por eso esto no es la rentabilidad del fondo.",
+"Reading the style columns":"Cómo leer las columnas de estilo","The brochure’s value/growth bucket is what the firm":"La casilla valor/crecimiento del folleto es lo que la firma","; the 13F tier is what its book’s weighted P/B and P/E":"; el nivel 13F es lo que el P/VC y el PER ponderados de su cartera","read as":"leen como",". Brochure tags are deliberately conservative, so an empty field means the brochure doesn’t say — not that the firm doesn’t do it.":". Las etiquetas del folleto son deliberadamente conservadoras, así que un campo vacío significa que el folleto no lo dice, no que la firma no lo haga.",
+"Show all positions":"Mostrar todas las posiciones"
+},zh:{
+"new":"新建","added":"加仓","trimmed":"减仓","held":"持有",
+
+"Hedge Fund Profile: 13F Holdings vs Form ADV | FocusAlpha":"对冲基金画像：13F 持仓 vs Form ADV | FocusAlpha",
+"Institutional holdings · sample data":"机构持仓 · 样本数据",
+"A sample of what FocusAlpha can build: Lone Pine’s filed 13F holdings, the Form ADV profile behind them, and a replicating portfolio traded only on what had actually been filed — pulled live each time the page opens and set against five Tiger-lineage peers. Use it as a template: search below to swap in any fund you follow.":"FocusAlpha 能做出来的一个样本：Lone Pine 申报的 13F 持仓、背后的 Form ADV 档案，以及一个只按已申报信息交易的复制组合——并与五家老虎系同行对比。把它当模板：在下方搜索，换成你关注的任何基金。",
+"SEC registered":"SEC 注册","Hedge Fund":"对冲基金","Growth-Biased book":"偏成长的持仓","Focus manager":"主角基金","Search for any 13F filer to swap in":"搜索任一 13F 申报人替换进来","Swap in any fund — search by name":"换成任一基金——按名称搜索","Pulling live data…":"正在拉取实时数据…","Form ADV":"Form ADV","Prices":"价格","Fetched":"获取于",
+"Reads FocusAlpha with your own connector access — every figure is public filing or market data, and none of it is investment advice.":"通过你自己的连接器读取 FocusAlpha——所有数字都来自公开申报或市场数据，都不构成投资建议。",
+"SEC profile":"SEC 档案","Regulatory AUM":"监管口径 AUM","13F equity filed":"13F 申报股票市值","Concentration":"集中度","Turnover":"换手率","Replicated return":"复制组合回报","Excess over S&P 500 TR":"相对标普 500 全收益的超额","Alpha, annualised":"年化 Alpha",
+"Form ADV (what the firm reports)":"Form ADV（公司自己申报的）","13F filings (what it holds)":"13F 申报（实际持有的）","Replicating portfolio (daily prices)":"复制组合（日度价格）","Peer set":"同行组","Six managers, one lineage":"六家基金，同一门派",
+"Size and headcount from Form ADV Part 1; portfolio shape from the filed 13F books; return, beta and alpha from one shared replication against the":"规模和人数来自 Form ADV 第 1 部分；组合结构来自申报的 13F；回报、beta 和 alpha 来自同一套复制方法，基准为","S&P 500 Total Return":"标普 500 全收益指数",". Ranked by excess return once every book is priced.":"。每个组合定价完成后按超额回报排序。",
+"Manager":"基金","Reg. AUM":"监管 AUM","13F book":"13F 持仓","Names":"持股数","Top 10":"前十大","Eff. N":"有效持股数","13F style":"13F 风格","Wtd P/E":"加权市盈率","Excess":"超额","Beta":"Beta","Alpha":"Alpha","Max DD":"最大回撤","Benchmark ·":"基准 ·","over the full price window":"整个价格窗口","no manager":"没有一家基金",
+"Form ADV Part 2A × 13F":"Form ADV 第 2A 部分 × 13F","What they say, against what they hold":"自己怎么说，实际怎么持",
+"The Part 2A brochure is the only place a manager describes, in its own words, how it invests. A 13F says nothing about intent, only exposure.":"第 2A 部分的说明书是基金唯一用自己的话描述如何投资的地方。13F 不说意图，只说敞口。",
+"Read together they can disagree":"两者放在一起可能互相矛盾","— a firm can describe a blend mandate and run a book whose multiples read as growth.":"——一家公司可以自称均衡策略，持仓估值倍数却像成长股。",
+"Brochure says":"说明书说","Styles it names":"点名的风格","13F book reads":"13F 持仓读起来像","vg score":"vg 分","Wtd P/B":"加权市净率","Verdict":"结论","says Blend, holds Growth":"自称均衡，实持成长","growth biased":"偏成长","no Part 2A in store":"库里没有第 2A 部分",
+"The vg score is the book’s weighted P/B and P/E against a large-cap anchor, so it runs opposite to intuition:":"vg 分是持仓加权市净率和市盈率相对大盘锚的比值，所以方向和直觉相反：","lower is growthier":"越低越成长","(under 0.55 deep growth, about 0.80 blend, 1.35 and up deep value).":"（低于 0.55 深度成长，0.80 左右均衡，1.35 以上深度价值）。",
+"describe one style in the brochure and hold a book the multiples read as another. Coatue and Maverick have no Part 2A brochure in FocusAlpha’s store yet, so they can’t be compared.":"在说明书里自称一种风格，持仓估值却读成另一种。Coatue 和 Maverick 的第 2A 部分说明书还没入库，无法比较。",
+"States: fundamental · long horizon · shorts · leverage · derivatives ·":"自述：基本面 · 长期 · 做空 · 杠杆 · 衍生品 ·","Open the brochure (PDF)":"打开说明书（PDF）","equity styles":"股票风格","investment strategy":"投资策略","Form ADV Part 2A · Item 5":"Form ADV 第 2A 部分 · 第 5 项",
+"The fee schedule as the brochure prints it. The parsed rate is for scanning;":"说明书原样印出的费率表。解析出的费率便于快速浏览；","where it and the sentence disagree, the sentence wins":"与原句不一致时，以原句为准","Who pays":"谁付","Fee":"费用","Rate":"费率","Charged on":"计费基准","In the brochure’s words":"说明书原话","Management":"管理费","Performance":"业绩费",
+"Replicating portfolio":"复制组合","Trading only on what had been filed":"只按已申报的信息交易","Each book is bought at the":"每个组合在","close of the first trading day after its 13F appeared on EDGAR":"其 13F 出现在 EDGAR 后第一个交易日的收盘价买入",
+"and held until the next filing — buying at quarter-end would use information nobody had yet. Long US-listed equity only: no shorts, options or non-US listings, so this is not the fund's own performance.":"，持有到下次申报——若按季末价买入，用的就是当时没人知道的信息。只含美股多头：没有空头、期权和非美上市，所以这不是基金本身的业绩。",
+"S&P 500 TR":"标普 500 全收益","The index returned":"指数回报",
+"from Jul 14, 2025 to Sep 22, 2026. Each line starts at the first trading day a filed book could be bought, holding whichever 13F was already public. Lone Pine priced 60 of 67 tickers across its books (92% of book value on average).":"（2025 年 7 月 14 日至 2026 年 9 月 22 日）。每条线从申报组合可买入的第一个交易日开始，持有当时已公开的 13F。Lone Pine 各期组合 67 个代码中 60 个有价格（平均覆盖 92% 的持仓市值）。",
+"Risk-adjusted":"风险调整后","How much of the return is just beta":"回报里有多少只是 beta","Beta against the index, and annualised Jensen alpha (risk-free at zero).":"相对指数的 beta，以及年化 Jensen alpha（无风险利率取零）。","Upper right is money made picking stocks":"右上是选股赚的钱","; lower right is a rise bought with market exposure.":"；右下是靠市场敞口涨上去的。","Beta against the S&P 500 TR":"相对标普 500 全收益的 Beta",
+"Attribution":"归因","What carried Lone Pine’s book, and what cost it":"什么撑起了 Lone Pine 的组合，什么拖累了它","Each name's contribution to the replicating portfolio — weight times its move while held, summed across holding periods.":"每只股票对复制组合的贡献——权重 × 持有期间涨跌，跨持有期加总。","holding periods beat the index, and the book beat it on":"个持有期跑赢指数，按交易日算跑赢的比例为","of trading days. Top 6 and bottom 6 names shown.":"。显示贡献最大和最小的各 6 只。",
+"Per filing":"逐期","Excess return, holding period by holding period":"逐个持有期的超额回报","One cell per filed book, from the day it was bought to the day it was replaced, against the index over the same days. A consistent sign says more than any one big period.":"每个申报组合一格，从买入日到被替换日，与同期指数比较。方向一致比某一期的大数更有说服力。","Beat index":"跑赢指数",
+"Latest 13F-HR":"最新 13F-HR","Quarter ending":"季度截至",", filed":"，申报于","positions worth":"个持仓，市值",". Against Q1 2026:":"。相对 2026 年一季度：","new,":"新建，","added to,":"加仓，","trimmed and":"减仓，","sold out. The action is read from the change in share count; a move inside ±2% reads as held.":"清仓。动作按股数变化判断；±2% 以内视为持有不变。",
+"Δ shares":"股数变动","Action":"动作","Prior weight":"上期权重","New":"新建","Trimmed":"减仓","Added":"加仓","Held":"持有","Sold out since Q1 2026:":"2026 年一季度以来清仓：",", and 1 more.":"，另有 1 只。",
+"Sector weights":"行业权重","Where the weight moved":"权重往哪里移","Share of the filed book by sector, quarter by quarter. Sectors come from the FocusAlpha company registry;":"申报组合按行业的占比，逐季度。行业来自 FocusAlpha 公司登记表；","is holdings it could not match to a company.":"是没能匹配到公司的持仓。","Unresolved":"未匹配",
+"13F history":"13F 历史","Filed US equity, quarter by quarter":"逐季度申报的美股持仓","This is not AUM":"这不是 AUM","— only the slice a 13F requires: long US-listed equity. A falling line can be drawdown or a move into assets the form doesn't cover, and the filing can't tell the two apart.":"——只是 13F 要求申报的那一块：美股多头。线往下走可能是亏损，也可能是转到了表格不覆盖的资产，申报本身分不出来。",
+"Tenure":"持有时长","What Lone Pine has held the longest":"Lone Pine 持有最久的股票","Positions carried through the most of the":"在 FocusAlpha 保存的","FocusAlpha holds for Lone Pine (Q2 2024 to Q2 2026), with the largest weight each reached. A filled dot is a quarter the name was in the book.":"（2024 年二季度至 2026 年二季度）中持有季度最多的持仓，附各自达到的最高权重。实心点表示该季度在组合中。","Quarters held":"持有季度数","First seen":"首次出现","Peak weight":"最高权重","Weight now":"当前权重",
+"Provenance":"数据来源","Sources and method":"来源与方法","Where each number comes from":"每个数字从哪来","— size, staff, brochure style and fees:":"——规模、人数、说明书风格和费率：",". ADV figures are self-reported to the SEC.":"。ADV 数字是公司向 SEC 自行申报的。","13F books":"13F 持仓","— every quarter since Jun 1, 2024:":"——2024 年 6 月 1 日以来的每个季度：",". Long share positions only; option and bond lines are left out.":"。仅股票多头；期权和债券行不计。","— daily adjusted closes from":"——复权日收盘价来自","; the index is":"；指数为","Sectors and names":"行业与名称","— the FocusAlpha company registry via":"——FocusAlpha 公司登记表，通过","The replicating portfolio":"复制组合",
+"Each 13F book is bought, value-weighted, at the close of the first trading day after it was filed, and held without trading until the next filing. No costs, cash earns nothing, and a name that stops trading is held at its last price. Lone Pine is priced on every position; the other managers on the names that make up 95% of each book (at most 60), reweighted.":"每期 13F 组合按市值加权，在申报后第一个交易日收盘买入，持有不动直到下次申报。不计成本，现金无收益，停牌的股票按最后价格持有。Lone Pine 按全部持仓定价；其他基金按构成各自组合 95% 市值的股票（最多 60 只）重新加权定价。",
+"What this window can’t show":"这个窗口看不到的",
+"FocusAlpha keeps about eight quarters of 13F filings and daily prices from Jul 14, 2025, so the replication covers roughly a year. A 13F lands up to 45 days after quarter-end and discloses only long US-listed equity — no shorts, no non-US listings, no swaps. A manager running 2:1 gross leverage with a short book looks nothing like its 13F, which is why this is not the fund’s performance.":"FocusAlpha 保存约八个季度的 13F 申报和 2025 年 7 月 14 日以来的日度价格，所以复制大约覆盖一年。13F 最晚在季末后 45 天才披露，且只披露美股多头——没有空头、非美上市和互换。一家 2:1 总杠杆并持有空头的基金，实际情况和 13F 完全不像，所以这不是基金的业绩。",
+"Reading the style columns":"怎么读风格列","The brochure’s value/growth bucket is what the firm":"说明书里的价值/成长归类是公司自己","; the 13F tier is what its book’s weighted P/B and P/E":"；13F 档位是组合加权市净率和市盈率","read as":"读出来的",". Brochure tags are deliberately conservative, so an empty field means the brochure doesn’t say — not that the firm doesn’t do it.":"。说明书标签刻意保守，所以空着表示说明书没说，不代表公司不做。",
+"Show all positions":"显示全部持仓"
+},rules:{es:[
+ [/^Top (\d+) positions · (Q\d \d{4}) · height = weight$/,m=>`Top ${m[1]} posiciones · ${m[2].replace("Q","T")} · altura = peso`],
+ [/^Form ADV filed (.+)$/,m=>"Form ADV presentado el "+m[1]],
+ [/^filed (.+)$/,m=>"presentado el "+m[1]],
+ [/^through (.+)$/,m=>"hasta "+m[1]],
+ [/^(\d+) h ago$/,m=>"hace "+m[1]+" h"],
+ [/^(\d+) quarters of 13F$/,m=>m[1]+" trimestres de 13F"],
+ [/^(\d+) quarters$/,m=>m[1]+" trimestres"],
+ [/^(Q\d) (\d{4}) · filed (.+)$/,m=>`T${m[1].slice(1)} ${m[2]} · presentado el ${m[3]}`],
+ [/^(Q\d) (\d{4}) · ([+−-][\d.]+%) vs (Q\d) (\d{4})$/,m=>`T${m[1].slice(1)} ${m[2]} · ${m[3]} vs T${m[4].slice(1)} ${m[5]}`],
+ [/^Form ADV · (\d+) accounts · (\d+) staff$/,m=>`Form ADV · ${m[1]} cuentas · ${m[2]} empleados`],
+ [/^top ten · (\d+) names · (\d+) effective$/,m=>`top diez · ${m[1]} nombres · ${m[2]} efectivos`],
+ [/^last quarter · (\d+)% average$/,m=>`último trimestre · ${m[1]}% de media`],
+ [/^index ([+−-][\d.]+%) over the same days$/,m=>`índice ${m[1]} en los mismos días`],
+ [/^beta ([\d.]+) · information ratio (.+)$/,m=>`beta ${m[1]} · ratio de información ${m[2]}`],
+ [/^(\d+)% of book value priced( · every position)?$/,m=>`${m[1]}% del valor de la cartera valorado${m[2]?" · todas las posiciones":""}`],
+ [/^pricing (\d+)\/(\d+)$/,m=>`valorando ${m[1]}/${m[2]}`],
+ [/^Pricing the filed books · (\d+)\/(\d+) calls$/,m=>`Valorando las carteras presentadas · ${m[1]}/${m[2]} llamadas`],
+ [/^Over (.+?) → (.+?),$/,m=>`Entre ${m[1]} → ${m[2]},`],
+ [/^(.+) returned the most \(([+−-][\d.]+%)\); (.+) ran the highest beta \(([\d.]+)\), so more of its move came from market exposure\. Peers are priced on the names that make up 95% of each book \(at most 60\); the focus manager on every position\.$/,m=>`${m[1]} rindió más (${m[2]}); ${m[3]} llevó la beta más alta (${m[4]}), así que más de su movimiento vino de la exposición al mercado. Los pares se valoran en los nombres que forman el 95% de cada cartera (como máximo 60); la gestora principal en todas sus posiciones.`],
+ [/^here beat the index after adjusting for beta\. (.*)$/,m=>"de aquí batió al índice tras ajustar por beta. "+m[1]],
+ [/^was ahead of the index after adjusting for beta\. (.*)$/,m=>"iba por delante del índice tras ajustar por beta. "+m[1]],
+ [/^brochure summary · (.+)$/,m=>"resumen del folleto · "+m[1]],
+ [/^ADV Item (\d+) · p\.(\d+)$/,m=>`ADV Item ${m[1]} · pág. ${m[2]}`],
+ [/^Item (\d+), p\.(\d+)$/,m=>`Item ${m[1]}, pág. ${m[2]}`],
+ [/^(.+)’s (Q\d \d{4}) book$/,m=>`Cartera de ${m[1]}, T${m[2].slice(1)}`],
+ [/^What (.+)’s funds charge$/,m=>`Qué cobran los fondos de ${m[1]}`],
+ [/^(Q\d) ’(\d\d) book$/,m=>`Cartera T${m[1].slice(1)} ’${m[2]}`],
+ [/^(Q\d) ’(\d\d)$/,m=>`T${m[1].slice(1)} ’${m[2]}`],
+ [/^(\d+) of (\d+)$/,m=>`${m[1]} de ${m[2]}`],
+ [/^of (\d+)$/,m=>"de "+m[1]],
+ [/^Show all (\d+) positions$/,m=>`Mostrar las ${m[1]} posiciones`],
+ [/^Sold out since (Q\d \d{4}):$/,m=>`Vendidas del todo desde T${m[1].slice(1)}:`],
+ [/^, and (\d+) more\.$/,m=>`, y ${m[1]} más.`],
+ [/^\. Against (Q\d \d{4}):$/,m=>`. Frente al T${m[1].slice(1)}:`],
+ [/^Resolving sectors · (\d+) of (\d+) tickers$/,m=>`Resolviendo sectores · ${m[1]} de ${m[2]} tickers`],
+ [/^This load: (\d+) of (\d+) FocusAlpha calls answered —$/,m=>`Esta carga: ${m[1]} de ${m[2]} llamadas a FocusAlpha respondidas —`],
+ [/^×(\d+)\. Oldest data fetched (\d+) h ago\. All figures are public filing and market data; none of it is investment advice\.$/,m=>`×${m[1]}. El dato más antiguo se obtuvo hace ${m[2]} h. Todas las cifras son datos públicos de informes y de mercado; nada es asesoramiento de inversión.`],
+ [/^Sample only — (\d+) reads from data frozen (\S+)\. For current data, connect FocusAlpha in your AI\.$/,m=>`Solo muestra: ${m[1]} lecturas de datos congelados el ${m[2]}. Para datos actuales, conecta FocusAlpha en tu IA.`],
+ [/^Share of book value priced: (.+)$/,m=>"Cuota del valor de la cartera valorada: "+m[1]],
+ [/^(\S+) · ([\d.]+)% of book · (new position|shares ([+−-]\d+%))$/,m=>`${m[1]} · ${m[2]}% de la cartera · ${m[3]==="new position"?"posición nueva":"acciones "+m[4]}`],
+ [/^(Q\d \d{4}) book, held (.+?) → (.+?): portfolio (.+?), index (.+)$/,m=>`Cartera T${m[1].slice(1)}, mantenida ${m[2]} → ${m[3]}: cartera ${m[4]}, índice ${m[5]}`],
+ [/^(.+) · (Q\d \d{4}): ([\d.]+)% of the book$/,m=>`${m[1]} · T${m[2].slice(1)}: ${m[3]}% de la cartera`],
+ [/^What (.+) has held the longest$/,m=>`Lo que ${m[1]} ha mantenido más tiempo`],
+ [/^What carried (.+)’s book, and what cost it$/,m=>`Qué sostuvo la cartera de ${m[1]} y qué le costó`],
+ [/^Sample only — (.*)$/,m=>"Solo muestra: "+m[1]],
+],zh:[
+ [/^Top (\d+) positions · (Q\d \d{4}) · height = weight$/,m=>`前 ${m[1]} 大持仓 · ${m[2].replace(/Q(\d) (\d{4})/,"$2 年 Q$1")} · 高度 = 权重`],
+ [/^Form ADV filed (.+)$/,m=>"Form ADV 申报于 "+m[1]],
+ [/^filed (.+)$/,m=>"申报于 "+m[1]],
+ [/^through (.+)$/,m=>"截至 "+m[1]],
+ [/^(\d+) h ago$/,m=>m[1]+" 小时前"],
+ [/^(\d+) quarters of 13F$/,m=>m[1]+" 个季度的 13F"],
+ [/^(\d+) quarters$/,m=>m[1]+" 个季度"],
+ [/^(Q\d) (\d{4}) · filed (.+)$/,m=>`${m[2]} 年 ${m[1]} · 申报于 ${m[3]}`],
+ [/^(Q\d) (\d{4}) · ([+−-][\d.]+%) vs (Q\d) (\d{4})$/,m=>`${m[2]} 年 ${m[1]} · 较 ${m[5]} 年 ${m[4]} ${m[3]}`],
+ [/^Form ADV · (\d+) accounts · (\d+) staff$/,m=>`Form ADV · ${m[1]} 个账户 · ${m[2]} 名员工`],
+ [/^top ten · (\d+) names · (\d+) effective$/,m=>`前十大 · ${m[1]} 只 · 有效 ${m[2]} 只`],
+ [/^last quarter · (\d+)% average$/,m=>`上季度 · 平均 ${m[1]}%`],
+ [/^index ([+−-][\d.]+%) over the same days$/,m=>`同期指数 ${m[1]}`],
+ [/^beta ([\d.]+) · information ratio (.+)$/,m=>`beta ${m[1]} · 信息比率 ${m[2]}`],
+ [/^(\d+)% of book value priced( · every position)?$/,m=>`已定价持仓市值 ${m[1]}%${m[2]?" · 全部持仓":""}`],
+ [/^pricing (\d+)\/(\d+)$/,m=>`定价中 ${m[1]}/${m[2]}`],
+ [/^Pricing the filed books · (\d+)\/(\d+) calls$/,m=>`正在为申报组合定价 · ${m[1]}/${m[2]} 次调用`],
+ [/^Over (.+?) → (.+?),$/,m=>`在 ${m[1]} → ${m[2]} 期间，`],
+ [/^(.+) returned the most \(([+−-][\d.]+%)\); (.+) ran the highest beta \(([\d.]+)\), so more of its move came from market exposure\. Peers are priced on the names that make up 95% of each book \(at most 60\); the focus manager on every position\.$/,m=>`${m[1]} 回报最高（${m[2]}）；${m[3]} 的 beta 最高（${m[4]}），涨幅更多来自市场敞口。同行按构成各自组合 95% 市值的股票（最多 60 只）定价；主角基金按全部持仓定价。`],
+ [/^here beat the index after adjusting for beta\. (.*)$/,m=>"在调整 beta 后跑赢指数。"+m[1]],
+ [/^was ahead of the index after adjusting for beta\. (.*)$/,m=>"在调整 beta 后领先指数。"+m[1]],
+ [/^brochure summary · (.+)$/,m=>"说明书摘要 · "+m[1]],
+ [/^ADV Item (\d+) · p\.(\d+)$/,m=>`ADV 第 ${m[1]} 项 · 第 ${m[2]} 页`],
+ [/^Item (\d+), p\.(\d+)$/,m=>`第 ${m[1]} 项，第 ${m[2]} 页`],
+ [/^(.+)’s (Q\d \d{4}) book$/,m=>`${m[1]} 的 ${m[2].replace(/Q(\d) (\d{4})/,"$2 年 Q$1")} 持仓`],
+ [/^What (.+)’s funds charge$/,m=>`${m[1]} 的基金收什么费`],
+ [/^(Q\d) ’(\d\d) book$/,m=>`${m[1]} ’${m[2]} 持仓`],
+ [/^(\d+) of (\d+)$/,m=>`${m[2]} 个中的 ${m[1]} 个`],
+ [/^of (\d+)$/,m=>"/ "+m[1]],
+ [/^Show all (\d+) positions$/,m=>`显示全部 ${m[1]} 个持仓`],
+ [/^Sold out since (Q\d \d{4}):$/,m=>`${m[1].replace(/Q(\d) (\d{4})/,"$2 年 Q$1")} 以来清仓：`],
+ [/^, and (\d+) more\.$/,m=>`，另有 ${m[1]} 只。`],
+ [/^\. Against (Q\d \d{4}):$/,m=>`。相对 ${m[1].replace(/Q(\d) (\d{4})/,"$2 年 Q$1")}：`],
+ [/^Resolving sectors · (\d+) of (\d+) tickers$/,m=>`正在匹配行业 · ${m[2]} 个代码中的 ${m[1]} 个`],
+ [/^This load: (\d+) of (\d+) FocusAlpha calls answered —$/,m=>`本次加载：${m[2]} 次 FocusAlpha 调用中 ${m[1]} 次有回应——`],
+ [/^×(\d+)\. Oldest data fetched (\d+) h ago\. All figures are public filing and market data; none of it is investment advice\.$/,m=>`×${m[1]}。最早的数据获取于 ${m[2]} 小时前。所有数字均为公开申报和市场数据，均不构成投资建议。`],
+ [/^Sample only — (\d+) reads from data frozen (\S+)\. For current data, connect FocusAlpha in your AI\.$/,m=>`仅为样本——${m[1]} 次读取，数据冻结于 ${m[2]}。要看最新数据，请在你的 AI 里连接 FocusAlpha。`],
+ [/^Share of book value priced: (.+)$/,m=>"已定价持仓市值占比："+m[1]],
+ [/^(\S+) · ([\d.]+)% of book · (new position|shares ([+−-]\d+%))$/,m=>`${m[1]} · 占组合 ${m[2]}% · ${m[3]==="new position"?"新建仓":"股数 "+m[4]}`],
+ [/^(Q\d \d{4}) book, held (.+?) → (.+?): portfolio (.+?), index (.+)$/,m=>`${m[1].replace(/Q(\d) (\d{4})/,"$2 年 Q$1")} 持仓，持有 ${m[2]} → ${m[3]}：组合 ${m[4]}，指数 ${m[5]}`],
+ [/^(.+) · (Q\d \d{4}): ([\d.]+)% of the book$/,m=>`${m[1]} · ${m[2].replace(/Q(\d) (\d{4})/,"$2 年 Q$1")}：占组合 ${m[3]}%`],
+ [/^What (.+) has held the longest$/,m=>`${m[1]} 持有最久的股票`],
+ [/^What carried (.+)’s book, and what cost it$/,m=>`什么撑起了 ${m[1]} 的组合，什么拖累了它`],
+ [/^Sample only — (.*)$/,m=>"仅为样本——"+m[1]],
+]}};
+
+</script>
+<script>
+/* Language layer for the sample dashboards. window.FA_I18N_DICT = {es:{en→es}, zh:{en→zh},
+   rules:{es:[[regex,fn]], zh:[...]}} — exact English fragments first, then rule templates for
+   strings the page composes at runtime ("205 items", "page 1 · rows 1–100"). A MutationObserver
+   keeps every re-render translated. Choice persists in localStorage "fa:lang" (shared with the
+   tutorial page); switching reloads, since every page rebuilds its state from the snapshot. */
+(function(){
+var SH=window.FA_I18N_SHARED||{}, PG=window.FA_I18N_DICT||{};
+var D={es:Object.assign({},SH.es||{},PG.es||{}),zh:Object.assign({},SH.zh||{},PG.zh||{}),rules:PG.rules||{}};
+var LANGS=[["en","EN"],["es","ES"],["zh","中文"]];
+var lang="en"; try{ var v=localStorage.getItem("fa:lang"); if(v&&D[v]) lang=v; }catch(e){}
+// ?lang=es on the URL wins and is remembered, so a link can carry the language.
+try{ var q=new URLSearchParams(location.search).get("lang"); if(q&&(q==="en"||D[q])){ lang=q; localStorage.setItem("fa:lang",q); } }catch(e){}
+function T(s){
+  if(lang==="en"||typeof s!=="string"||!s) return s;
+  var d=D[lang]; if(d[s]!==undefined) return d[s];
+  var k=s.trim(); if(!k) return s; if(d[k]!==undefined) return s.replace(k,d[k]);
+  var rules=D.rules[lang]||[];
+  for(var i=0;i<rules.length;i++){ var m=k.match(rules[i][0]); if(m){ var r=rules[i][1](m,T); if(r!=null&&r!==k) return s.replace(k,r); } }
+  return s;
+}
+var SKIP=/^(SCRIPT|STYLE|PRE|CODE|TEXTAREA)$/;
+function tNode(n){ var p=n.parentNode; if(!p||SKIP.test(p.tagName)) return; if(p.closest&&p.closest("#faPrompt,.fa-lang,[data-no-i18n]")) return; var v=T(n.nodeValue); if(v!==n.nodeValue) n.nodeValue=v; }
+var ATTRS=["placeholder","title","aria-label"];
+function tAttrs(el){ if(!el.getAttribute) return; for(var i=0;i<ATTRS.length;i++){ var a=ATTRS[i]; if(el.hasAttribute(a)){ var v=el.getAttribute(a), t=T(v); if(t!==v) el.setAttribute(a,t); } } }
+function walk(root){
+  if(root.nodeType===3){ tNode(root); return; } if(root.nodeType!==1) return;
+  tAttrs(root); var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT), n, list=[]; while((n=w.nextNode())) list.push(n); for(var i=0;i<list.length;i++) tNode(list[i]);
+  var els=root.querySelectorAll("[placeholder],[title],[aria-label]"); for(var j=0;j<els.length;j++) tAttrs(els[j]);
+}
+function observe(){
+  new MutationObserver(function(muts){ for(var i=0;i<muts.length;i++){ var m=muts[i]; if(m.type==="characterData") tNode(m.target); else if(m.type==="attributes") tAttrs(m.target); else for(var j=0;j<m.addedNodes.length;j++) walk(m.addedNodes[j]); } })
+  .observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:ATTRS});
+}
+function switcher(){
+  var box=document.createElement("div"); box.className="fa-lang"; box.setAttribute("role","group"); box.setAttribute("aria-label",T("Language"));
+  LANGS.forEach(function(l){ var b=document.createElement("button"); b.type="button"; b.textContent=l[1]; b.lang=l[0]; if(l[0]===lang) b.setAttribute("aria-pressed","true");
+    b.addEventListener("click",function(){ if(l[0]===lang) return; try{localStorage.setItem("fa:lang",l[0])}catch(e){} location.reload(); }); box.appendChild(b); });
+  var st=document.createElement("style"); st.textContent=".fa-lang{display:inline-flex;gap:2px;padding:2px;border-radius:999px;border:1px solid var(--line,#DCDFE6);background:var(--surface2,var(--surface,var(--card,#fff)));margin-right:8px;flex:none;vertical-align:middle}.fa-lang button{border:0;background:transparent;border-radius:999px;padding:4px 8px;font:600 11px/1 inherit;font-family:inherit;color:var(--muted,#5B6472);cursor:pointer;letter-spacing:.02em}.fa-lang button[aria-pressed=true]{background:#4F2FB0;color:#fff}.fa-lang button:hover:not([aria-pressed=true]){background:rgba(79,47,176,.10);color:#4F2FB0}";
+  document.head.appendChild(st);
+  var gh=document.querySelector(".fa-gh"); if(gh&&gh.parentNode) gh.parentNode.insertBefore(box,gh); else document.body.appendChild(box);
+}
+window.FA_T=T; window.FA_LANG=lang;
+window.FA_I18N={apply:function(){ if(lang!=="en"){ document.documentElement.lang=lang; walk(document.documentElement); observe(); } switcher(); }};
+})();
+
+FA_I18N.apply();
+</script>
+<!-- /fa-i18n -->
 </body></html><!-- Build my own — appended to each demo. Uses the page's own tokens, so it
      inherits whatever design language the page already has. -->
 <style>

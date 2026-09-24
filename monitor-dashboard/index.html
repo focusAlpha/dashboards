@@ -915,4 +915,151 @@ My watchlist (edit this):
 })();
 </script>
 
+<!-- fa-i18n -->
+<script>
+/* Strings every sample page shares: the masthead buttons, the Build-my-own modal, the theme toggle. */
+window.FA_I18N_SHARED={es:{
+"Source on GitHub":"Código en GitHub","Build my own":"Construir el mío","Copy":"Copiar","Copied":"Copiado","Press ⌘C":"Pulsa ⌘C","Theme":"Tema","Toggle theme":"Cambiar tema",
+"This page's source on GitHub (MIT)":"El código de esta página en GitHub (MIT)","GitHub":"GitHub","Close":"Cerrar","Language":"Idioma","Refresh":"Actualizar","Done":"Listo","Clear all":"Borrar todo","Clear":"Borrar","Filters":"Filtros","Columns":"Columnas","Next ›":"Siguiente ›","‹ Prev":"‹ Anterior",
+"Build your own, on your own data":"Construye el tuyo, con tus propios datos",
+"This page is a frozen snapshot. Its source is public on":"Esta página es una instantánea congelada. Su código es público en",
+"Each sample is a frozen snapshot. Its source is public on":"Cada muestra es una instantánea congelada. Su código es público en",
+". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":". Pega el prompt de abajo en Claude: descarga ese código y lo vuelve a publicar leyendo datos de FocusAlpha en vivo a través de tu conector: tu universo, tus filtros, tu cuenta.",
+"Connect":"Conecta","in your preferred AI, if you haven’t already":"en tu IA preferida, si aún no lo has hecho","Connect →":"Conectar →",
+"the prompt below and paste it into a new conversation":"el prompt de abajo y pégalo en una conversación nueva",
+"Edit the conditions at the bottom — that last block is yours to change":"Edita las condiciones al final: ese último bloque es tuyo para cambiarlo",
+"Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions":"Claude descarga el código de la página desde GitHub, lo publica con tu conector y aplica tus condiciones",
+"Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.":"Claude lee FocusAlpha con el acceso de tu propio conector. Cada cifra procede de informes públicos o datos de mercado, y nada de esto es asesoramiento de inversión.",
+"Fetch this page again from FocusAlpha, skipping the cache":"Volver a pedir esta página a FocusAlpha, sin usar la caché",
+"Live call · what this page sends":"Llamada en vivo · lo que envía esta página","// MCP tool · FocusAlpha":"// herramienta MCP · FocusAlpha","// REST":"// REST","type to search":"escribe para buscar","any":"cualquiera","yes":"sí","no":"no","Go deeper":"Profundizar","Ticker":"Ticker","Sector":"Sector","Exchange":"Bolsa","Size":"Tamaño","Country":"País","Industry":"Sector detallado","Market cap":"Capitalización","Holdings":"Posiciones","Events":"Eventos","Return":"Rentabilidad","Shares":"Acciones","Weight":"Peso","Value":"Valor","Position":"Posición","Sample:":"Muestra:","FocusAlpha":"FocusAlpha","sort":"ordenar","min":"mín.","max":"máx.","desc":"desc","asc":"asc","Loading…":"Cargando…","filed":"presentado"
+},zh:{
+"Source on GitHub":"GitHub 源码","Build my own":"搭建我自己的","Copy":"复制","Copied":"已复制","Press ⌘C":"请按 ⌘C","Theme":"主题","Toggle theme":"切换主题",
+"This page's source on GitHub (MIT)":"本页在 GitHub 上的源码（MIT）","GitHub":"GitHub","Close":"关闭","Language":"语言","Refresh":"刷新","Done":"完成","Clear all":"全部清除","Clear":"清除","Filters":"筛选","Columns":"列","Next ›":"下一页 ›","‹ Prev":"‹ 上一页",
+"Build your own, on your own data":"用你自己的数据，搭建你自己的看板",
+"This page is a frozen snapshot. Its source is public on":"本页是冻结的快照，源码公开在",
+"Each sample is a frozen snapshot. Its source is public on":"每个样本都是冻结的快照，源码公开在",
+". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":"。把下面的 prompt 粘贴到 Claude：它会拉取源码，重新发布成通过你的连接器读取 FocusAlpha 实时数据的版本——你的股票池、你的条件、你的账户。",
+"Connect":"连接","in your preferred AI, if you haven’t already":"到你常用的 AI，如果还没连的话","Connect →":"去连接 →",
+"the prompt below and paste it into a new conversation":"下面的 prompt，粘贴到一个新对话里",
+"Edit the conditions at the bottom — that last block is yours to change":"修改末尾的条件——最后那一块是留给你改的",
+"Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions":"Claude 从 GitHub 拉取页面源码，用你的连接器发布，再套上你的条件",
+"Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.":"Claude 通过你自己的连接器读取 FocusAlpha。所有数字都来自公开申报或市场数据，都不构成投资建议。",
+"Fetch this page again from FocusAlpha, skipping the cache":"跳过缓存，重新向 FocusAlpha 请求本页",
+"Live call · what this page sends":"实时调用 · 本页发送的请求","// MCP tool · FocusAlpha":"// MCP 工具 · FocusAlpha","// REST":"// REST","type to search":"输入以搜索","any":"不限","yes":"是","no":"否","Go deeper":"深入查看","Ticker":"代码","Sector":"行业","Exchange":"交易所","Size":"规模","Country":"国家","Industry":"细分行业","Market cap":"市值","Holdings":"持仓","Events":"事件","Return":"回报","Shares":"股数","Weight":"权重","Value":"市值","Position":"持仓","Sample:":"样本：","FocusAlpha":"FocusAlpha","sort":"排序","min":"最小","max":"最大","desc":"降序","asc":"升序","Loading…":"加载中…","filed":"已申报"
+}};
+
+</script>
+<script>
+window.FA_I18N_DICT={es:{
+"Semiconductor News Monitor — US and Asia | FocusAlpha":"Monitor de noticias de semiconductores: EE. UU. y Asia | FocusAlpha",
+"Semiconductor desk · US · Taiwan · Korea · Japan · China":"Mesa de semiconductores · EE. UU. · Taiwán · Corea · Japón · China","Semiconductor News Board":"Tablero de noticias de semiconductores",
+"Each capsule above is one company: height = 7-day news volume, vertical position = 1-week price change, color = net sentiment. Click one to filter.":"Cada cápsula de arriba es una empresa: altura = volumen de noticias en 7 días, posición vertical = variación del precio en 1 semana, color = sentimiento neto. Haz clic en una para filtrar.",
+"Connect live data":"Conectar datos en vivo","Overview · updates with your filters":"Resumen · cambia con tus filtros","News items & events":"Noticias y eventos","The rest are neutral or unscored":"El resto es neutral o sin puntuar","From Asian-language press":"De prensa en idiomas asiáticos","Most covered company":"Empresa con más cobertura",
+"Region":"Región","All":"Todas","Korea":"Corea","Japan":"Japón","China":"China","Taiwan":"Taiwán","Stocks":"Acciones","All stocks":"Todas las acciones","All directions":"Todas las direcciones","Bullish":"Alcista","Bearish":"Bajista","Neutral":"Neutral","Event type: all":"Tipo de evento: todos","Important news (default)":"Noticias importantes (por defecto)","Everything, incl. unscored":"Todo, incl. sin puntuar","Impact ≥ 40":"Impacto ≥ 40","Impact ≥ 60":"Impacto ≥ 60","Impact ≥ 75":"Impacto ≥ 75","Sort":"Ordenar","Latest":"Más recientes","Most important":"Más importantes","Include sector news":"Incluir noticias sectoriales","Companies":"Empresas","News feed":"Flujo de noticias","Loading more…":"Cargando más…",
+"No scored coverage naming this company in the last 7 days":"Sin cobertura puntuada que nombre a esta empresa en los últimos 7 días",
+"What kind of news it was":"Qué tipo de noticia fue","Event types behind the items that match your current filters.":"Tipos de evento detrás de los elementos que coinciden con tus filtros actuales.","sector (unclassified)":"sector (sin clasificar)","Range":"Rango","Clear company filter":"Quitar el filtro de empresa","Company overview":"Resumen de empresas","Find a company":"Buscar una empresa","Find a company or ticker…":"Buscar empresa o ticker…","Search headlines and reasons…":"Buscar en titulares y motivos…","Search":"Buscar","Direction":"Dirección","Event type":"Tipo de evento","Which news":"Qué noticias","Market cap in USD":"Capitalización en USD","Headline translated from Japanese":"Titular traducido del japonés","Headline translated from Chinese":"Titular traducido del chino","Headline translated from Korean":"Titular traducido del coreano","ZH → EN":"ZH → EN","JA → EN":"JA → EN","KO → EN":"KO → EN",
+"Dots mark days with scored news (green bullish · orange bearish · violet neutral). Daily closes 2026-06-22 to 2026-09-21, local currency.":"Los puntos marcan días con noticias puntuadas (verde alcista · naranja bajista · violeta neutral). Cierres diarios del 22-06-2026 al 21-09-2026, moneda local.",
+"Source: FocusAlpha news and event feed, exchange disclosures and daily prices. Headlines published in Chinese, Japanese and Korean are machine-translated into English by Claude; the link opens the original article. Direction and impact scores are the FocusAlpha model's reading of each article — not the reporting itself, not a price forecast and not investment advice. “Important” means the FocusAlpha model scored the article for a company, or the rule scorer rated it 40+ (30+ when the headline names one of the tracked companies). “Sector” items were filed to these companies' feeds but name none of them. Prices are daily closes of each company's local listing, in local currency; 1W and 1M compare with 5 and 21 trading days earlier. Mainland China price history starts 30 July 2026. Market caps are the latest FocusAlpha figure for each local listing, converted to USD at FocusAlpha's reference FX rates, for ranking only.":"Fuente: feed de noticias y eventos de FocusAlpha, divulgaciones de las bolsas y precios diarios. Los titulares publicados en chino, japonés y coreano los traduce Claude automáticamente al inglés; el enlace abre el artículo original. Las puntuaciones de dirección e impacto son la lectura que hace el modelo de FocusAlpha de cada artículo: no son el reportaje en sí, ni una previsión de precio, ni asesoramiento de inversión. «Importante» significa que el modelo de FocusAlpha puntuó el artículo para una empresa, o que el puntuador por reglas le dio 40+ (30+ cuando el titular nombra a una de las empresas seguidas). Los elementos «sector» llegaron a los feeds de estas empresas pero no nombran a ninguna. Los precios son cierres diarios de la cotización local de cada empresa, en moneda local; 1S y 1M comparan con 5 y 21 sesiones antes. El histórico de precios de China continental empieza el 30 de julio de 2026. Las capitalizaciones son la última cifra de FocusAlpha para cada cotización local, convertida a USD con los tipos de referencia de FocusAlpha, solo para ordenar."
+},zh:{
+"Semiconductor News Monitor — US and Asia | FocusAlpha":"半导体新闻监控——美国与亚洲 | FocusAlpha",
+"Semiconductor desk · US · Taiwan · Korea · Japan · China":"半导体看板 · 美国 · 台湾 · 韩国 · 日本 · 中国","Semiconductor News Board":"半导体新闻看板",
+"Each capsule above is one company: height = 7-day news volume, vertical position = 1-week price change, color = net sentiment. Click one to filter.":"上方每个胶囊是一家公司：高度 = 7 天新闻量，纵向位置 = 1 周涨跌幅，颜色 = 净情绪。点击可筛选。",
+"Connect live data":"连接实时数据","Overview · updates with your filters":"总览 · 随筛选条件变化","News items & events":"新闻与事件","The rest are neutral or unscored":"其余为中性或未评分","From Asian-language press":"来自亚洲语言媒体","Most covered company":"报道最多的公司",
+"Region":"地区","All":"全部","Korea":"韩国","Japan":"日本","China":"中国","Taiwan":"台湾","Stocks":"股票","All stocks":"全部股票","All directions":"全部方向","Bullish":"利多","Bearish":"利空","Neutral":"中性","Event type: all":"事件类型：全部","Important news (default)":"重要新闻（默认）","Everything, incl. unscored":"全部，含未评分","Impact ≥ 40":"影响力 ≥ 40","Impact ≥ 60":"影响力 ≥ 60","Impact ≥ 75":"影响力 ≥ 75","Sort":"排序","Latest":"最新","Most important":"最重要","Include sector news":"包含行业新闻","Companies":"公司","News feed":"新闻流","Loading more…":"加载更多…",
+"No scored coverage naming this company in the last 7 days":"过去 7 天没有点名这家公司的已评分报道",
+"What kind of news it was":"这些新闻是什么类型","Event types behind the items that match your current filters.":"当前筛选结果对应的事件类型。","sector (unclassified)":"行业（未分类）","Range":"区间","Clear company filter":"清除公司筛选","Company overview":"公司总览","Find a company":"查找公司","Find a company or ticker…":"查找公司或代码…","Search headlines and reasons…":"搜索标题和原因…","Search":"搜索","Direction":"方向","Event type":"事件类型","Which news":"哪些新闻","Market cap in USD":"市值（美元）","Headline translated from Japanese":"标题译自日文","Headline translated from Chinese":"标题译自中文","Headline translated from Korean":"标题译自韩文","ZH → EN":"中 → 英","JA → EN":"日 → 英","KO → EN":"韩 → 英",
+"Dots mark days with scored news (green bullish · orange bearish · violet neutral). Daily closes 2026-06-22 to 2026-09-21, local currency.":"圆点标出有已评分新闻的日子（绿色利多 · 橙色利空 · 紫色中性）。2026-06-22 至 2026-09-21 的日收盘价，本币。",
+"Source: FocusAlpha news and event feed, exchange disclosures and daily prices. Headlines published in Chinese, Japanese and Korean are machine-translated into English by Claude; the link opens the original article. Direction and impact scores are the FocusAlpha model's reading of each article — not the reporting itself, not a price forecast and not investment advice. “Important” means the FocusAlpha model scored the article for a company, or the rule scorer rated it 40+ (30+ when the headline names one of the tracked companies). “Sector” items were filed to these companies' feeds but name none of them. Prices are daily closes of each company's local listing, in local currency; 1W and 1M compare with 5 and 21 trading days earlier. Mainland China price history starts 30 July 2026. Market caps are the latest FocusAlpha figure for each local listing, converted to USD at FocusAlpha's reference FX rates, for ranking only.":"来源：FocusAlpha 新闻与事件流、交易所披露和每日价格。中文、日文、韩文标题由 Claude 机器翻译成英文；链接打开原文。方向和影响力评分是 FocusAlpha 模型对每篇文章的判读——不是报道本身，不是价格预测，也不是投资建议。「重要」指 FocusAlpha 模型为某公司对文章打了分，或规则评分器给到 40 分以上（标题点名了跟踪公司时 30 分以上）。「行业」条目进入了这些公司的信息流但没有点名任何一家。价格为各公司本地上市的日收盘价，本币计；1 周和 1 月分别与 5 和 21 个交易日前比较。中国内地价格历史从 2026 年 7 月 30 日开始。市值为 FocusAlpha 对各本地上市的最新数字，按 FocusAlpha 参考汇率换算为美元，仅用于排序。"
+},rules:{es:[
+ [/^([\d,]+) companies · every news item from the past 7 days, in English · 3 months of prices · data as of (.+)$/,m=>`${m[1]} empresas · todas las noticias de los últimos 7 días, en inglés · 3 meses de precios · datos a ${m[2]}`],
+ [/^Sample · data as of (.+?) · not live — connect FocusAlpha for current data$/,m=>`Muestra · datos a ${m[1]} · no es en vivo: conecta FocusAlpha para datos actuales`],
+ [/^([\d,]+) scored · ([\d,]+) with impact ≥ (\d+)$/,m=>`${m[1]} puntuados · ${m[2]} con impacto ≥ ${m[3]}`],
+ [/^Chinese ([\d,]+) · Japanese ([\d,]+) · Korean ([\d,]+), shown in English$/,m=>`Chino ${m[1]} · Japonés ${m[2]} · Coreano ${m[3]}, mostrados en inglés`],
+ [/^([\d,]+) related items$/,m=>m[1]+" elementos relacionados"],
+ [/^([\d,]+) · by news$/,m=>m[1]+" · por noticias"],
+ [/^([\d,]+) items$/,m=>m[1]+" elementos"],
+ [/^([\d,]+) bullish$/,m=>m[1]+" alcistas"],
+ [/^([\d,]+) bearish$/,m=>m[1]+" bajistas"],
+ [/^close (\d\d-\d\d)$/,m=>"cierre "+m[1]],
+ [/^since (\d\d-\d\d) (.+)$/,m=>"desde "+m[1]+" "+m[2]],
+ [/^(\d+) more reports?$/,m=>m[1]+(m[1]==="1"?" informe más":" informes más")],
+ [/^May also reach \(system inference, not in the reporting\):(.*)$/,m=>"También puede afectar a (inferencia del sistema, no en el reportaje):"+m[1]],
+ [/^News feed · (.+)$/,m=>"Flujo de noticias · "+m[1]],
+ [/^Show only (.+)$/,m=>"Mostrar solo "+m[1]],
+ [/^Remove (.+)$/,m=>"Quitar "+m[1]],
+ [/^(.+) daily close$/,m=>"cierre diario de "+m[1]],
+ [/^(.+) · ([\d,]+) important items · ([\d,]+) bullish \/ ([\d,]+) bearish · 1W (.+)$/,m=>`${m[1]} · ${m[2]} elementos importantes · ${m[3]} alcistas / ${m[4]} bajistas · 1S ${m[5]}`],
+ [/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (January|February|March|April|May|June|July|August|September|October|November|December) (\d+)$/,m=>{const D={Monday:"Lunes",Tuesday:"Martes",Wednesday:"Miércoles",Thursday:"Jueves",Friday:"Viernes",Saturday:"Sábado",Sunday:"Domingo"},M={January:"enero",February:"febrero",March:"marzo",April:"abril",May:"mayo",June:"junio",July:"julio",August:"agosto",September:"septiembre",October:"octubre",November:"noviembre",December:"diciembre"};return `${D[m[1]]}, ${m[3]} de ${M[m[2]]}`}],
+],zh:[
+ [/^([\d,]+) companies · every news item from the past 7 days, in English · 3 months of prices · data as of (.+)$/,m=>`${m[1]} 家公司 · 过去 7 天的全部新闻（英文） · 3 个月价格 · 数据截至 ${m[2]}`],
+ [/^Sample · data as of (.+?) · not live — connect FocusAlpha for current data$/,m=>`样本 · 数据截至 ${m[1]} · 非实时——连接 FocusAlpha 获取最新数据`],
+ [/^([\d,]+) scored · ([\d,]+) with impact ≥ (\d+)$/,m=>`${m[1]} 条已评分 · ${m[2]} 条影响力 ≥ ${m[3]}`],
+ [/^Chinese ([\d,]+) · Japanese ([\d,]+) · Korean ([\d,]+), shown in English$/,m=>`中文 ${m[1]} · 日文 ${m[2]} · 韩文 ${m[3]}，以英文显示`],
+ [/^([\d,]+) related items$/,m=>m[1]+" 条相关"],
+ [/^([\d,]+) · by news$/,m=>m[1]+" · 按新闻量"],
+ [/^([\d,]+) items$/,m=>m[1]+" 条"],
+ [/^([\d,]+) bullish$/,m=>m[1]+" 条利多"],
+ [/^([\d,]+) bearish$/,m=>m[1]+" 条利空"],
+ [/^close (\d\d-\d\d)$/,m=>m[1]+" 收盘"],
+ [/^since (\d\d-\d\d) (.+)$/,m=>m[1]+" 以来 "+m[2]],
+ [/^(\d+) more reports?$/,m=>"另有 "+m[1]+" 篇报道"],
+ [/^May also reach \(system inference, not in the reporting\):(.*)$/,m=>"可能还会波及（系统推断，非报道内容）："+m[1]],
+ [/^News feed · (.+)$/,m=>"新闻流 · "+m[1]],
+ [/^Show only (.+)$/,m=>"只看 "+m[1]],
+ [/^Remove (.+)$/,m=>"移除 "+m[1]],
+ [/^(.+) daily close$/,m=>m[1]+" 日收盘价"],
+ [/^(.+) · ([\d,]+) important items · ([\d,]+) bullish \/ ([\d,]+) bearish · 1W (.+)$/,m=>`${m[1]} · ${m[2]} 条重要新闻 · ${m[3]} 利多 / ${m[4]} 利空 · 1 周 ${m[5]}`],
+ [/^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday), (January|February|March|April|May|June|July|August|September|October|November|December) (\d+)$/,m=>{const D={Monday:"周一",Tuesday:"周二",Wednesday:"周三",Thursday:"周四",Friday:"周五",Saturday:"周六",Sunday:"周日"},M={January:1,February:2,March:3,April:4,May:5,June:6,July:7,August:8,September:9,October:10,November:11,December:12};return `${M[m[2]]} 月 ${m[3]} 日 ${D[m[1]]}`}],
+]}};
+
+</script>
+<script>
+/* Language layer for the sample dashboards. window.FA_I18N_DICT = {es:{en→es}, zh:{en→zh},
+   rules:{es:[[regex,fn]], zh:[...]}} — exact English fragments first, then rule templates for
+   strings the page composes at runtime ("205 items", "page 1 · rows 1–100"). A MutationObserver
+   keeps every re-render translated. Choice persists in localStorage "fa:lang" (shared with the
+   tutorial page); switching reloads, since every page rebuilds its state from the snapshot. */
+(function(){
+var SH=window.FA_I18N_SHARED||{}, PG=window.FA_I18N_DICT||{};
+var D={es:Object.assign({},SH.es||{},PG.es||{}),zh:Object.assign({},SH.zh||{},PG.zh||{}),rules:PG.rules||{}};
+var LANGS=[["en","EN"],["es","ES"],["zh","中文"]];
+var lang="en"; try{ var v=localStorage.getItem("fa:lang"); if(v&&D[v]) lang=v; }catch(e){}
+// ?lang=es on the URL wins and is remembered, so a link can carry the language.
+try{ var q=new URLSearchParams(location.search).get("lang"); if(q&&(q==="en"||D[q])){ lang=q; localStorage.setItem("fa:lang",q); } }catch(e){}
+function T(s){
+  if(lang==="en"||typeof s!=="string"||!s) return s;
+  var d=D[lang]; if(d[s]!==undefined) return d[s];
+  var k=s.trim(); if(!k) return s; if(d[k]!==undefined) return s.replace(k,d[k]);
+  var rules=D.rules[lang]||[];
+  for(var i=0;i<rules.length;i++){ var m=k.match(rules[i][0]); if(m){ var r=rules[i][1](m,T); if(r!=null&&r!==k) return s.replace(k,r); } }
+  return s;
+}
+var SKIP=/^(SCRIPT|STYLE|PRE|CODE|TEXTAREA)$/;
+function tNode(n){ var p=n.parentNode; if(!p||SKIP.test(p.tagName)) return; if(p.closest&&p.closest("#faPrompt,.fa-lang,[data-no-i18n]")) return; var v=T(n.nodeValue); if(v!==n.nodeValue) n.nodeValue=v; }
+var ATTRS=["placeholder","title","aria-label"];
+function tAttrs(el){ if(!el.getAttribute) return; for(var i=0;i<ATTRS.length;i++){ var a=ATTRS[i]; if(el.hasAttribute(a)){ var v=el.getAttribute(a), t=T(v); if(t!==v) el.setAttribute(a,t); } } }
+function walk(root){
+  if(root.nodeType===3){ tNode(root); return; } if(root.nodeType!==1) return;
+  tAttrs(root); var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT), n, list=[]; while((n=w.nextNode())) list.push(n); for(var i=0;i<list.length;i++) tNode(list[i]);
+  var els=root.querySelectorAll("[placeholder],[title],[aria-label]"); for(var j=0;j<els.length;j++) tAttrs(els[j]);
+}
+function observe(){
+  new MutationObserver(function(muts){ for(var i=0;i<muts.length;i++){ var m=muts[i]; if(m.type==="characterData") tNode(m.target); else if(m.type==="attributes") tAttrs(m.target); else for(var j=0;j<m.addedNodes.length;j++) walk(m.addedNodes[j]); } })
+  .observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:ATTRS});
+}
+function switcher(){
+  var box=document.createElement("div"); box.className="fa-lang"; box.setAttribute("role","group"); box.setAttribute("aria-label",T("Language"));
+  LANGS.forEach(function(l){ var b=document.createElement("button"); b.type="button"; b.textContent=l[1]; b.lang=l[0]; if(l[0]===lang) b.setAttribute("aria-pressed","true");
+    b.addEventListener("click",function(){ if(l[0]===lang) return; try{localStorage.setItem("fa:lang",l[0])}catch(e){} location.reload(); }); box.appendChild(b); });
+  var st=document.createElement("style"); st.textContent=".fa-lang{display:inline-flex;gap:2px;padding:2px;border-radius:999px;border:1px solid var(--line,#DCDFE6);background:var(--surface2,var(--surface,var(--card,#fff)));margin-right:8px;flex:none;vertical-align:middle}.fa-lang button{border:0;background:transparent;border-radius:999px;padding:4px 8px;font:600 11px/1 inherit;font-family:inherit;color:var(--muted,#5B6472);cursor:pointer;letter-spacing:.02em}.fa-lang button[aria-pressed=true]{background:#4F2FB0;color:#fff}.fa-lang button:hover:not([aria-pressed=true]){background:rgba(79,47,176,.10);color:#4F2FB0}";
+  document.head.appendChild(st);
+  var gh=document.querySelector(".fa-gh"); if(gh&&gh.parentNode) gh.parentNode.insertBefore(box,gh); else document.body.appendChild(box);
+}
+window.FA_T=T; window.FA_LANG=lang;
+window.FA_I18N={apply:function(){ if(lang!=="en"){ document.documentElement.lang=lang; walk(document.documentElement); observe(); } switcher(); }};
+})();
+
+FA_I18N.apply();
+</script>
+<!-- /fa-i18n -->
 </body></html>

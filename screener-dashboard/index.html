@@ -846,6 +846,197 @@ else loadPreset(PRESETS[0]);
 })();
 </script>
 
+<!-- fa-i18n -->
+<script>
+/* Strings every sample page shares: the masthead buttons, the Build-my-own modal, the theme toggle. */
+window.FA_I18N_SHARED={es:{
+"Source on GitHub":"Código en GitHub","Build my own":"Construir el mío","Copy":"Copiar","Copied":"Copiado","Press ⌘C":"Pulsa ⌘C","Theme":"Tema","Toggle theme":"Cambiar tema",
+"This page's source on GitHub (MIT)":"El código de esta página en GitHub (MIT)","GitHub":"GitHub","Close":"Cerrar","Language":"Idioma","Refresh":"Actualizar","Done":"Listo","Clear all":"Borrar todo","Clear":"Borrar","Filters":"Filtros","Columns":"Columnas","Next ›":"Siguiente ›","‹ Prev":"‹ Anterior",
+"Build your own, on your own data":"Construye el tuyo, con tus propios datos",
+"This page is a frozen snapshot. Its source is public on":"Esta página es una instantánea congelada. Su código es público en",
+"Each sample is a frozen snapshot. Its source is public on":"Cada muestra es una instantánea congelada. Su código es público en",
+". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":". Pega el prompt de abajo en Claude: descarga ese código y lo vuelve a publicar leyendo datos de FocusAlpha en vivo a través de tu conector: tu universo, tus filtros, tu cuenta.",
+"Connect":"Conecta","in your preferred AI, if you haven’t already":"en tu IA preferida, si aún no lo has hecho","Connect →":"Conectar →",
+"the prompt below and paste it into a new conversation":"el prompt de abajo y pégalo en una conversación nueva",
+"Edit the conditions at the bottom — that last block is yours to change":"Edita las condiciones al final: ese último bloque es tuyo para cambiarlo",
+"Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions":"Claude descarga el código de la página desde GitHub, lo publica con tu conector y aplica tus condiciones",
+"Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.":"Claude lee FocusAlpha con el acceso de tu propio conector. Cada cifra procede de informes públicos o datos de mercado, y nada de esto es asesoramiento de inversión.",
+"Fetch this page again from FocusAlpha, skipping the cache":"Volver a pedir esta página a FocusAlpha, sin usar la caché",
+"Live call · what this page sends":"Llamada en vivo · lo que envía esta página","// MCP tool · FocusAlpha":"// herramienta MCP · FocusAlpha","// REST":"// REST","type to search":"escribe para buscar","any":"cualquiera","yes":"sí","no":"no","Go deeper":"Profundizar","Ticker":"Ticker","Sector":"Sector","Exchange":"Bolsa","Size":"Tamaño","Country":"País","Industry":"Sector detallado","Market cap":"Capitalización","Holdings":"Posiciones","Events":"Eventos","Return":"Rentabilidad","Shares":"Acciones","Weight":"Peso","Value":"Valor","Position":"Posición","Sample:":"Muestra:","FocusAlpha":"FocusAlpha","sort":"ordenar","min":"mín.","max":"máx.","desc":"desc","asc":"asc","Loading…":"Cargando…","filed":"presentado"
+},zh:{
+"Source on GitHub":"GitHub 源码","Build my own":"搭建我自己的","Copy":"复制","Copied":"已复制","Press ⌘C":"请按 ⌘C","Theme":"主题","Toggle theme":"切换主题",
+"This page's source on GitHub (MIT)":"本页在 GitHub 上的源码（MIT）","GitHub":"GitHub","Close":"关闭","Language":"语言","Refresh":"刷新","Done":"完成","Clear all":"全部清除","Clear":"清除","Filters":"筛选","Columns":"列","Next ›":"下一页 ›","‹ Prev":"‹ 上一页",
+"Build your own, on your own data":"用你自己的数据，搭建你自己的看板",
+"This page is a frozen snapshot. Its source is public on":"本页是冻结的快照，源码公开在",
+"Each sample is a frozen snapshot. Its source is public on":"每个样本都是冻结的快照，源码公开在",
+". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":"。把下面的 prompt 粘贴到 Claude：它会拉取源码，重新发布成通过你的连接器读取 FocusAlpha 实时数据的版本——你的股票池、你的条件、你的账户。",
+"Connect":"连接","in your preferred AI, if you haven’t already":"到你常用的 AI，如果还没连的话","Connect →":"去连接 →",
+"the prompt below and paste it into a new conversation":"下面的 prompt，粘贴到一个新对话里",
+"Edit the conditions at the bottom — that last block is yours to change":"修改末尾的条件——最后那一块是留给你改的",
+"Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions":"Claude 从 GitHub 拉取页面源码，用你的连接器发布，再套上你的条件",
+"Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.":"Claude 通过你自己的连接器读取 FocusAlpha。所有数字都来自公开申报或市场数据，都不构成投资建议。",
+"Fetch this page again from FocusAlpha, skipping the cache":"跳过缓存，重新向 FocusAlpha 请求本页",
+"Live call · what this page sends":"实时调用 · 本页发送的请求","// MCP tool · FocusAlpha":"// MCP 工具 · FocusAlpha","// REST":"// REST","type to search":"输入以搜索","any":"不限","yes":"是","no":"否","Go deeper":"深入查看","Ticker":"代码","Sector":"行业","Exchange":"交易所","Size":"规模","Country":"国家","Industry":"细分行业","Market cap":"市值","Holdings":"持仓","Events":"事件","Return":"回报","Shares":"股数","Weight":"权重","Value":"市值","Position":"持仓","Sample:":"样本：","FocusAlpha":"FocusAlpha","sort":"排序","min":"最小","max":"最大","desc":"降序","asc":"升序","Loading…":"加载中…","filed":"已申报"
+}};
+
+</script>
+<script>
+window.FA_I18N_DICT={es:{
+"Global Stock Screener Across 82 Markets | FocusAlpha":"Buscador global de acciones en 82 mercados | FocusAlpha",
+"Screening Terminal":"Terminal de filtrado","screen_companies · sample data":"screen_companies · datos de muestra","row data":"datos de filas","events axis":"eje de eventos","universe":"universo","companies":"empresas",
+"Filters · ten axes":"Filtros · diez ejes","Identity":"Identidad",
+"Where it is listed and who it answers to. country cannot say \"US filer\" — has_cik can.":"Dónde cotiza y ante quién responde. country no puede decir «presenta ante la SEC»; has_cik sí.",
+"Files with SEC":"Presenta ante la SEC",
+"USD is the only column that compares across countries; the local-currency cap rides along on each row for reconciliation.":"El USD es la única columna comparable entre países; la capitalización en moneda local acompaña cada fila para conciliar.",
+"Momentum":"Momentum","Price returns in percent. History starts 2025-07-14, so 12 months is the longest window.":"Rentabilidades en porcentaje. El histórico empieza el 14-07-2025, así que 12 meses es la ventana más larga.",
+"1-month":"1 mes","3-month":"3 meses","6-month":"6 meses","12-month":"12 meses",
+"Valuation":"Valoración","Ratios exist for the tracked US-GAAP cohort (~3,500 filers). A loss-maker has no PE — use is_lossmaking, not pe_ttm.":"Los ratios existen para la cohorte US-GAAP seguida (~3.500 emisores). Una empresa con pérdidas no tiene PER: usa is_lossmaking, no pe_ttm.",
+"PE (TTM)":"PER (TTM)","Price / book":"Precio / valor contable","Price / sales":"Precio / ventas","FCF yield":"Rendimiento FCF","Dividend yield":"Rentabilidad por dividendo","Has statements":"Tiene estados financieros","Loss-making":"Con pérdidas",
+"Profitability & leverage":"Rentabilidad y apalancamiento","Margins and growth are fractions in the API (0.15 = 15%); typed here in percent.":"En la API los márgenes y el crecimiento son fracciones (0,15 = 15%); aquí se escriben en porcentaje.",
+"Gross margin":"Margen bruto","Operating margin":"Margen operativo","Net margin":"Margen neto","Debt / equity":"Deuda / capital","Revenue growth":"Crecimiento de ingresos","EPS growth":"Crecimiento del BPA",
+"Guidance":"Guidance","Two counts that must not be mixed: a guidance raise = a number went UP; good news = better for the company. A cost line raised is a guidance raise and bad news. Seven disclosure regimes feed this.":"Dos recuentos que no deben mezclarse: una subida de guidance = una cifra SUBIÓ; buena noticia = mejor para la empresa. Una partida de costes al alza es subida de guidance y mala noticia. Lo alimentan siete regímenes de divulgación.",
+"Good-news moves ≥":"Movimientos positivos ≥","Bad-news moves ≥":"Movimientos negativos ≥","Guidance raises ≥":"Subidas de guidance ≥","Guidance cuts ≥":"Recortes de guidance ≥","Good news since":"Buenas noticias desde","Bad news since":"Malas noticias desde",
+"Events · 90 days":"Eventos · 90 días",
+"Investment-relevant events only — routine filings (board-meeting dates, monthly returns, AGM notices) are left out. Within a list a company needs ANY ticked type; across lists it needs ALL of them, so \"Management change\" + \"Insider buying\" finds both at once. \"Happened since\" dates the ticked types.":"Solo eventos relevantes para invertir: se excluyen los trámites rutinarios (fechas de consejo, informes mensuales, convocatorias de junta). Dentro de una lista basta CUALQUIER tipo marcado; entre listas se exigen TODOS, así que «Cambio de dirección» + «Compras de directivos» encuentra ambos a la vez. «Ocurrido desde» fecha los tipos marcados.",
+"Any market":"Cualquier mercado","· filings + news":"· informes + noticias","rollup_family · matches ANY":"rollup_family · coincide con CUALQUIERA",
+"Management change":"Cambio de dirección","Earnings":"Resultados","Guidance update":"Actualización de guidance","M&A":"Fusiones y adquisiciones","Buyback / dividend":"Recompra / dividendo","Capital raise / financing":"Ampliación / financiación","Ownership / stake change":"Cambio de accionariado","Analyst rating change":"Cambio de recomendación","Major contract":"Contrato relevante","FDA / clinical":"FDA / clínico","Litigation":"Litigio","Regulatory action":"Acción regulatoria","Credit rating":"Rating crediticio","Index change":"Cambio de índice","Incident":"Incidente",
+"Filings to watch":"Informes a vigilar","· regulators' own words":"· en palabras del regulador","event_family · expanded per type · matches ANY":"event_family · expandido por tipo · coincide con CUALQUIERA",
+"Profit warning / forecast revision":"Aviso de resultados / revisión de previsión","Tender offer / change of control":"OPA / cambio de control","Bankruptcy / default risk":"Quiebra / riesgo de impago","Restatement / auditor change":"Reformulación / cambio de auditor","Listing notice / suspension":"Aviso de cotización / suspensión","Impairment / special losses":"Deterioro / pérdidas extraordinarias","Lock-up expiry (China)":"Fin de lock-up (China)","Insider buying / selling":"Compras / ventas de directivos","buying":"compras","selling":"ventas","Happened since":"Ocurrido desde",
+"Positioning":"Posicionamiento","Short interest is FINRA, US only, twice a month. CEO pay and D&O stake come from the proxy. Insider buying / selling sits under Events.":"El interés corto es de FINRA, solo EE. UU., dos veces al mes. La retribución del CEO y la participación de directivos vienen del proxy. Las compras / ventas de directivos están en Eventos.",
+"Short % float":"Corto % flotante","Days to cover ≥":"Días para cubrir ≥","D&O stake":"Participación de directivos","CEO total comp":"Retribución total del CEO",
+"Taiwan":"Taiwán","Taiwan listings only: foreign ownership from TWSE, monthly revenue YoY from MOPS.":"Solo cotizadas en Taiwán: participación extranjera de la TWSE, ingresos mensuales interanuales de MOPS.","Foreign held":"En manos extranjeras","Monthly rev YoY":"Ingresos mensuales interanuales",
+"Products & relations":"Productos y relaciones","What a company makes and who it names. Any of 60,620 product terms (comma-separated; spellings are separate terms, so pass every one) and any of 4,403 companies as peer_of / competitor_of. An unknown company is an error, not an empty page.":"Qué fabrica una empresa y a quién nombra. Cualquiera de 60.620 términos de producto (separados por comas; cada grafía es un término distinto, pásalas todas) y cualquiera de 4.403 empresas como peer_of / competitor_of. Una empresa desconocida es un error, no una página vacía.",
+"Makes":"Fabrica","Related to":"Relacionado con","Peer of":"Par de","Competitor of":"Competidor de",
+"Memory makers — six spellings passed together, because the vocabulary expands spellings, not concepts":"Fabricantes de memoria: seis grafías juntas, porque el vocabulario expande grafías, no conceptos",
+"Companies in NVIDIA's disclosed compensation peer group, either direction":"Empresas del grupo de comparación retributiva declarado por NVIDIA, en cualquier dirección",
+"Named as a competitor in Micron's 10-K Item 1, or naming Micron":"Nombrada como competidora en el Item 1 del 10-K de Micron, o que nombra a Micron",
+"Every control is one parameter of":"Cada control es un parámetro de",
+", sent live to FocusAlpha with your connector. Values shown as % are sent as fractions (0.15 = 15%) where the API expects fractions; the call above the table is exactly what the page sends. Vocabulary counts are across the whole universe.":", enviado en vivo a FocusAlpha con tu conector. Los valores mostrados en % se envían como fracciones (0,15 = 15%) donde la API las espera; la llamada sobre la tabla es exactamente lo que envía la página. Los recuentos del vocabulario son sobre todo el universo.",
+"Saved screens · click to load":"Filtros guardados · clic para cargar",
+"Guidance raisers, 90d":"Subidas de guidance, 90 d","Good-news guidance moves, most first":"Movimientos positivos de guidance, los más primero","Guidance cutters, 90d":"Recortes de guidance, 90 d","Bad-news moves against their own last event":"Movimientos negativos frente a su propio último evento","Raised since Sept 1":"Subidas desde el 1 de sept.","Timestamp filter — the newest good-news move":"Filtro por fecha: el movimiento positivo más reciente","Guidance × momentum":"Guidance × momentum","Raised, but down 3M":"Subió, pero cae a 3 meses","Better guidance the price has not paid for":"Mejor guidance que el precio aún no ha pagado","Every market, filings and news":"Todos los mercados, informes y noticias","Events × insiders":"Eventos × directivos","New management, insiders buying":"Nueva dirección, directivos comprando","Management change AND net Form 4 buying":"Cambio de dirección Y compras netas en Form 4","M&A in play":"Fusiones en juego","M&A across every market, filings and news":"Fusiones y adquisiciones en todos los mercados, informes y noticias","Buybacks & dividends":"Recompras y dividendos","Capital return announced in 90 days":"Retribución al accionista anunciada en 90 días","Events · filed":"Eventos · presentados","Profit warnings & revisions":"Avisos de resultados y revisiones","HKEX warnings, TDnet revisions, China 业绩预告":"Avisos de HKEX, revisiones de TDnet, 业绩预告 de China","Red flags":"Señales de alarma","Default risk, restatement or auditor change, listing notice":"Riesgo de impago, reformulación o cambio de auditor, aviso de cotización","Insider buying into shorts":"Directivos comprando contra los cortos","Net Form 4 buying, short interest ≥ 8% of float":"Compras netas en Form 4, interés corto ≥ 8% del flotante","Cheap, profitable, growing":"Barata, rentable, creciendo","PE ≤ 15, op margin ≥ 15%, revenue +10%":"PER ≤ 15, margen operativo ≥ 15%, ingresos +10%","Loss-making & shorted":"Con pérdidas y en corto","The screen a null PE cannot express":"El filtro que un PER nulo no puede expresar","Taiwan: foreign-held growth":"Taiwán: crecimiento en manos extranjeras","Foreign ≥ 50%, monthly revenue +20% YoY":"Extranjeros ≥ 50%, ingresos mensuales +20% interanual","Products":"Productos","Memory makers":"Fabricantes de memoria","makes_term with six spellings":"makes_term con seis grafías","Relations":"Relaciones","NVIDIA's peer group":"Grupo de pares de NVIDIA","peer_of=NVDA, from the proxy statement":"peer_of=NVDA, del proxy statement","Micron's named competitors":"Competidores nombrados por Micron","competitor_of=MU, from 10-K Item 1":"competitor_of=MU, del Item 1 del 10-K","Highest-paid CEOs, weak year":"CEOs mejor pagados, año flojo","CEO comp ≥ $30M and 12M return ≤ 0":"Retribución del CEO ≥ 30 M$ y rentabilidad a 12 meses ≤ 0",
+"Profitability":"Rentabilidad","Company":"Empresa","Ctry":"País","Mkt cap":"Cap.","Good news":"Buenas noticias","Bad news":"Malas noticias","Guidance raise":"Subida guidance","Guidance cut":"Recorte guidance","Last good":"Última buena","Last bad":"Última mala",
+"Company detail":"Detalle de la empresa","// REST · Professional, 1 credit":"// REST · Professional, 1 crédito","// vocabulary: GET /v1/screen/facets (free)":"// vocabulario: GET /v1/screen/facets (gratis)",
+"Investment events (90d)":"Eventos de inversión (90 d)","P/B":"P/VC","P/S":"P/V","FCF yld":"Rend. FCF","Div yld":"Rent. div.","Gross m.":"M. bruto","Op m.":"M. operativo","Net m.":"M. neto","D/E":"D/C","Rev YoY":"Ingresos interanual","EPS YoY":"BPA interanual","Short %":"Corto %","SI chg":"Var. corto","D&O %":"Directivos %","CEO comp":"Retrib. CEO","Foreign %":"Extranjeros %","Terms":"Términos","Peers":"Pares","Competitors":"Competidores","Matched":"Coincidencias","loss-making":"con pérdidas","· SEC filer":"· presenta ante la SEC",
+"Size & momentum":"Tamaño y momentum","Local cap":"Cap. local","Return flag":"Marca de rentabilidad","Guidance, 90 days":"Guidance, 90 días","Good-news moves":"Movimientos positivos","Bad-news moves":"Movimientos negativos","Last good news":"Última buena noticia","Last bad news":"Última mala noticia","Last guidance":"Último guidance",
+"A guidance raise ≠ good news: a cost line going up counts as a guidance raise and as bad news. The quote behind every move is served by":"Subida de guidance ≠ buena noticia: una partida de costes al alza cuenta como subida de guidance y como mala noticia. La cita detrás de cada movimiento la sirve",
+"Investment events, 90 days":"Eventos de inversión, 90 días","Routine filings (board-meeting dates, monthly returns, AGM notices) are left out. Red tags are filed red flags; hover a tag for the regulator's own word.":"Se excluyen los trámites rutinarios (fechas de consejo, informes mensuales, convocatorias de junta). Las etiquetas rojas son alertas presentadas; pasa el cursor para ver la palabra del regulador.",
+"Valuation & profitability":"Valoración y rentabilidad","Revenue":"Ingresos","Net income":"Beneficio neto","Free cash flow":"Flujo de caja libre","Revenue YoY":"Ingresos interanual","Stale":"Desactualizado","Days to cover":"Días para cubrir","SI change":"Var. interés corto","SI as of":"Interés corto a","Insider net 90d":"Neto directivos 90 d","filter only":"solo filtro","entity graph":"grafo de entidades","Product terms":"Términos de producto","Related terms":"Términos relacionados","Peer companies":"Empresas pares","Named competitors":"Competidores nombrados",
+"// the quote behind each guidance move":"// la cita detrás de cada movimiento de guidance","// the labelled event stream, one row per event":"// el flujo de eventos etiquetados, una fila por evento","// who this company's events reprice without naming":"// a quién revalorizan los eventos de esta empresa sin nombrarlo","// who is in its value chain":"// quién está en su cadena de valor",
+"red flag":"señal de alarma","dram,nand,memory":"dram,nand,memory","term, term":"término, término","ticker or cmp_…":"ticker o cmp_…"
+},zh:{
+"Global Stock Screener Across 82 Markets | FocusAlpha":"覆盖 82 个市场的全球股票筛选器 | FocusAlpha",
+"Screening Terminal":"筛选终端","screen_companies · sample data":"screen_companies · 样本数据","row data":"行数据","events axis":"事件轴","universe":"股票池","companies":"家公司",
+"Filters · ten axes":"筛选 · 十个维度","Identity":"身份",
+"Where it is listed and who it answers to. country cannot say \"US filer\" — has_cik can.":"在哪里上市、向谁申报。country 说不了「是否向 SEC 申报」，has_cik 可以。",
+"Files with SEC":"向 SEC 申报",
+"USD is the only column that compares across countries; the local-currency cap rides along on each row for reconciliation.":"只有美元列能跨国比较；本币市值随每行附带，便于核对。",
+"Momentum":"动量","Price returns in percent. History starts 2025-07-14, so 12 months is the longest window.":"价格回报以百分比计。历史从 2025-07-14 开始，所以最长窗口是 12 个月。",
+"1-month":"1 个月","3-month":"3 个月","6-month":"6 个月","12-month":"12 个月",
+"Valuation":"估值","Ratios exist for the tracked US-GAAP cohort (~3,500 filers). A loss-maker has no PE — use is_lossmaking, not pe_ttm.":"估值比率只覆盖跟踪的 US-GAAP 公司（约 3,500 家）。亏损公司没有市盈率，请用 is_lossmaking，不要用 pe_ttm。",
+"PE (TTM)":"市盈率（TTM）","Price / book":"市净率","Price / sales":"市销率","FCF yield":"自由现金流收益率","Dividend yield":"股息率","Has statements":"有财务报表","Loss-making":"亏损",
+"Profitability & leverage":"盈利能力与杠杆","Margins and growth are fractions in the API (0.15 = 15%); typed here in percent.":"API 里利润率和增速是小数（0.15 = 15%），这里按百分比输入。",
+"Gross margin":"毛利率","Operating margin":"营业利润率","Net margin":"净利率","Debt / equity":"负债/权益","Revenue growth":"营收增速","EPS growth":"EPS 增速",
+"Guidance":"业绩指引","Two counts that must not be mixed: a guidance raise = a number went UP; good news = better for the company. A cost line raised is a guidance raise and bad news. Seven disclosure regimes feed this.":"两个不能混的计数：指引上调 = 某个数字变高了；好消息 = 对公司更有利。成本项上调既是指引上调也是坏消息。数据来自七套披露制度。",
+"Good-news moves ≥":"好消息次数 ≥","Bad-news moves ≥":"坏消息次数 ≥","Guidance raises ≥":"指引上调次数 ≥","Guidance cuts ≥":"指引下调次数 ≥","Good news since":"好消息起始日","Bad news since":"坏消息起始日",
+"Events · 90 days":"事件 · 90 天",
+"Investment-relevant events only — routine filings (board-meeting dates, monthly returns, AGM notices) are left out. Within a list a company needs ANY ticked type; across lists it needs ALL of them, so \"Management change\" + \"Insider buying\" finds both at once. \"Happened since\" dates the ticked types.":"只含与投资相关的事件，例行申报（董事会日期、月度回报、股东大会通知）不算。同一列表内勾选的类型满足任一即可；跨列表则需全部满足，所以「管理层变动」+「内部人买入」会同时找到两者。「发生于…之后」限定勾选类型的时间。",
+"Any market":"任何市场","· filings + news":"· 公告 + 新闻","rollup_family · matches ANY":"rollup_family · 匹配任一",
+"Management change":"管理层变动","Earnings":"业绩","Guidance update":"指引更新","M&A":"并购","Buyback / dividend":"回购 / 分红","Capital raise / financing":"融资 / 增发","Ownership / stake change":"股权变动","Analyst rating change":"分析师评级变动","Major contract":"重大合同","FDA / clinical":"FDA / 临床","Litigation":"诉讼","Regulatory action":"监管行动","Credit rating":"信用评级","Index change":"指数调整","Incident":"突发事件",
+"Filings to watch":"值得盯的公告","· regulators' own words":"· 监管机构原话","event_family · expanded per type · matches ANY":"event_family · 按类型展开 · 匹配任一",
+"Profit warning / forecast revision":"盈利预警 / 预测修正","Tender offer / change of control":"要约收购 / 控制权变更","Bankruptcy / default risk":"破产 / 违约风险","Restatement / auditor change":"财报重述 / 更换审计师","Listing notice / suspension":"上市通知 / 停牌","Impairment / special losses":"减值 / 特殊损失","Lock-up expiry (China)":"解禁（中国）","Insider buying / selling":"内部人买入 / 卖出","buying":"买入","selling":"卖出","Happened since":"发生于…之后",
+"Positioning":"仓位与持股","Short interest is FINRA, US only, twice a month. CEO pay and D&O stake come from the proxy. Insider buying / selling sits under Events.":"空头持仓来自 FINRA，仅美国，每月两次。CEO 薪酬和董监高持股来自委托书。内部人买卖在「事件」里。",
+"Short % float":"空头占流通股 %","Days to cover ≥":"回补天数 ≥","D&O stake":"董监高持股","CEO total comp":"CEO 总薪酬",
+"Taiwan":"台湾","Taiwan listings only: foreign ownership from TWSE, monthly revenue YoY from MOPS.":"仅台湾上市公司：外资持股来自台湾证交所，月营收同比来自公开资讯观测站。","Foreign held":"外资持股","Monthly rev YoY":"月营收同比",
+"Products & relations":"产品与关系","What a company makes and who it names. Any of 60,620 product terms (comma-separated; spellings are separate terms, so pass every one) and any of 4,403 companies as peer_of / competitor_of. An unknown company is an error, not an empty page.":"公司生产什么、点名了谁。60,620 个产品词任选（逗号分隔；不同写法是不同的词，请全部传入），4,403 家公司可作为 peer_of / competitor_of。未知公司会报错，而不是返回空页。",
+"Makes":"生产","Related to":"相关于","Peer of":"同行于","Competitor of":"竞争于",
+"Memory makers — six spellings passed together, because the vocabulary expands spellings, not concepts":"存储芯片厂商——六种写法一起传，因为词表只扩展写法，不扩展概念",
+"Companies in NVIDIA's disclosed compensation peer group, either direction":"NVIDIA 披露的薪酬对标组里的公司，双向",
+"Named as a competitor in Micron's 10-K Item 1, or naming Micron":"在美光 10-K 第 1 项被点名为竞争对手，或点名了美光",
+"Every control is one parameter of":"每个控件都是",
+", sent live to FocusAlpha with your connector. Values shown as % are sent as fractions (0.15 = 15%) where the API expects fractions; the call above the table is exactly what the page sends. Vocabulary counts are across the whole universe.":" 的一个参数，通过你的连接器实时发给 FocusAlpha。API 需要小数的地方，显示为 % 的值会按小数发送（0.15 = 15%）；表格上方的调用就是本页实际发送的内容。词表计数是全股票池的。",
+"Saved screens · click to load":"预设筛选 · 点击加载",
+"Guidance raisers, 90d":"90 天内上调指引","Good-news guidance moves, most first":"好消息指引变动，最多的在前","Guidance cutters, 90d":"90 天内下调指引","Bad-news moves against their own last event":"相对自身上次事件的坏消息变动","Raised since Sept 1":"9 月 1 日以来上调","Timestamp filter — the newest good-news move":"按时间筛选——最新的好消息变动","Guidance × momentum":"指引 × 动量","Raised, but down 3M":"上调了，但 3 个月下跌","Better guidance the price has not paid for":"指引变好而股价还没反应","Every market, filings and news":"所有市场，公告和新闻","Events × insiders":"事件 × 内部人","New management, insiders buying":"新管理层，内部人买入","Management change AND net Form 4 buying":"管理层变动 且 Form 4 净买入","M&A in play":"并购进行中","M&A across every market, filings and news":"所有市场的并购，公告和新闻","Buybacks & dividends":"回购与分红","Capital return announced in 90 days":"90 天内宣布的股东回报","Events · filed":"事件 · 已申报","Profit warnings & revisions":"盈利预警与修正","HKEX warnings, TDnet revisions, China 业绩预告":"港交所盈警、TDnet 修正、中国业绩预告","Red flags":"风险信号","Default risk, restatement or auditor change, listing notice":"违约风险、财报重述或更换审计师、上市通知","Insider buying into shorts":"空头重仓下的内部人买入","Net Form 4 buying, short interest ≥ 8% of float":"Form 4 净买入，空头占流通股 ≥ 8%","Cheap, profitable, growing":"便宜、盈利、增长","PE ≤ 15, op margin ≥ 15%, revenue +10%":"市盈率 ≤ 15，营业利润率 ≥ 15%，营收 +10%","Loss-making & shorted":"亏损且被做空","The screen a null PE cannot express":"市盈率为空时表达不了的筛选","Taiwan: foreign-held growth":"台湾：外资持股的成长股","Foreign ≥ 50%, monthly revenue +20% YoY":"外资 ≥ 50%，月营收同比 +20%","Products":"产品","Memory makers":"存储芯片厂商","makes_term with six spellings":"makes_term 传六种写法","Relations":"关系","NVIDIA's peer group":"NVIDIA 的对标组","peer_of=NVDA, from the proxy statement":"peer_of=NVDA，来自委托书","Micron's named competitors":"美光点名的竞争对手","competitor_of=MU, from 10-K Item 1":"competitor_of=MU，来自 10-K 第 1 项","Highest-paid CEOs, weak year":"薪酬最高的 CEO，业绩弱的一年","CEO comp ≥ $30M and 12M return ≤ 0":"CEO 薪酬 ≥ 3,000 万美元且 12 个月回报 ≤ 0",
+"Profitability":"盈利能力","Company":"公司","Ctry":"国家","Mkt cap":"市值","Good news":"好消息","Bad news":"坏消息","Guidance raise":"指引上调","Guidance cut":"指引下调","Last good":"最近好消息","Last bad":"最近坏消息",
+"Company detail":"公司详情","// REST · Professional, 1 credit":"// REST · Professional，1 个额度","// vocabulary: GET /v1/screen/facets (free)":"// 词表：GET /v1/screen/facets（免费）",
+"Investment events (90d)":"投资事件（90 天）","P/B":"市净率","P/S":"市销率","FCF yld":"FCF 收益率","Div yld":"股息率","Gross m.":"毛利率","Op m.":"营业利润率","Net m.":"净利率","D/E":"负债/权益","Rev YoY":"营收同比","EPS YoY":"EPS 同比","Short %":"空头 %","SI chg":"空头变动","D&O %":"董监高 %","CEO comp":"CEO 薪酬","Foreign %":"外资 %","Terms":"词条","Peers":"同行","Competitors":"竞争对手","Matched":"命中","loss-making":"亏损","· SEC filer":"· 向 SEC 申报",
+"Size & momentum":"规模与动量","Local cap":"本币市值","Return flag":"回报标记","Guidance, 90 days":"业绩指引，90 天","Good-news moves":"好消息变动","Bad-news moves":"坏消息变动","Last good news":"最近的好消息","Last bad news":"最近的坏消息","Last guidance":"最近的指引",
+"A guidance raise ≠ good news: a cost line going up counts as a guidance raise and as bad news. The quote behind every move is served by":"指引上调 ≠ 好消息：成本项上调既算指引上调也算坏消息。每次变动背后的原话由",
+"Investment events, 90 days":"投资事件，90 天","Routine filings (board-meeting dates, monthly returns, AGM notices) are left out. Red tags are filed red flags; hover a tag for the regulator's own word.":"例行申报（董事会日期、月度回报、股东大会通知）不算。红色标签是已申报的风险信号；悬停可见监管机构原话。",
+"Valuation & profitability":"估值与盈利","Revenue":"营收","Net income":"净利润","Free cash flow":"自由现金流","Revenue YoY":"营收同比","Stale":"已过期","Days to cover":"回补天数","SI change":"空头变动","SI as of":"空头数据截至","Insider net 90d":"内部人 90 天净买卖","filter only":"仅用于筛选","entity graph":"实体关系图","Product terms":"产品词","Related terms":"相关词","Peer companies":"同行公司","Named competitors":"点名的竞争对手",
+"// the quote behind each guidance move":"// 每次指引变动背后的原话","// the labelled event stream, one row per event":"// 打了标签的事件流，一行一个事件","// who this company's events reprice without naming":"// 这家公司的事件会波及但没点名的公司","// who is in its value chain":"// 它的价值链上有谁",
+"red flag":"风险信号","dram,nand,memory":"dram,nand,memory","term, term":"词, 词","ticker or cmp_…":"代码或 cmp_…"
+},rules:{es:[
+ [/^(\d+) set$/,m=>m[1]+" activo"+(m[1]==="1"?"":"s")],
+ [/^page (\d+) · rows ([\d,]+)–([\d,]+)( · last page)? · (\d+) per call$/,m=>`página ${m[1]} · filas ${m[2]}–${m[3]}${m[4]?" · última página":""} · ${m[5]} por llamada`],
+ [/^sample · data as of (\S+)$/,m=>"muestra · datos a "+m[1]],
+ [/^Sample data as of (\S+)\.$/,m=>"Datos de muestra a "+m[1]+"."],
+ [/^([\d,]+) companies frozen here, out of ([\d,]+) live\. For current data, connect FocusAlpha in your AI\.$/,m=>`${m[1]} empresas congeladas aquí, de ${m[2]} en vivo. Para datos actuales, conecta FocusAlpha en tu IA.`],
+ [/^companies with no (\S+) are left out by the API$/,m=>"la API omite las empresas sin "+m[1]],
+ [/^sort by (\S+)$/,m=>"ordenar por "+m[1]],
+ [/^ttm · period (\S+)$/,m=>"TTM · periodo "+m[1]],
+ [/^rollup_family: (\S+)$/,m=>"rollup_family: "+m[1]],
+],zh:[
+ [/^(\d+) set$/,m=>"已设 "+m[1]+" 项"],
+ [/^page (\d+) · rows ([\d,]+)–([\d,]+)( · last page)? · (\d+) per call$/,m=>`第 ${m[1]} 页 · 第 ${m[2]}–${m[3]} 行${m[4]?" · 最后一页":""} · 每次 ${m[5]} 条`],
+ [/^sample · data as of (\S+)$/,m=>"样本 · 数据截至 "+m[1]],
+ [/^Sample data as of (\S+)\.$/,m=>"样本数据截至 "+m[1]+"。"],
+ [/^([\d,]+) companies frozen here, out of ([\d,]+) live\. For current data, connect FocusAlpha in your AI\.$/,m=>`本页冻结了 ${m[1]} 家公司，线上共 ${m[2]} 家。要看最新数据，请在你的 AI 里连接 FocusAlpha。`],
+ [/^companies with no (\S+) are left out by the API$/,m=>"API 会排除没有 "+m[1]+" 的公司"],
+ [/^sort by (\S+)$/,m=>"按 "+m[1]+" 排序"],
+ [/^ttm · period (\S+)$/,m=>"TTM · 期间 "+m[1]],
+ [/^rollup_family: (\S+)$/,m=>"rollup_family: "+m[1]],
+]}};
+
+</script>
+<script>
+/* Language layer for the sample dashboards. window.FA_I18N_DICT = {es:{en→es}, zh:{en→zh},
+   rules:{es:[[regex,fn]], zh:[...]}} — exact English fragments first, then rule templates for
+   strings the page composes at runtime ("205 items", "page 1 · rows 1–100"). A MutationObserver
+   keeps every re-render translated. Choice persists in localStorage "fa:lang" (shared with the
+   tutorial page); switching reloads, since every page rebuilds its state from the snapshot. */
+(function(){
+var SH=window.FA_I18N_SHARED||{}, PG=window.FA_I18N_DICT||{};
+var D={es:Object.assign({},SH.es||{},PG.es||{}),zh:Object.assign({},SH.zh||{},PG.zh||{}),rules:PG.rules||{}};
+var LANGS=[["en","EN"],["es","ES"],["zh","中文"]];
+var lang="en"; try{ var v=localStorage.getItem("fa:lang"); if(v&&D[v]) lang=v; }catch(e){}
+// ?lang=es on the URL wins and is remembered, so a link can carry the language.
+try{ var q=new URLSearchParams(location.search).get("lang"); if(q&&(q==="en"||D[q])){ lang=q; localStorage.setItem("fa:lang",q); } }catch(e){}
+function T(s){
+  if(lang==="en"||typeof s!=="string"||!s) return s;
+  var d=D[lang]; if(d[s]!==undefined) return d[s];
+  var k=s.trim(); if(!k) return s; if(d[k]!==undefined) return s.replace(k,d[k]);
+  var rules=D.rules[lang]||[];
+  for(var i=0;i<rules.length;i++){ var m=k.match(rules[i][0]); if(m){ var r=rules[i][1](m,T); if(r!=null&&r!==k) return s.replace(k,r); } }
+  return s;
+}
+var SKIP=/^(SCRIPT|STYLE|PRE|CODE|TEXTAREA)$/;
+function tNode(n){ var p=n.parentNode; if(!p||SKIP.test(p.tagName)) return; if(p.closest&&p.closest("#faPrompt,.fa-lang,[data-no-i18n]")) return; var v=T(n.nodeValue); if(v!==n.nodeValue) n.nodeValue=v; }
+var ATTRS=["placeholder","title","aria-label"];
+function tAttrs(el){ if(!el.getAttribute) return; for(var i=0;i<ATTRS.length;i++){ var a=ATTRS[i]; if(el.hasAttribute(a)){ var v=el.getAttribute(a), t=T(v); if(t!==v) el.setAttribute(a,t); } } }
+function walk(root){
+  if(root.nodeType===3){ tNode(root); return; } if(root.nodeType!==1) return;
+  tAttrs(root); var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT), n, list=[]; while((n=w.nextNode())) list.push(n); for(var i=0;i<list.length;i++) tNode(list[i]);
+  var els=root.querySelectorAll("[placeholder],[title],[aria-label]"); for(var j=0;j<els.length;j++) tAttrs(els[j]);
+}
+function observe(){
+  new MutationObserver(function(muts){ for(var i=0;i<muts.length;i++){ var m=muts[i]; if(m.type==="characterData") tNode(m.target); else if(m.type==="attributes") tAttrs(m.target); else for(var j=0;j<m.addedNodes.length;j++) walk(m.addedNodes[j]); } })
+  .observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:ATTRS});
+}
+function switcher(){
+  var box=document.createElement("div"); box.className="fa-lang"; box.setAttribute("role","group"); box.setAttribute("aria-label",T("Language"));
+  LANGS.forEach(function(l){ var b=document.createElement("button"); b.type="button"; b.textContent=l[1]; b.lang=l[0]; if(l[0]===lang) b.setAttribute("aria-pressed","true");
+    b.addEventListener("click",function(){ if(l[0]===lang) return; try{localStorage.setItem("fa:lang",l[0])}catch(e){} location.reload(); }); box.appendChild(b); });
+  var st=document.createElement("style"); st.textContent=".fa-lang{display:inline-flex;gap:2px;padding:2px;border-radius:999px;border:1px solid var(--line,#DCDFE6);background:var(--surface2,var(--surface,var(--card,#fff)));margin-right:8px;flex:none;vertical-align:middle}.fa-lang button{border:0;background:transparent;border-radius:999px;padding:4px 8px;font:600 11px/1 inherit;font-family:inherit;color:var(--muted,#5B6472);cursor:pointer;letter-spacing:.02em}.fa-lang button[aria-pressed=true]{background:#4F2FB0;color:#fff}.fa-lang button:hover:not([aria-pressed=true]){background:rgba(79,47,176,.10);color:#4F2FB0}";
+  document.head.appendChild(st);
+  var gh=document.querySelector(".fa-gh"); if(gh&&gh.parentNode) gh.parentNode.insertBefore(box,gh); else document.body.appendChild(box);
+}
+window.FA_T=T; window.FA_LANG=lang;
+window.FA_I18N={apply:function(){ if(lang!=="en"){ document.documentElement.lang=lang; walk(document.documentElement); observe(); } switcher(); }};
+})();
+
+FA_I18N.apply();
+</script>
+<!-- /fa-i18n -->
 </body></html><!-- Build my own — appended to each demo. Uses the page's own tokens, so it
      inherits whatever design language the page already has. -->
 <style>

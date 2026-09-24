@@ -940,15 +940,209 @@ My conditions (edit these):
   });
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!scrim.hidden)close()});
   document.getElementById('faCopy').addEventListener('click',function(){
-    var b=this,t=document.getElementById('faPrompt').textContent;
-    function done(){b.textContent='Copied';b.classList.add('done');setTimeout(function(){b.textContent='Copy';b.classList.remove('done')},1600)}
+    var b=this,t=document.getElementById('faPrompt').textContent,label=b.textContent,T=window.FA_T||function(x){return x};
+    function done(){b.textContent=T('Copied');b.classList.add('done');setTimeout(function(){b.textContent=label;b.classList.remove('done')},1600)}
     // A sandboxed or insecure context refuses the clipboard API; select the text
     // instead of failing silently, so the button always leads somewhere.
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,select)}else select();
     function select(){
       var r=document.createRange();r.selectNodeContents(document.getElementById('faPrompt'));
-      var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Press ⌘C';
+      var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent=T('Press ⌘C');
     }
   });
 })();
 </script>
+
+<!-- fa-i18n -->
+<script>
+/* Strings every sample page shares: the masthead buttons, the Build-my-own modal, the theme toggle. */
+window.FA_I18N_SHARED={es:{
+"Source on GitHub":"Código en GitHub","Build my own":"Construir el mío","Copy":"Copiar","Copied":"Copiado","Press ⌘C":"Pulsa ⌘C","Theme":"Tema","Toggle theme":"Cambiar tema",
+"This page's source on GitHub (MIT)":"El código de esta página en GitHub (MIT)","GitHub":"GitHub","Close":"Cerrar","Language":"Idioma","Refresh":"Actualizar","Done":"Listo","Clear all":"Borrar todo","Clear":"Borrar","Filters":"Filtros","Columns":"Columnas","Next ›":"Siguiente ›","‹ Prev":"‹ Anterior",
+"Build your own, on your own data":"Construye el tuyo, con tus propios datos",
+"This page is a frozen snapshot. Its source is public on":"Esta página es una instantánea congelada. Su código es público en",
+"Each sample is a frozen snapshot. Its source is public on":"Cada muestra es una instantánea congelada. Su código es público en",
+". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":". Pega el prompt de abajo en Claude: descarga ese código y lo vuelve a publicar leyendo datos de FocusAlpha en vivo a través de tu conector: tu universo, tus filtros, tu cuenta.",
+"Connect":"Conecta","in your preferred AI, if you haven’t already":"en tu IA preferida, si aún no lo has hecho","Connect →":"Conectar →",
+"the prompt below and paste it into a new conversation":"el prompt de abajo y pégalo en una conversación nueva",
+"Edit the conditions at the bottom — that last block is yours to change":"Edita las condiciones al final: ese último bloque es tuyo para cambiarlo",
+"Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions":"Claude descarga el código de la página desde GitHub, lo publica con tu conector y aplica tus condiciones",
+"Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.":"Claude lee FocusAlpha con el acceso de tu propio conector. Cada cifra procede de informes públicos o datos de mercado, y nada de esto es asesoramiento de inversión.",
+"Fetch this page again from FocusAlpha, skipping the cache":"Volver a pedir esta página a FocusAlpha, sin usar la caché",
+"Live call · what this page sends":"Llamada en vivo · lo que envía esta página","// MCP tool · FocusAlpha":"// herramienta MCP · FocusAlpha","// REST":"// REST","type to search":"escribe para buscar","any":"cualquiera","yes":"sí","no":"no","Go deeper":"Profundizar","Ticker":"Ticker","Sector":"Sector","Exchange":"Bolsa","Size":"Tamaño","Country":"País","Industry":"Sector detallado","Market cap":"Capitalización","Holdings":"Posiciones","Events":"Eventos","Return":"Rentabilidad","Shares":"Acciones","Weight":"Peso","Value":"Valor","Position":"Posición","Sample:":"Muestra:","FocusAlpha":"FocusAlpha","sort":"ordenar","min":"mín.","max":"máx.","desc":"desc","asc":"asc","Loading…":"Cargando…","filed":"presentado"
+},zh:{
+"Source on GitHub":"GitHub 源码","Build my own":"搭建我自己的","Copy":"复制","Copied":"已复制","Press ⌘C":"请按 ⌘C","Theme":"主题","Toggle theme":"切换主题",
+"This page's source on GitHub (MIT)":"本页在 GitHub 上的源码（MIT）","GitHub":"GitHub","Close":"关闭","Language":"语言","Refresh":"刷新","Done":"完成","Clear all":"全部清除","Clear":"清除","Filters":"筛选","Columns":"列","Next ›":"下一页 ›","‹ Prev":"‹ 上一页",
+"Build your own, on your own data":"用你自己的数据，搭建你自己的看板",
+"This page is a frozen snapshot. Its source is public on":"本页是冻结的快照，源码公开在",
+"Each sample is a frozen snapshot. Its source is public on":"每个样本都是冻结的快照，源码公开在",
+". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":"。把下面的 prompt 粘贴到 Claude：它会拉取源码，重新发布成通过你的连接器读取 FocusAlpha 实时数据的版本——你的股票池、你的条件、你的账户。",
+"Connect":"连接","in your preferred AI, if you haven’t already":"到你常用的 AI，如果还没连的话","Connect →":"去连接 →",
+"the prompt below and paste it into a new conversation":"下面的 prompt，粘贴到一个新对话里",
+"Edit the conditions at the bottom — that last block is yours to change":"修改末尾的条件——最后那一块是留给你改的",
+"Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions":"Claude 从 GitHub 拉取页面源码，用你的连接器发布，再套上你的条件",
+"Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.":"Claude 通过你自己的连接器读取 FocusAlpha。所有数字都来自公开申报或市场数据，都不构成投资建议。",
+"Fetch this page again from FocusAlpha, skipping the cache":"跳过缓存，重新向 FocusAlpha 请求本页",
+"Live call · what this page sends":"实时调用 · 本页发送的请求","// MCP tool · FocusAlpha":"// MCP 工具 · FocusAlpha","// REST":"// REST","type to search":"输入以搜索","any":"不限","yes":"是","no":"否","Go deeper":"深入查看","Ticker":"代码","Sector":"行业","Exchange":"交易所","Size":"规模","Country":"国家","Industry":"细分行业","Market cap":"市值","Holdings":"持仓","Events":"事件","Return":"回报","Shares":"股数","Weight":"权重","Value":"市值","Position":"持仓","Sample:":"样本：","FocusAlpha":"FocusAlpha","sort":"排序","min":"最小","max":"最大","desc":"降序","asc":"升序","Loading…":"加载中…","filed":"已申报"
+}};
+
+</script>
+<script>
+window.FA_I18N_DICT={es:{
+"Two label sets that are not the same question. The wrapper tier says what kind of thing the fund is; the four-level classification (asset class › category › segment › specializations) is computed from holdings once a month. Codes are dotted paths — copy them from the vocabulary, never guess one.":"Dos conjuntos de etiquetas que no responden a la misma pregunta. El tipo de envoltorio dice qué clase de cosa es el fondo; la clasificación de cuatro niveles (clase de activo › categoría › segmento › especializaciones) se calcula a partir de las posiciones una vez al mes. Los códigos son rutas con puntos: cópialos del vocabulario, nunca los adivines.","funds":"fondos","universe":"universo",
+
+"ETF Screener: Fees, NAV, Flows and Holdings | FocusAlpha":"Buscador de ETFs: comisiones, NAV, flujos y posiciones | FocusAlpha",
+"ETF Screening Terminal":"Terminal de filtrado de ETFs","screen_etfs · sample data":"screen_etfs · datos de muestra","data through":"datos hasta","holdings profile":"perfil de posiciones",
+"Filters · seven axes":"Filtros · siete ejes","What it is":"Qué es","Wrapper tier":"Tipo de envoltorio","tier · matches ANY":"tier · coincide con CUALQUIERA",
+"Plain beta":"Beta simple","Leveraged / inverse":"Apalancado / inverso","Structured outcome":"Resultado estructurado","Option income":"Ingresos por opciones","Physical commodity":"Materia prima física","Futures commodity":"Materia prima con futuros","Crypto":"Cripto","Currency":"Divisa","Alternative":"Alternativo",
+"Asset class":"Clase de activo","Category":"Categoría","Segment":"Segmento","Specializations":"Especializaciones","Path prefix":"Prefijo de ruta","Name contains":"El nombre contiene",
+"Every sector fund at once — a prefix matches any level of the path":"Todos los fondos sectoriales a la vez: un prefijo coincide con cualquier nivel de la ruta","Biotech funds — the L4 code, matched against the list each fund carries":"Fondos de biotecnología: el código L4, cotejado con la lista que lleva cada fondo",
+"AUM is the CLASS-level figure: filed net assets, or NAV × shares on a multi-class pool. A pool-level number is never served as one fund's size, so a multi-class fund with no class figure has no AUM and ranks on nothing for it.":"El AUM es la cifra de la CLASE: activos netos presentados, o NAV × participaciones en un fondo multiclase. Una cifra a nivel de fondo nunca se sirve como tamaño de una clase, así que un fondo multiclase sin cifra de clase no tiene AUM y no se ordena por él.",
+"Fees":"Comisiones","The newest prospectus fee table per class, net of a waiver where the filing printed a waiver line. No fee row is not a zero fee: unit investment trusts (SPY, GLD) file none and cannot be fee-ranked.":"La tabla de comisiones más reciente del folleto por clase, neta de exención donde el documento la imprimió. Sin fila de comisión no significa comisión cero: los unit investment trusts (SPY, GLD) no la presentan y no se pueden ordenar por comisión.",
+"Net expense ratio":"Ratio de gastos neto","NAV & pricing":"NAV y precio",
+"NAV, shares and net assets are the newest daily row, each number with its own date and a status: published, converted (rescaled across a split), derived (rebuilt from net assets) or withheld (basis unmeasured, so null on purpose). Premium / discount is as published, in percent of NAV. NAV is a column, not a filter.":"NAV, participaciones y activos netos son la fila diaria más reciente, cada cifra con su fecha y un estado: publicado, convertido (reescalado tras un split), derivado (reconstruido desde activos netos) o retenido (base sin medir, así que nulo a propósito). La prima / descuento es la publicada, en % del NAV. El NAV es una columna, no un filtro.",
+"Premium / discount":"Prima / descuento","Flows":"Flujos",
+"Creations and redemptions in USD, computed as the change in split-adjusted shares × the previous split-adjusted NAV. A day that fails the shares × NAV = net assets check carries no flow rather than an invented one. Only the 20-day window has a filter; 1-day and 5-day are columns.":"Creaciones y reembolsos en USD, calculados como la variación de participaciones ajustadas por split × el NAV ajustado anterior. Un día que no cumple participaciones × NAV = activos netos no lleva flujo, en vez de uno inventado. Solo la ventana de 20 días tiene filtro; 1 y 5 días son columnas.",
+"20-day net flow":"Flujo neto a 20 días","Holdings profile":"Perfil de posiciones",
+"Measured from the newest holdings day, not labels. Sector funds carry no cap-band label, so \"large-cap biotech\" is the sector label plus a measured large-cap share. Funds with no holdings feed have nulls here and drop out of these filters.":"Medido en el último día de posiciones, no por etiquetas. Los fondos sectoriales no llevan etiqueta de capitalización, así que «biotecnología de gran capitalización» es la etiqueta sectorial más una cuota medida de gran capitalización. Los fondos sin feed de posiciones tienen nulos aquí y quedan fuera de estos filtros.",
+"Holdings ≥":"Posiciones ≥","Top-10 weight":"Peso del top 10","Large-cap share":"Cuota de gran cap.","Small-cap ≥":"Pequeña cap. ≥","US share ≥":"Cuota EE. UU. ≥","EM share ≥":"Cuota emergentes ≥","Treasury share ≥":"Cuota Treasuries ≥","Duration":"Duración",
+"Structure":"Estructura","The fund's own filed flags. Most funds file none of them, so \"no\" and \"not filed\" look alike in a filter — when you mean the wrapper, use the wrapper tier under axis 1 instead.":"Las marcas que el propio fondo presenta. La mayoría no presenta ninguna, así que «no» y «no presentado» parecen iguales en un filtro: si te refieres al envoltorio, usa el tipo de envoltorio del eje 1.",
+"Index fund":"Fondo índice","Fund of funds":"Fondo de fondos","Filed lev/inv flag":"Marca apal./inv. presentada","Exposure hidden":"Exposición oculta",
+"Every control is one parameter of":"Cada control es un parámetro de",
+", sent live to FocusAlpha with your connector. Fees are typed in basis points and sent as decimals (20 bp = 0.002); weights typed in % and sent as fractions; dollars typed in $M and sent in USD. The call above the table is exactly what the page sends. Vocabulary counts are across the whole universe.":", enviado en vivo a FocusAlpha con tu conector. Las comisiones se escriben en puntos básicos y se envían como decimales (20 pb = 0,002); los pesos en % y se envían como fracciones; los dólares en M$ y se envían en USD. La llamada sobre la tabla es exactamente lo que envía la página. Los recuentos del vocabulario son sobre todo el universo.",
+"Saved screens · click to load":"Filtros guardados · clic para cargar",
+"Largest funds":"Fondos más grandes","Class-level AUM, biggest first":"AUM a nivel de clase, los mayores primero","Biggest 20-day inflows":"Mayores entradas a 20 días","Net creations over 20 trading days, funds ≥ $1B":"Creaciones netas en 20 sesiones, fondos ≥ 1.000 M$","Biggest 20-day outflows":"Mayores salidas a 20 días","Net redemptions, largest first, funds ≥ $1B":"Reembolsos netos, los mayores primero, fondos ≥ 1.000 M$","Flows × wrapper":"Flujos × envoltorio","Leveraged funds bleeding assets":"Fondos apalancados que pierden activos","Cheapest US broad equity":"Renta variable amplia de EE. UU. más barata","Sector funds under 20 bp":"Fondos sectoriales por debajo de 20 pb","taxonomy_prefix=equity.sector — every sector at once":"taxonomy_prefix=equity.sector: todos los sectores a la vez","Most expensive, ≥ $1B":"Más caros, ≥ 1.000 M$","Net expense ratio, highest first":"Ratio de gastos neto, los más altos primero","Fixed income":"Renta fija","Short Treasuries under 10 bp":"Treasuries cortos por debajo de 10 pb","IG government, duration ≤ 2y, net fee ≤ 10 bp":"Gobierno grado inversión, duración ≤ 2 años, comisión neta ≤ 10 pb","High-yield corporate bond":"Bonos corporativos high yield","Spot bitcoin":"Bitcoin al contado","Sector × measured":"Sector × medido","Large-cap biotech":"Biotecnología de gran capitalización","Health-care segment + biotechnology code + measured large-cap share ≥ 50%":"Segmento salud + código de biotecnología + cuota medida de gran cap. ≥ 50%","Concentrated books":"Carteras concentradas","Top-10 ≥ 60% of weight, plain beta, ≥ $1B":"Top 10 ≥ 60% del peso, beta simple, ≥ 1.000 M$","Trading at a discount":"Cotizando con descuento","Published premium / discount ≤ −0.5%":"Prima / descuento publicado ≤ −0,5%","Trading at a premium":"Cotizando con prima","Published premium ≥ +0.5%":"Prima publicada ≥ +0,5%","Wrapper":"Envoltorio","Option-income funds":"Fondos de ingresos por opciones","tier=option_income, by size":"tier=option_income, por tamaño","Thematic":"Temático","AI & robotics":"IA y robótica","Geography":"Geografía","EM-heavy equity":"Renta variable con peso emergente","Measured EM share ≥ 70%, from holdings":"Cuota emergente medida ≥ 70%, según posiciones",
+"Labels":"Etiquetas","Fund":"Fondo","Classification":"Clasificación","Net fee":"Comisión neta","Prem/disc":"Prima/desc.","Flow 20d":"Flujo 20 d","Flow 1d":"Flujo 1 d","Flow 5d":"Flujo 5 d","20d / AUM":"20 d / AUM","not filed":"no presentado",
+"Fund detail":"Detalle del fondo","// vocabulary: GET /v1/etfs/screen/facets · codes: GET /v1/etfs/taxonomy (both free)":"// vocabulario: GET /v1/etfs/screen/facets · códigos: GET /v1/etfs/taxonomy (ambos gratis)",
+"Gross fee":"Comisión bruta","Waiver line":"Línea de exención","NAV date":"Fecha NAV","Net assets":"Activos netos","Level":"Nivel","Lines":"Líneas","Top 1":"Top 1","Top 10":"Top 10","Large":"Grande","Small":"Pequeña","Treasury":"Treasuries","Holdings as of":"Posiciones a","Index":"Índice","Turnover":"Rotación","Classes":"Clases","n/f":"n/p",
+"filed net assets are this share class's own":"los activos netos presentados son de esta clase","filed net assets are pool-level (all share classes together); AUM shown is the class figure only when one could be derived":"los activos netos presentados son del fondo entero (todas las clases juntas); el AUM mostrado es la cifra de la clase solo cuando pudo derivarse","shares status: derived":"estado de participaciones: derivado","no fee row in the newest prospectus filing — not a zero fee":"sin fila de comisión en el último folleto; no es comisión cero",
+"Plain beta ·":"Beta simple ·","· pool":"· fondo","labels · monthly, from holdings · as of 2026-07-31":"etiquetas · mensuales, según posiciones · a 31-07-2026",
+"The tier is what kind of thing the fund is; the four levels are what its holdings show, recomputed monthly. A fund that drifted mid-month keeps its label until the next run.":"El tipo dice qué clase de cosa es el fondo; los cuatro niveles dicen lo que muestran sus posiciones, recalculados cada mes. Un fondo que derivó a mitad de mes conserva su etiqueta hasta la siguiente ejecución.",
+"gives the sentence behind every code.":"da la frase detrás de cada código.","Size & NAV":"Tamaño y NAV","daily · valuation 2026-09-03":"diario · valoración 03-09-2026","AUM (class)":"AUM (clase)","Net assets filed":"Activos netos presentados","Net assets level":"Nivel de activos netos","this share class":"esta clase","Net assets as of":"Activos netos a","NAV status":"Estado del NAV","Shares outstanding":"Participaciones en circulación","Shares status":"Estado de participaciones","Valuation date":"Fecha de valoración",
+"Read the net-assets level before quoting AUM: class vs pool is a 3–4× difference on a multi-class pool. A withheld NAV is null on purpose — the split basis is unmeasured — not missing data.":"Lee el nivel de activos netos antes de citar el AUM: clase frente a fondo es una diferencia de 3–4× en un fondo multiclase. Un NAV retenido es nulo a propósito (la base de split no está medida), no un dato que falte.",
+"newest prospectus fee table":"tabla de comisiones del último folleto","Gross expense ratio":"Ratio de gastos bruto","Waiver line filed":"Línea de exención presentada","no — net equals gross":"no: neto igual a bruto","No fee row is not a zero fee: unit investment trusts file no fee table and rank on nothing for expense ratio.":"Sin fila de comisión no significa comisión cero: los unit investment trusts no presentan tabla de comisiones y no se ordenan por ratio de gastos.",
+"creations − redemptions, USD":"creaciones − reembolsos, USD","1 day":"1 día","5 days":"5 días","20 days":"20 días","20 days / AUM":"20 días / AUM",
+"Change in split-adjusted shares × the previous split-adjusted NAV. A day whose shares × NAV does not reconcile to filed net assets carries no flow; the daily series is":"Variación de participaciones ajustadas por split × el NAV ajustado anterior. Un día cuyas participaciones × NAV no cuadran con los activos netos presentados no lleva flujo; la serie diaria es",
+"measured · holdings as of 2026-07-31":"medido · posiciones a 31-07-2026","Top 1 weight":"Peso del top 1","Top 10 weight":"Peso del top 10","Emerging":"Emergentes","Large cap":"Gran cap.","Mid cap":"Mediana cap.","Small cap":"Pequeña cap.","Maturity":"Vencimiento","Corporate":"Corporativo","the fund's own filings":"los propios informes del fondo","Leveraged / inverse flag":"Marca apalancado / inverso","Share classes on pool":"Clases en el fondo",
+"// everything on this fund: identity, labels, latest row, fees, structure, splits, distributions":"// todo sobre este fondo: identidad, etiquetas, última fila, comisiones, estructura, splits, distribuciones","// daily NAV, shares, net assets, premium — both split bases, each value with its status":"// NAV, participaciones, activos netos y prima diarios, en ambas bases de split, cada valor con su estado","// daily creations / redemptions":"// creaciones / reembolsos diarios","// the pool's holdings lines, newest day":"// las líneas de posiciones del fondo, último día",
+"code, code · matches ANY":"código, código · coincide con CUALQUIERA","fund name":"nombre del fondo"
+},zh:{
+"Two label sets that are not the same question. The wrapper tier says what kind of thing the fund is; the four-level classification (asset class › category › segment › specializations) is computed from holdings once a month. Codes are dotted paths — copy them from the vocabulary, never guess one.":"两套标签，回答的不是同一个问题。结构类型说明基金是什么东西；四级分类（资产类别 › 类别 › 细分 › 专项标签）每月按持仓计算一次。代码是带点的路径——从词表里复制，不要猜。","funds":"只基金","universe":"基金池",
+
+"ETF Screener: Fees, NAV, Flows and Holdings | FocusAlpha":"ETF 筛选器：费率、净值、资金流与持仓 | FocusAlpha",
+"ETF Screening Terminal":"ETF 筛选终端","screen_etfs · sample data":"screen_etfs · 样本数据","data through":"数据截至","holdings profile":"持仓画像",
+"Filters · seven axes":"筛选 · 七个维度","What it is":"它是什么","Wrapper tier":"产品结构类型","tier · matches ANY":"tier · 匹配任一",
+"Plain beta":"普通指数","Leveraged / inverse":"杠杆 / 反向","Structured outcome":"结构化收益","Option income":"期权收益","Physical commodity":"实物商品","Futures commodity":"期货商品","Crypto":"加密货币","Currency":"货币","Alternative":"另类",
+"Asset class":"资产类别","Category":"类别","Segment":"细分","Specializations":"专项标签","Path prefix":"路径前缀","Name contains":"名称包含",
+"Every sector fund at once — a prefix matches any level of the path":"一次选出所有行业基金——前缀可匹配路径的任一层级","Biotech funds — the L4 code, matched against the list each fund carries":"生物科技基金——第 4 级代码，与每只基金携带的标签列表匹配",
+"AUM is the CLASS-level figure: filed net assets, or NAV × shares on a multi-class pool. A pool-level number is never served as one fund's size, so a multi-class fund with no class figure has no AUM and ranks on nothing for it.":"AUM 是份额类别层面的数字：申报的净资产，或多类别基金的净值 × 份额。基金整体的数字绝不会当作单一类别的规模，所以没有类别数字的多类别基金没有 AUM，也不参与按 AUM 排序。",
+"Fees":"费率","The newest prospectus fee table per class, net of a waiver where the filing printed a waiver line. No fee row is not a zero fee: unit investment trusts (SPY, GLD) file none and cannot be fee-ranked.":"每个类别最新招募说明书里的费率表，若申报中印有豁免行则扣除豁免。没有费率行不等于零费率：单位投资信托（SPY、GLD）不申报费率表，无法按费率排序。",
+"Net expense ratio":"净费率","NAV & pricing":"净值与定价",
+"NAV, shares and net assets are the newest daily row, each number with its own date and a status: published, converted (rescaled across a split), derived (rebuilt from net assets) or withheld (basis unmeasured, so null on purpose). Premium / discount is as published, in percent of NAV. NAV is a column, not a filter.":"净值、份额和净资产取最新的日度记录，每个数字带自己的日期和状态：published（已公布）、converted（拆分后换算）、derived（由净资产反推）或 withheld（基准未测定，故意留空）。溢价/折价按公布值，以净值百分比计。净值是一列，不是筛选条件。",
+"Premium / discount":"溢价 / 折价","Flows":"资金流",
+"Creations and redemptions in USD, computed as the change in split-adjusted shares × the previous split-adjusted NAV. A day that fails the shares × NAV = net assets check carries no flow rather than an invented one. Only the 20-day window has a filter; 1-day and 5-day are columns.":"申购与赎回，以美元计，按拆分调整后份额的变动 × 前一日拆分调整后净值计算。份额 × 净值 = 净资产校验不通过的日子不记资金流，而不是编一个数。只有 20 日窗口可筛选；1 日和 5 日是列。",
+"20-day net flow":"20 日净流入","Holdings profile":"持仓画像",
+"Measured from the newest holdings day, not labels. Sector funds carry no cap-band label, so \"large-cap biotech\" is the sector label plus a measured large-cap share. Funds with no holdings feed have nulls here and drop out of these filters.":"按最新持仓日实测，不靠标签。行业基金没有市值区间标签，所以「大盘生物科技」= 行业标签 + 实测的大盘占比。没有持仓数据源的基金这里为空，会被这些筛选排除。",
+"Holdings ≥":"持仓数 ≥","Top-10 weight":"前十大权重","Large-cap share":"大盘占比","Small-cap ≥":"小盘占比 ≥","US share ≥":"美国占比 ≥","EM share ≥":"新兴市场占比 ≥","Treasury share ≥":"国债占比 ≥","Duration":"久期",
+"Structure":"结构","The fund's own filed flags. Most funds file none of them, so \"no\" and \"not filed\" look alike in a filter — when you mean the wrapper, use the wrapper tier under axis 1 instead.":"基金自己申报的标记。大多数基金一个都没申报，所以「否」和「未申报」在筛选里看起来一样——想按产品结构筛，请用第 1 维度的结构类型。",
+"Index fund":"指数基金","Fund of funds":"基金中基金","Filed lev/inv flag":"申报的杠杆/反向标记","Exposure hidden":"隐藏敞口",
+"Every control is one parameter of":"每个控件都是",
+", sent live to FocusAlpha with your connector. Fees are typed in basis points and sent as decimals (20 bp = 0.002); weights typed in % and sent as fractions; dollars typed in $M and sent in USD. The call above the table is exactly what the page sends. Vocabulary counts are across the whole universe.":" 的一个参数，通过你的连接器实时发给 FocusAlpha。费率按基点输入、按小数发送（20 bp = 0.002）；权重按 % 输入、按小数发送；美元按百万输入、按美元发送。表格上方的调用就是本页实际发送的内容。词表计数是全池的。",
+"Saved screens · click to load":"预设筛选 · 点击加载",
+"Largest funds":"最大的基金","Class-level AUM, biggest first":"份额类别层面的 AUM，从大到小","Biggest 20-day inflows":"20 日流入最多","Net creations over 20 trading days, funds ≥ $1B":"20 个交易日净申购，基金规模 ≥ 10 亿美元","Biggest 20-day outflows":"20 日流出最多","Net redemptions, largest first, funds ≥ $1B":"净赎回，从大到小，基金规模 ≥ 10 亿美元","Flows × wrapper":"资金流 × 结构","Leveraged funds bleeding assets":"资产持续流出的杠杆基金","Cheapest US broad equity":"最便宜的美国宽基股票","Sector funds under 20 bp":"费率低于 20 bp 的行业基金","taxonomy_prefix=equity.sector — every sector at once":"taxonomy_prefix=equity.sector——一次选出所有行业","Most expensive, ≥ $1B":"最贵的，规模 ≥ 10 亿美元","Net expense ratio, highest first":"净费率，从高到低","Fixed income":"固定收益","Short Treasuries under 10 bp":"费率低于 10 bp 的短期国债","IG government, duration ≤ 2y, net fee ≤ 10 bp":"投资级政府债，久期 ≤ 2 年，净费率 ≤ 10 bp","High-yield corporate bond":"高收益公司债","Spot bitcoin":"现货比特币","Sector × measured":"行业 × 实测","Large-cap biotech":"大盘生物科技","Health-care segment + biotechnology code + measured large-cap share ≥ 50%":"医疗细分 + 生物科技代码 + 实测大盘占比 ≥ 50%","Concentrated books":"集中持仓","Top-10 ≥ 60% of weight, plain beta, ≥ $1B":"前十大 ≥ 60% 权重，普通指数，规模 ≥ 10 亿美元","Trading at a discount":"折价交易","Published premium / discount ≤ −0.5%":"公布的溢价/折价 ≤ −0.5%","Trading at a premium":"溢价交易","Published premium ≥ +0.5%":"公布的溢价 ≥ +0.5%","Wrapper":"结构","Option-income funds":"期权收益基金","tier=option_income, by size":"tier=option_income，按规模","Thematic":"主题","AI & robotics":"AI 与机器人","Geography":"地区","EM-heavy equity":"新兴市场为主的股票基金","Measured EM share ≥ 70%, from holdings":"实测新兴市场占比 ≥ 70%，按持仓",
+"Labels":"标签","Fund":"基金","Classification":"分类","Net fee":"净费率","Prem/disc":"溢/折价","Flow 20d":"20 日资金流","Flow 1d":"1 日资金流","Flow 5d":"5 日资金流","20d / AUM":"20 日 / AUM","not filed":"未申报",
+"Fund detail":"基金详情","// vocabulary: GET /v1/etfs/screen/facets · codes: GET /v1/etfs/taxonomy (both free)":"// 词表：GET /v1/etfs/screen/facets · 代码：GET /v1/etfs/taxonomy（均免费）",
+"Gross fee":"总费率","Waiver line":"豁免行","NAV date":"净值日期","Net assets":"净资产","Level":"层面","Lines":"条数","Top 1":"第一大","Top 10":"前十大","Large":"大盘","Small":"小盘","Treasury":"国债","Holdings as of":"持仓截至","Index":"指数","Turnover":"换手率","Classes":"类别数","n/f":"未申报",
+"filed net assets are this share class's own":"申报的净资产是本份额类别自己的","filed net assets are pool-level (all share classes together); AUM shown is the class figure only when one could be derived":"申报的净资产是基金整体的（所有份额类别合计）；只有能反推出类别数字时才显示为 AUM","shares status: derived":"份额状态：反推","no fee row in the newest prospectus filing — not a zero fee":"最新招募说明书里没有费率行——不是零费率",
+"Plain beta ·":"普通指数 ·","· pool":"· 整体","labels · monthly, from holdings · as of 2026-07-31":"标签 · 每月按持仓计算 · 截至 2026-07-31",
+"The tier is what kind of thing the fund is; the four levels are what its holdings show, recomputed monthly. A fund that drifted mid-month keeps its label until the next run.":"结构类型说明基金是什么东西；四级分类是持仓显示出来的样子，每月重算。月中漂移的基金保留原标签，直到下次重算。",
+"gives the sentence behind every code.":"给出每个代码背后的说明。","Size & NAV":"规模与净值","daily · valuation 2026-09-03":"日度 · 估值日 2026-09-03","AUM (class)":"AUM（类别）","Net assets filed":"申报净资产","Net assets level":"净资产层面","this share class":"本份额类别","Net assets as of":"净资产截至","NAV status":"净值状态","Shares outstanding":"流通份额","Shares status":"份额状态","Valuation date":"估值日期",
+"Read the net-assets level before quoting AUM: class vs pool is a 3–4× difference on a multi-class pool. A withheld NAV is null on purpose — the split basis is unmeasured — not missing data.":"引用 AUM 前先看净资产层面：多类别基金里，类别和整体相差 3–4 倍。withheld 的净值是故意留空（拆分基准未测定），不是数据缺失。",
+"newest prospectus fee table":"最新招募说明书费率表","Gross expense ratio":"总费率","Waiver line filed":"已申报豁免行","no — net equals gross":"否——净费率等于总费率","No fee row is not a zero fee: unit investment trusts file no fee table and rank on nothing for expense ratio.":"没有费率行不等于零费率：单位投资信托不申报费率表，不参与按费率排序。",
+"creations − redemptions, USD":"申购 − 赎回，美元","1 day":"1 日","5 days":"5 日","20 days":"20 日","20 days / AUM":"20 日 / AUM",
+"Change in split-adjusted shares × the previous split-adjusted NAV. A day whose shares × NAV does not reconcile to filed net assets carries no flow; the daily series is":"拆分调整后份额的变动 × 前一日拆分调整后净值。份额 × 净值与申报净资产对不上的日子不记资金流；日度序列见",
+"measured · holdings as of 2026-07-31":"实测 · 持仓截至 2026-07-31","Top 1 weight":"第一大权重","Top 10 weight":"前十大权重","Emerging":"新兴市场","Large cap":"大盘","Mid cap":"中盘","Small cap":"小盘","Maturity":"到期期限","Corporate":"公司债","the fund's own filings":"基金自己的申报","Leveraged / inverse flag":"杠杆 / 反向标记","Share classes on pool":"基金下的份额类别",
+"// everything on this fund: identity, labels, latest row, fees, structure, splits, distributions":"// 这只基金的全部信息：身份、标签、最新记录、费率、结构、拆分、分红","// daily NAV, shares, net assets, premium — both split bases, each value with its status":"// 日度净值、份额、净资产、溢价——两种拆分基准，每个值带状态","// daily creations / redemptions":"// 日度申购 / 赎回","// the pool's holdings lines, newest day":"// 基金的持仓明细，最新一天",
+"code, code · matches ANY":"代码, 代码 · 匹配任一","fund name":"基金名称"
+},rules:{es:[
+ [/^(\d+) set$/,m=>m[1]+" activo"+(m[1]==="1"?"":"s")],
+ [/^page (\d+) · rows ([\d,]+)–([\d,]+)( · last page)? · (\d+) per call$/,m=>`página ${m[1]} · filas ${m[2]}–${m[3]}${m[4]?" · última página":""} · ${m[5]} por llamada`],
+ [/^sample · data through (\S+)$/,m=>"muestra · datos hasta "+m[1]],
+ [/^Sample data through (\S+)$/,m=>"Datos de muestra hasta "+m[1]],
+ [/^, frozen on (\S+)\. All ([\d,]+) active US-listed share classes are in the page; nothing here updates\. For current data, connect FocusAlpha in your AI\.$/,m=>`, congelados el ${m[1]}. Las ${m[2]} clases activas cotizadas en EE. UU. están en la página; nada aquí se actualiza. Para datos actuales, conecta FocusAlpha en tu IA.`],
+ [/^([\d,]+) funds$/,m=>m[1]+" fondos"],
+ [/^funds with no (\S+) are left out by the API$/,m=>"la API omite los fondos sin "+m[1]],
+ [/^sort by (\S+)$/,m=>"ordenar por "+m[1]],
+ [/^tier: (\S+)$/,m=>"tier: "+m[1]],
+ [/^(shares|nav) status: (\S+)$/,m=>(m[1]==="nav"?"estado del NAV: ":"estado de participaciones: ")+m[2]],
+ [/^· (\d+) share classes$/,m=>"· "+m[1]+" clases"],
+ [/^labels · monthly, from holdings · as of (\S+)$/,m=>"etiquetas · mensuales, según posiciones · a "+m[1]],
+ [/^daily · valuation (\S+)$/,m=>"diario · valoración "+m[1]],
+ [/^measured · holdings as of (\S+)$/,m=>"medido · posiciones a "+m[1]],
+],zh:[
+ [/^(\d+) set$/,m=>"已设 "+m[1]+" 项"],
+ [/^page (\d+) · rows ([\d,]+)–([\d,]+)( · last page)? · (\d+) per call$/,m=>`第 ${m[1]} 页 · 第 ${m[2]}–${m[3]} 行${m[4]?" · 最后一页":""} · 每次 ${m[5]} 条`],
+ [/^sample · data through (\S+)$/,m=>"样本 · 数据截至 "+m[1]],
+ [/^Sample data through (\S+)$/,m=>"样本数据截至 "+m[1]],
+ [/^, frozen on (\S+)\. All ([\d,]+) active US-listed share classes are in the page; nothing here updates\. For current data, connect FocusAlpha in your AI\.$/,m=>`，冻结于 ${m[1]}。全部 ${m[2]} 个活跃的美国上市份额类别都在页面里；这里不会更新。要看最新数据，请在你的 AI 里连接 FocusAlpha。`],
+ [/^([\d,]+) funds$/,m=>m[1]+" 只基金"],
+ [/^funds with no (\S+) are left out by the API$/,m=>"API 会排除没有 "+m[1]+" 的基金"],
+ [/^sort by (\S+)$/,m=>"按 "+m[1]+" 排序"],
+ [/^tier: (\S+)$/,m=>"tier: "+m[1]],
+ [/^(shares|nav) status: (\S+)$/,m=>(m[1]==="nav"?"净值状态：":"份额状态：")+m[2]],
+ [/^· (\d+) share classes$/,m=>"· "+m[1]+" 个份额类别"],
+ [/^labels · monthly, from holdings · as of (\S+)$/,m=>"标签 · 每月按持仓计算 · 截至 "+m[1]],
+ [/^daily · valuation (\S+)$/,m=>"日度 · 估值日 "+m[1]],
+ [/^measured · holdings as of (\S+)$/,m=>"实测 · 持仓截至 "+m[1]],
+]}};
+
+</script>
+<script>
+/* Language layer for the sample dashboards. window.FA_I18N_DICT = {es:{en→es}, zh:{en→zh},
+   rules:{es:[[regex,fn]], zh:[...]}} — exact English fragments first, then rule templates for
+   strings the page composes at runtime ("205 items", "page 1 · rows 1–100"). A MutationObserver
+   keeps every re-render translated. Choice persists in localStorage "fa:lang" (shared with the
+   tutorial page); switching reloads, since every page rebuilds its state from the snapshot. */
+(function(){
+var SH=window.FA_I18N_SHARED||{}, PG=window.FA_I18N_DICT||{};
+var D={es:Object.assign({},SH.es||{},PG.es||{}),zh:Object.assign({},SH.zh||{},PG.zh||{}),rules:PG.rules||{}};
+var LANGS=[["en","EN"],["es","ES"],["zh","中文"]];
+var lang="en"; try{ var v=localStorage.getItem("fa:lang"); if(v&&D[v]) lang=v; }catch(e){}
+// ?lang=es on the URL wins and is remembered, so a link can carry the language.
+try{ var q=new URLSearchParams(location.search).get("lang"); if(q&&(q==="en"||D[q])){ lang=q; localStorage.setItem("fa:lang",q); } }catch(e){}
+function T(s){
+  if(lang==="en"||typeof s!=="string"||!s) return s;
+  var d=D[lang]; if(d[s]!==undefined) return d[s];
+  var k=s.trim(); if(!k) return s; if(d[k]!==undefined) return s.replace(k,d[k]);
+  var rules=D.rules[lang]||[];
+  for(var i=0;i<rules.length;i++){ var m=k.match(rules[i][0]); if(m){ var r=rules[i][1](m,T); if(r!=null&&r!==k) return s.replace(k,r); } }
+  return s;
+}
+var SKIP=/^(SCRIPT|STYLE|PRE|CODE|TEXTAREA)$/;
+function tNode(n){ var p=n.parentNode; if(!p||SKIP.test(p.tagName)) return; if(p.closest&&p.closest("#faPrompt,.fa-lang,[data-no-i18n]")) return; var v=T(n.nodeValue); if(v!==n.nodeValue) n.nodeValue=v; }
+var ATTRS=["placeholder","title","aria-label"];
+function tAttrs(el){ if(!el.getAttribute) return; for(var i=0;i<ATTRS.length;i++){ var a=ATTRS[i]; if(el.hasAttribute(a)){ var v=el.getAttribute(a), t=T(v); if(t!==v) el.setAttribute(a,t); } } }
+function walk(root){
+  if(root.nodeType===3){ tNode(root); return; } if(root.nodeType!==1) return;
+  tAttrs(root); var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT), n, list=[]; while((n=w.nextNode())) list.push(n); for(var i=0;i<list.length;i++) tNode(list[i]);
+  var els=root.querySelectorAll("[placeholder],[title],[aria-label]"); for(var j=0;j<els.length;j++) tAttrs(els[j]);
+}
+function observe(){
+  new MutationObserver(function(muts){ for(var i=0;i<muts.length;i++){ var m=muts[i]; if(m.type==="characterData") tNode(m.target); else if(m.type==="attributes") tAttrs(m.target); else for(var j=0;j<m.addedNodes.length;j++) walk(m.addedNodes[j]); } })
+  .observe(document.documentElement,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:ATTRS});
+}
+function switcher(){
+  var box=document.createElement("div"); box.className="fa-lang"; box.setAttribute("role","group"); box.setAttribute("aria-label",T("Language"));
+  LANGS.forEach(function(l){ var b=document.createElement("button"); b.type="button"; b.textContent=l[1]; b.lang=l[0]; if(l[0]===lang) b.setAttribute("aria-pressed","true");
+    b.addEventListener("click",function(){ if(l[0]===lang) return; try{localStorage.setItem("fa:lang",l[0])}catch(e){} location.reload(); }); box.appendChild(b); });
+  var st=document.createElement("style"); st.textContent=".fa-lang{display:inline-flex;gap:2px;padding:2px;border-radius:999px;border:1px solid var(--line,#DCDFE6);background:var(--surface2,var(--surface,var(--card,#fff)));margin-right:8px;flex:none;vertical-align:middle}.fa-lang button{border:0;background:transparent;border-radius:999px;padding:4px 8px;font:600 11px/1 inherit;font-family:inherit;color:var(--muted,#5B6472);cursor:pointer;letter-spacing:.02em}.fa-lang button[aria-pressed=true]{background:#4F2FB0;color:#fff}.fa-lang button:hover:not([aria-pressed=true]){background:rgba(79,47,176,.10);color:#4F2FB0}";
+  document.head.appendChild(st);
+  var gh=document.querySelector(".fa-gh"); if(gh&&gh.parentNode) gh.parentNode.insertBefore(box,gh); else document.body.appendChild(box);
+}
+window.FA_T=T; window.FA_LANG=lang;
+window.FA_I18N={apply:function(){ if(lang!=="en"){ document.documentElement.lang=lang; walk(document.documentElement); observe(); } switcher(); }};
+})();
+
+FA_I18N.apply();
+</script>
+<!-- /fa-i18n -->
