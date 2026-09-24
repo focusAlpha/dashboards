@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="en">
+<head>
+<!--
+  FocusAlpha · Guidance changes, with long-term targets · LIVE SOURCE
+  The same page as https://focusalpha.ai/guidance-changes-dashboard with no data baked in: every number is read
+  through the viewer's FocusAlpha connector (MCP) when the page opens. Opened as a plain web
+  page, without a connector, it shows only its empty state.
+
+  To use it: publish this file as a claude.ai artifact with the connector declared —
+    capabilities: { mcp: { servers: [{ server: "FocusAlpha", tools: ["screen_companies","get_guidance_changes","get_guidance"] }] } }
+  Where to edit: WINDOW (the season), SCREEN (the universe, in screen_companies terms) and MAX_COMPANIES, all at the top of the script.
+  Source and licence (MIT): https://github.com/focusAlpha/dashboards
+-->
+<meta name="robots" content="noindex">
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FocusAlpha Guidance Changes</title>
+<style>
+  :root{
+    --paper:#EBF0F8; --card:#FFFFFF; --ink:#0E1A2C; --slate:#4C5C76; --faint:#7A8AA4;
+    --rule:#CFDAEA; --rule-soft:#E1E9F4;
+    --accent:#1B4F8C; --accent-2:#4E86C6; --accent-soft:#DAE6F5; --copper:#9E6425;
+    --up:#1F6B4F; --up-soft:#DDEDE5; --down:#9E3729; --down-soft:#F5E1DD;
+    --hold:#7A8AA4; --hold-soft:#E1E9F4;
+    --warn:#84600F;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+    color-scheme:light;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --paper:#0A1421; --card:#101E30; --ink:#E5ECF6; --slate:#9CADC5; --faint:#72859F;
+      --rule:#213249; --rule-soft:#182739;
+      --accent:#74ACEC; --accent-2:#3C6FA8; --accent-soft:#15263C; --copper:#D9A45E;
+      --up:#6FC095; --up-soft:#12281F; --down:#E38B7B; --down-soft:#2C1A17;
+      --hold:#72859F; --hold-soft:#182739;
+      --warn:#DCB265; color-scheme:dark;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0A1421; --card:#101E30; --ink:#E5ECF6; --slate:#9CADC5; --faint:#72859F;
+    --rule:#213249; --rule-soft:#182739;
+    --accent:#74ACEC; --accent-2:#3C6FA8; --accent-soft:#15263C; --copper:#D9A45E;
+    --up:#6FC095; --up-soft:#12281F; --down:#E38B7B; --down-soft:#2C1A17;
+    --hold:#72859F; --hold-soft:#182739;
+    --warn:#DCB265; color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--paper); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:64rem; margin:0 auto; padding:2.5rem 1.5rem 6rem;}
+  p{max-width:66ch; margin:0 0 1rem;}
+  h1,h2,h3{margin:0}
+  a{color:var(--accent);}
+  a:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--accent); outline-offset:2px;}
+
+  /* ---------- masthead ---------- */
+  .masthead{border-bottom:2px solid var(--accent); padding-bottom:1.5rem; margin-bottom:1.6rem;}
+  .mast-top{display:flex; align-items:center; gap:.8rem; flex-wrap:wrap; margin-bottom:1rem;}
+  .eyebrow{font-family:var(--mono); font-size:.72rem; letter-spacing:.15em; text-transform:uppercase; color:var(--accent);}
+  .eyebrow small{text-transform:none; letter-spacing:0; color:var(--faint); margin-left:.6rem;}
+  .mast-actions{margin-left:auto; display:flex; align-items:center; gap:.5rem; flex-wrap:wrap;}
+  .status{font-family:var(--mono); font-size:.72rem; color:var(--faint); display:inline-flex; align-items:center; gap:.45rem; white-space:nowrap;}
+  .status .dot{width:.5rem; height:.5rem; border-radius:50%; background:var(--hold);}
+  .status.ok .dot{background:var(--up);} .status.err .dot{background:var(--down);} .status.busy .dot{background:var(--copper); animation:pulse 1.1s infinite;}
+  @keyframes pulse{50%{opacity:.3}}
+  @media (prefers-reduced-motion:reduce){.status.busy .dot{animation:none}}
+  .btn{font:500 .78rem/1 var(--sans); padding:.5rem .8rem; border:1px solid var(--rule); border-radius:8px; background:var(--card); color:var(--ink); cursor:pointer;}
+  .btn:hover{border-color:var(--accent);}
+  .btn[hidden]{display:none}
+  h1{font-family:var(--serif); font-weight:600; font-size:clamp(2rem,5.5vw,3.1rem); line-height:1.12; letter-spacing:-.015em; text-wrap:balance; margin-bottom:.75rem;}
+  .standfirst{font-family:var(--serif); font-size:1.18rem; line-height:1.55; color:var(--slate); max-width:56ch;}
+  .stamp{display:flex; flex-wrap:wrap; gap:.4rem 1.6rem; margin-top:1.2rem; font-family:var(--mono); font-size:.75rem; color:var(--faint);}
+  .stamp b{color:var(--slate); font-weight:500;}
+
+  .banner{border-left:3px solid var(--accent); background:var(--accent-soft); padding:.85rem 1.1rem; margin:0 0 1.4rem; font-size:.9rem; display:flex; gap:1rem; align-items:center; flex-wrap:wrap;}
+  .banner[hidden]{display:none}
+  .banner span{flex:1; min-width:16rem;}
+  .banner.err{border-left-color:var(--down); background:var(--down-soft);}
+
+  /* ---------- controls ---------- */
+  .controls{display:flex; flex-wrap:wrap; gap:.6rem 1rem; align-items:flex-end; padding:.9rem 1rem; border:1px solid var(--rule); background:var(--card); margin-bottom:1rem;}
+  .ctl{display:flex; flex-direction:column; gap:.25rem;}
+  .ctl label{font-family:var(--mono); font-size:.64rem; letter-spacing:.1em; text-transform:uppercase; color:var(--faint);}
+  .ctl select,.ctl input{font:400 .85rem var(--sans); color:var(--ink); background:var(--paper); border:1px solid var(--rule); border-radius:6px; padding:.4rem .55rem; min-width:9rem;}
+  .ctl input{min-width:12rem}
+  .ctl-note{margin-left:auto; font-family:var(--mono); font-size:.72rem; color:var(--faint); align-self:center; white-space:nowrap;}
+
+  section{margin-top:3.2rem;}
+  .sec-head{display:flex; align-items:baseline; gap:.9rem; border-bottom:1px solid var(--rule); padding-bottom:.6rem; margin-bottom:1.5rem;}
+  .sec-head h2{font-family:var(--serif); font-size:1.55rem; font-weight:600; letter-spacing:-.01em; text-wrap:balance;}
+  .sec-head .tagline{font-family:var(--mono); font-size:.7rem; letter-spacing:.12em; text-transform:uppercase; color:var(--faint); margin-left:auto; white-space:nowrap;}
+  h3{font-family:var(--serif); font-size:1.14rem; font-weight:600; margin:2.2rem 0 .6rem; text-wrap:balance;}
+  .lede{margin-bottom:1.4rem; color:var(--slate);}
+  .small{font-size:.85rem; color:var(--slate);}
+  .fine{font-size:.82rem; color:var(--faint); margin-top:.2rem;}
+
+  /* ---------- funnel ---------- */
+  .funnel{display:flex; flex-direction:column; gap:.55rem; margin:1.6rem 0 1rem;}
+  .fstep{display:grid; grid-template-columns:minmax(11rem,15rem) 1fr; gap:1rem; align-items:center;}
+  .fstep .flabel{font-size:.88rem; line-height:1.35;}
+  .fstep .flabel small{display:block; color:var(--faint); font-size:.76rem;}
+  .fbar{position:relative; height:2.9rem; display:flex; align-items:center;}
+  .fbar .fill{height:100%; background:var(--accent); display:flex; align-items:center; padding-left:.8rem; border-radius:2px; min-width:3.2rem;}
+  .fbar .fill.f1{background:var(--slate);}
+  .fbar .fill.f2{background:var(--accent-2);}
+  .fbar .fill.f3{background:var(--up);}
+  .fbar .fill.f4{background:var(--hold);}
+  .fbar .n{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:1.15rem; color:#fff; letter-spacing:-.01em;}
+  .fbar .pct{font-family:var(--mono); font-size:.75rem; color:var(--faint); margin-left:.7rem; white-space:nowrap;}
+  @media (max-width:560px){.fstep{grid-template-columns:1fr} .fbar{height:2.4rem}}
+
+  /* ---------- split bar ---------- */
+  .splitbar{display:flex; height:3.4rem; border:1px solid var(--rule); margin:1.2rem 0 .6rem; overflow:hidden;}
+  .splitbar div{display:flex; flex-direction:column; justify-content:center; padding:0 .7rem; min-width:0;}
+  .splitbar .s-raise{background:var(--up-soft); color:var(--up);}
+  .splitbar .s-both{background:var(--accent-soft); color:var(--accent);}
+  .splitbar .s-cut{background:var(--down-soft); color:var(--down);}
+  .splitbar .s-nw{background:var(--card); color:var(--copper);}
+  .splitbar b{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:1.05rem;}
+  .splitbar span{font-size:.7rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+  /* ---------- diverging histogram ---------- */
+  .hist{display:flex; flex-direction:column; gap:.4rem; margin:1.3rem 0;}
+  .hrow{display:grid; grid-template-columns:1fr 5.5rem 1fr; align-items:center; gap:.5rem;}
+  .hleft{display:flex; justify-content:flex-end; align-items:center; gap:.5rem;}
+  .hright{display:flex; align-items:center; gap:.5rem;}
+  .hbar{height:1.5rem; border-radius:2px; min-width:2px;}
+  .hbar.down{background:var(--down);}
+  .hbar.up{background:var(--up);}
+  .hbar.acc{background:var(--accent-2);}
+  .hmid{font-family:var(--mono); font-size:.75rem; color:var(--slate); text-align:center; font-variant-numeric:tabular-nums;}
+  .hn{font-family:var(--mono); font-size:.78rem; color:var(--faint); font-variant-numeric:tabular-nums;}
+  .hkey{display:flex; justify-content:space-between; font-family:var(--mono); font-size:.7rem; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); margin-bottom:.4rem;}
+
+  /* ---------- ratio bars ---------- */
+  .ratios{display:flex; flex-direction:column; gap:.5rem; margin:1.3rem 0;}
+  .rrow{display:grid; grid-template-columns:minmax(9rem,11rem) 1fr auto; gap:.8rem; align-items:center;}
+  .rname{font-size:.85rem;}
+  .rtrack{display:flex; height:1.4rem; background:var(--rule-soft); border-radius:2px; overflow:hidden;}
+  .rtrack .ru{background:var(--up);}
+  .rtrack .rd{background:var(--down);}
+  .rtrack .ra{background:var(--accent-2);}
+  .rval{font-family:var(--mono); font-size:.78rem; color:var(--slate); font-variant-numeric:tabular-nums; white-space:nowrap;}
+
+  /* ---------- tables ---------- */
+  .scroll{overflow-x:auto; margin:1.2rem 0; border:1px solid var(--rule); background:var(--card);}
+  table{border-collapse:collapse; width:100%; font-size:.85rem;}
+  th,td{padding:.5rem .7rem; text-align:left; border-bottom:1px solid var(--rule-soft); white-space:nowrap; vertical-align:top;}
+  thead th{font-family:var(--mono); font-size:.66rem; letter-spacing:.09em; text-transform:uppercase; color:var(--faint); font-weight:500; border-bottom:1px solid var(--rule); background:var(--card);}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num,th.num{font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right;}
+  td.co{font-weight:500;}
+  td.tk{font-family:var(--mono); font-size:.78rem; color:var(--faint);}
+  td.val{font-family:var(--mono); font-size:.78rem; color:var(--slate);}
+  td.up{color:var(--up); font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right; font-weight:600;}
+  td.down{color:var(--down); font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right; font-weight:600;}
+  td.wrap-ok{white-space:normal; min-width:18rem; color:var(--slate);}
+  td.quote{white-space:normal; min-width:22rem; max-width:34rem; color:var(--slate); font-size:.8rem; line-height:1.45;}
+  td.date{font-family:var(--mono); font-size:.76rem; color:var(--faint);}
+  caption{caption-side:bottom; text-align:left; padding:.65rem .7rem; font-size:.78rem; color:var(--faint); border-top:1px solid var(--rule-soft);}
+  .more{margin:-.6rem 0 1rem; display:flex; gap:.6rem; align-items:center;}
+  .empty{padding:1rem .9rem; color:var(--faint); font-size:.85rem;}
+
+  /* ---------- misc ---------- */
+  .vitals{display:grid; grid-template-columns:repeat(auto-fit,minmax(10rem,1fr)); gap:1px; background:var(--rule); border:1px solid var(--rule); margin:1.4rem 0;}
+  .vital{background:var(--card); padding:1rem 1.05rem 1.1rem;}
+  .vital .k{font-family:var(--mono); font-size:.66rem; letter-spacing:.1em; text-transform:uppercase; color:var(--faint);}
+  .vital .v{font-family:var(--mono); font-variant-numeric:tabular-nums; font-size:1.8rem; line-height:1.15; margin-top:.45rem; letter-spacing:-.02em;}
+  .vital .u{font-size:.78rem; color:var(--slate); margin-top:.25rem;}
+  .note{border-left:3px solid var(--accent); background:var(--accent-soft); padding:.85rem 1.1rem; margin:1.4rem 0; font-size:.9rem;}
+  .note p{max-width:68ch; margin:0;}
+  .note p + p{margin-top:.5rem;}
+  .note.flag{border-left-color:var(--warn);}
+  code{font-family:var(--mono); font-size:.86em; background:var(--rule-soft); padding:.1em .35em; border-radius:2px;}
+  ul.tight{margin:.6rem 0 0 1.15rem; padding:0;}
+  ul.tight li{margin-bottom:.35rem; color:var(--slate); font-size:.92rem; max-width:66ch;}
+  .foot{margin-top:4rem; border-top:1px solid var(--rule); padding-top:1.2rem; font-family:var(--mono); font-size:.73rem; color:var(--faint); line-height:1.8;}
+  .arrow{color:var(--faint); padding:0 .3rem;}
+  .dark-toggle{font:500 .78rem/1 var(--sans); padding:.5rem .8rem; border:1px solid var(--rule); border-radius:8px; background:var(--card); color:var(--ink); cursor:pointer;}
+  .dark-toggle:hover{border-color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <div class="mast-top">
+    <div class="eyebrow">FocusAlpha · Guidance Layer <small>get_guidance_changes · live</small></div>
+    <div class="mast-actions">
+      <span class="status" id="live"><span class="dot"></span><span id="liveTxt">connecting…</span></span>
+      <button class="btn" id="refresh" type="button" hidden title="Fetch this page again from FocusAlpha, skipping the cache">Refresh</button>
+      <button class="dark-toggle" id="themeBtn" title="Toggle theme">Theme</button>
+    </div>
+  </div>
+  <h1>Who changed guidance this season, and by how much</h1>
+  <p class="standfirst" id="standfirst">Every forward number a company published this season, lined up against the number it published last time.</p>
+  <div class="stamp" id="stamp"></div>
+</header>
+
+<div class="banner" id="banner" hidden></div>
+
+<div class="controls">
+  <div class="ctl"><label for="fSector">Sector</label><select id="fSector"><option value="">All sectors</option></select></div>
+  <div class="ctl"><label for="fCap">Market cap</label><select id="fCap">
+    <option value="0">Whole universe</option><option value="20000000000">$20bn and above</option><option value="50000000000">$50bn and above</option><option value="100000000000">$100bn and above</option></select></div>
+  <div class="ctl"><label for="fQ">Company</label><input id="fQ" type="search" placeholder="Ticker or name" autocomplete="off"></div>
+  <div class="ctl-note" id="ctlNote"></div>
+</div>
+
+<main id="report"></main>
+
+<div class="foot" id="foot"></div>
+
+</div>
+
+<script>
+(function(){
+const SERVER='FocusAlpha';
+
+// ===================== WHAT THIS PAGE READS — edit these =====================
+// WINDOW: the season. Every guidance figure published on or after `from` (and on or before
+// `to`, when set) is compared with the figure the company published last time.
+const WINDOW={from:'2026-07-01',to:null,label:'Summer 2026 season'};
+// SCREEN: the universe, in screen_companies terms. The default is every SEC filer worth
+// $10bn or more that filed an earnings release since the window opened.
+const SCREEN={market_cap_usd_gte:10000000000,has_cik:true,event_family:'earnings_release',event_family_since:'2026-07-01'};
+// The page reads two tools per company (changes + latest guidance). Keep this within what
+// the connector will serve you in a sitting.
+const MAX_COMPANIES=150;
+// ===========================================================================
+
+const $=(s,r)=>(r||document).querySelector(s);
+const esc=(s)=>String(s==null?'':s).replace(/[&<>"]/g,(c)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=(n)=>Math.round(Number(n)||0).toLocaleString('en-US');
+const pctS=(v,d)=>{const n=Number(v);if(!Number.isFinite(n))return '—';const a=Math.abs(n).toFixed(d==null?1:d);return (n<0?'−':'+')+a+'%';};
+const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const dShort=(iso)=>{if(!iso)return '';const d=new Date(iso);if(isNaN(d))return String(iso).slice(0,10);return d.getUTCDate()+' '+MONTHS[d.getUTCMonth()]+' '+d.getUTCFullYear();};
+const hm=(ms)=>{const d=new Date(ms);return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');};
+const day=(v)=>v?String(v).slice(0,10):'';
+const num=(v)=>{if(v===null||v===undefined||v==='')return null;const n=Number(v);return Number.isFinite(n)?n:null;};
+
+let MCP=null, LIVE='init', LOADING=false, FETCHED=0, ERR=null, READ=0, TOTAL=0;
+let UNIVERSE=[], CH={}, LT={};
+const UI={sector:'',cap:0,q:''};
+
+/* ---------- the reads ---------- */
+async function call(tool,input,fresh){
+  const opts={cache:{staleTime:fresh?0:120000}};
+  const r=await MCP.callTool(SERVER,tool,input,opts);
+  return r&&r.payload!==undefined?r.payload:r;
+}
+async function pages(tool,input,max){
+  let rows=[],cursor=null,n=0;
+  do{ const p=await call(tool,cursor?Object.assign({},input,{cursor}):input); rows=rows.concat(p&&p.data||[]); cursor=p&&p.next_cursor||null; }while(cursor&&++n<(max||3));
+  return rows;
+}
+async function load(fresh){
+  if(!MCP||LOADING)return;
+  LOADING=true;ERR=null;READ=0;CH={};LT={};renderStatus();
+  try{
+    const u=await pages('screen_companies',Object.assign({},SCREEN,{sort:'market_cap_usd',limit:Math.min(MAX_COMPANIES,1000)}),Math.ceil(MAX_COMPANIES/1000)+1);
+    UNIVERSE=u.filter((r)=>r.primary_ticker).slice(0,MAX_COMPANIES).map((r)=>({t:r.primary_ticker,name:r.company_name,sector:r.sector||'',industry:r.industry||'',country:r.country||'',mcap:num(r.market_cap_usd)}));
+    TOTAL=UNIVERSE.length;renderStatus();fillSectors();
+    const q=UNIVERSE.slice();
+    async function worker(){
+      while(q.length){
+        const c=q.shift();
+        try{
+          CH[c.t]=await pages('get_guidance_changes',{company:c.t,limit:1000},2);
+          const l=await call('get_guidance',{company:c.t,view:'latest'});
+          LT[c.t]=l&&l.data||[];
+        }catch(e){ CH[c.t]=CH[c.t]||[]; LT[c.t]=LT[c.t]||[]; c.err=(e&&e.message)||'read failed'; }
+        READ++; if(READ%20===0){renderStatus();renderAll();}
+      }
+    }
+    await Promise.all([worker(),worker(),worker(),worker()]);
+    LIVE='ok';FETCHED=Date.now();
+  }catch(e){ LIVE='error'; ERR=(e&&(e.message||e.code))||'unknown error'; }
+  LOADING=false;renderStatus();renderAll();
+}
+
+/* ---------- the reading ---------- */
+const HEADLINE=/(^|_)(revenue|sales|eps|earnings|ebitda|ebit|net_income|operating_income|operating_margin|gross_margin|ebitda_margin|fcf|free_cash_flow|ffo|noi|comparable|comps|bookings|arr)($|_)/;
+const ABBR={eps:'EPS',ebitda:'EBITDA',ebit:'EBIT',fcf:'Free cash flow',ffo:'FFO',affo:'AFFO',noi:'NOI',cagr:'CAGR',capex:'Capital expenditure',opex:'Operating expenses',arr:'ARR',roe:'ROE',roic:'ROIC',rpo:'RPO',sg_a:'SG&A',pct:'',yoy:'YoY',cc:'constant currency',ltv:'LTV',aum:'AUM',nii:'Net interest income',nim:'Net interest margin',gmv:'GMV',dau:'DAU',mau:'MAU',comp:'Comparable',comps:'Comparable sales',sss:'Same-store sales',sbc:'Stock-based compensation',d_a:'D&A',dso:'DSO'};
+function metricLabel(r){
+  const k=String(r.metric_key||'').replace(/_pct$/,'').split('_').filter(Boolean);
+  const words=k.map((w,i)=>{ if(ABBR[w]!==undefined)return ABBR[w]; const s=w.replace(/^growth$/,'growth'); return i===0?s.charAt(0).toUpperCase()+s.slice(1):s; }).filter(Boolean);
+  let s=words.join(' ').replace(/^Free cash flow flow$/,'Free cash flow');
+  if(/EPS|EBITDA|EBIT|FFO|NOI|ARR|ROE|ROIC/.test(words[0]||'')&&words.length>1) s=words[0]+' '+words.slice(1).join(' ');
+  const b=String(r.basis||'').toLowerCase();
+  if(/adjusted|non_gaap|core/.test(b)&&!/^Adjusted/.test(s)) s='Adjusted '+s.charAt(0).toLowerCase()+s.slice(1);
+  else if(/organic/.test(b)&&!/organic/i.test(s)) s='Organic '+s.charAt(0).toLowerCase()+s.slice(1);
+  return s;
+}
+const RANGE={moved_above:'clears prior',shifted_up:'shifted up',narrowed_up:'narrowed up',widened_up:'widened up',moved_below:'below prior',shifted_down:'shifted down',narrowed_down:'narrowed down',widened_down:'widened down',narrowed:'narrowed',widened:'widened',unchanged:'unchanged'};
+const rangeWord=(r)=>RANGE[r.range_move]||String(r.range_move||'').replace(/_/g,' ')||'—';
+const shortName=(s)=>String(s||'').replace(/,?\s+(Inc\.?|Incorporated|Corp\.?|Corporation|plc|PLC|Ltd\.?|Limited|N\.V\.|S\.A\.|SE|AG|Co\.?|Company|Companies|Holdings?|Group)\s*$/,'').replace(/,?\s+(Inc\.?|Corp\.?|Company)\s*$/,'').replace(/^The\s+(?=\S+$)/,'');
+const inWindow=(iso)=>{const d=day(iso);return !!d&&d>=WINDOW.from&&(!WINDOW.to||d<=WINDOW.to);};
+const isMove=(r)=>r.change==='raise'||r.change==='cut';
+const isNarrow=(r)=>r.change==='narrow'||r.change==='widen';
+const periodYear=(p)=>{const m=String(p||'').match(/^(?:FY|CY)?\s*'?(\d{2}|\d{4})$/);if(!m)return null;let y=Number(m[1]);if(y<100)y+=2000;return y>=2000&&y<2100?y:null;};
+// A target is long-term when the layer marks it multi-year, or when the guided fiscal year
+// is two or more years past the year of the event it was stated in — and it still lies ahead:
+// a 2029 target stated in 2023 was long-term then, a 2025 one is history now.
+const THIS_YEAR=Number(WINDOW.from.slice(0,4));
+const isLongTerm=(r)=>{ const py=periodYear(r.period); if(py&&py<=THIS_YEAR)return false; if(r.horizon==='multi_year_target')return true; return !!(py&&r.year&&py-Number(r.year)>=2); };
+
+function universe(){
+  const q=UI.q.trim().toLowerCase();
+  return UNIVERSE.filter((c)=>(!UI.sector||c.sector===UI.sector)&&(!UI.cap||(c.mcap||0)>=UI.cap)&&(!q||c.t.toLowerCase().includes(q)||String(c.name||'').toLowerCase().includes(q)));
+}
+function compute(){
+  const U=universe();
+  const S={n:U.length,published:0,comparable:0,moved:0,reaffirmed:0,raiseOnly:0,both:0,cutOnly:0,narrowOnly:0,raisedAny:0,cutAny:0,narrowCos:0,narrowRows:0,
+    rows:[],moves:[],agree:0,disagree:0,noPct:0,up:0,down:0,hist:[[0,2],[2,5],[5,10],[10,20],[20,Infinity]].map(([a,b])=>({a,b,up:0,down:0})),
+    sectors:{},metrics:{},lt:[],ltCos:0,ltYears:{},withinRange:[],worse:[],read:0};
+  for(const c of U){
+    const ch=CH[c.t],lt=LT[c.t]; if(!ch&&!lt)continue; S.read++;
+    const rows=(ch||[]).filter((r)=>inWindow(r.conference_date)).map((r)=>Object.assign({c},r));
+    const pub=rows.length>0||(lt||[]).some((r)=>inWindow(r.conference_date));
+    if(pub)S.published++;
+    if(rows.length){
+      S.comparable++;
+      let ra=false,cu=false,na=false;
+      for(const r of rows){
+        S.rows.push(r);
+        if(isNarrow(r)){na=true;S.narrowRows++;}
+        if(!isMove(r))continue;
+        S.moves.push(r);
+        const p=num(r.pct_change);
+        if(r.change==='raise')ra=true; else cu=true;
+        const sec=c.sector||'Unclassified'; S.sectors[sec]=S.sectors[sec]||{up:0,down:0}; S.sectors[sec][r.change==='raise'?'up':'down']++;
+        const mk=metricLabel(r); S.metrics[mk]=S.metrics[mk]||{up:new Set(),down:new Set(),worse:0,n:0}; S.metrics[mk][r.change==='raise'?'up':'down'].add(c.t); S.metrics[mk].n++; if(r.higher_is_worse)S.metrics[mk].worse++;
+        if(r.higher_is_worse)S.worse.push(r);
+        if(p===null){S.noPct++;continue;}
+        if((r.change==='raise'&&p>0)||(r.change==='cut'&&p<0))S.agree++; else if(p!==0)S.disagree++;
+        if(p>0)S.up++; else if(p<0)S.down++;
+        const ap=Math.abs(p); const h=S.hist.find((x)=>ap>=x.a&&ap<x.b); if(h&&p!==0)h[p>0?'up':'down']++;
+        if(r.within_prior_range&&ap>=10)S.withinRange.push(r);
+      }
+      if(ra||cu){S.moved++; if(ra&&cu)S.both++; else if(ra)S.raiseOnly++; else S.cutOnly++;}
+      else if(na){S.moved++;S.narrowOnly++;}
+      else S.reaffirmed++;
+      if(ra)S.raisedAny++; if(cu)S.cutAny++; if(na)S.narrowCos++;
+    }
+    const targets=(lt||[]).filter(isLongTerm).map((r)=>Object.assign({c},r));
+    if(targets.length){S.ltCos++; for(const r of targets){S.lt.push(r); const y=periodYear(r.period); const key=y?'FY'+String(y).slice(2):'open-ended'; S.ltYears[key]=(S.ltYears[key]||0)+1;}}
+  }
+  return S;
+}
+
+/* ---------- the rendering ---------- */
+function fillSectors(){
+  const sel=$('#fSector'),cur=sel.value; const secs=[...new Set(UNIVERSE.map((c)=>c.sector).filter(Boolean))].sort();
+  sel.innerHTML='<option value="">All sectors</option>'+secs.map((s)=>`<option value="${esc(s)}">${esc(s)}</option>`).join('');
+  sel.value=secs.includes(cur)?cur:'';
+}
+function renderStatus(){
+  const el=$('#live'),t=$('#liveTxt'); el.className='status';
+  let s='';
+  if(LIVE==='nomcp'){s='no connector · connect FocusAlpha to load';}
+  else if(LOADING){el.classList.add('busy');s=TOTAL?`reading ${READ}/${TOTAL} companies`:'finding the universe…';}
+  else if(LIVE==='ok'){el.classList.add('ok');s='live · fetched '+hm(FETCHED);}
+  else if(LIVE==='error'){el.classList.add('err');s='FocusAlpha did not answer';}
+  else s='connecting…';
+  t.textContent=s;
+  $('#refresh').hidden=!MCP||LOADING;
+}
+function renderBanner(S){
+  const b=$('#banner'); b.className='banner';
+  if(LIVE==='nomcp'){b.hidden=false;b.innerHTML=`<span><b>No connector.</b> This page reads FocusAlpha through the viewer's MCP connector. Publish it as a claude.ai artifact with the connector declared, or connect FocusAlpha first at <a href="https://focusalpha.ai/start" target="_blank" rel="noopener">focusalpha.ai/start</a>.</span>`;return;}
+  if(LIVE==='error'){b.hidden=false;b.classList.add('err');b.innerHTML=`<span><b>FocusAlpha didn't answer.</b> ${esc(ERR||'')}</span><button class="btn" data-act="retry" type="button">Retry</button>`;return;}
+  const failed=UNIVERSE.filter((c)=>c.err).length;
+  if(!LOADING&&failed){b.hidden=false;b.innerHTML=`<span><b>${failed} of ${UNIVERSE.length} companies could not be read</b> and are counted as silent. Refresh to try them again.</span>`;return;}
+  b.hidden=true;b.innerHTML='';
+}
+function renderMast(S){
+  const from=dShort(WINDOW.from+'T00:00:00Z'), to=WINDOW.to?dShort(WINDOW.to+'T00:00:00Z'):null;
+  $('#standfirst').innerHTML=S.read
+    ? `Every forward number a company published ${to?`between ${esc(from)} and ${esc(to)}`:`since ${esc(from)}`}, lined up against the number it published last time. ${fmt(S.published)} companies said something; ${fmt(S.moved)} of them moved a number.`
+    : `Every forward number a company published ${to?`between ${esc(from)} and ${esc(to)}`:`since ${esc(from)}`}, lined up against the number it published last time.`;
+  $('#stamp').innerHTML=`<span><b>Window</b> ${esc(from)} – ${to?esc(to):'today'}</span><span><b>Change rows</b> ${fmt(S.rows.length)}</span><span><b>Companies</b> ${fmt(S.read)} read of ${fmt(S.n)}</span><span><b>Sources</b> Earnings releases + call transcripts</span><span><b>Counted</b> ${LIVE==='ok'?esc(dShort(new Date(FETCHED).toISOString())):'—'}</span>`;
+  $('#ctlNote').textContent=S.n===UNIVERSE.length?`${fmt(UNIVERSE.length)} companies in the universe`:`${fmt(S.n)} of ${fmt(UNIVERSE.length)} companies`;
+}
+const bar=(n,max,cls)=>`<div class="fill ${cls}" style="width:${max?Math.max(4,100*n/max).toFixed(1):4}%"><span class="n">${fmt(n)}</span></div>`;
+const pc=(a,b)=>b?Math.round(100*a/b)+'%':'—';
+function trRow(r,cls){
+  const p=num(r.pct_change);
+  return `<tr><td class="co">${esc(shortName(r.c.name))}</td><td class="tk">${esc(r.c.t)}</td><td>${esc(metricLabel(r))}</td><td>${esc(r.period||'')}</td><td class="val">${esc(r.prior_value||'—')}</td><td class="val">${esc(r.current_value||'—')}</td><td class="${cls||(p>0?'up':'down')}">${pctS(p)}</td><td>${esc(rangeWord(r))}</td><td class="date">${esc(dShort(r.conference_date))}</td></tr>`;
+}
+const TH='<thead><tr><th>Company</th><th>Ticker</th><th>Metric</th><th>Period</th><th>Prior guidance</th><th>New guidance</th><th class="num">Midpoint</th><th>Range</th><th>Stated</th></tr></thead>';
+function table(id,rows,cap,rowFn,head,show){
+  const n=show||20, all=EXPAND[id];
+  const body=rows.length?rows.slice(0,all?rows.length:n).map(rowFn).join(''):'';
+  const more=rows.length>n?`<div class="more"><button class="btn" data-more="${id}" type="button">${all?'Show fewer':'Show all '+fmt(rows.length)}</button></div>`:'';
+  return `<div class="scroll">${rows.length?`<table>${cap?`<caption>${cap}</caption>`:''}${head}<tbody>${body}</tbody></table>`:`<div class="empty">Nothing in this universe matches.</div>`}</div>${more}`;
+}
+const EXPAND={};
+function renderAll(){
+  const S=compute();
+  renderBanner(S);renderMast(S);
+  if(!S.read){
+    $('#report').innerHTML=`<section><div class="sec-head"><h2>Waiting for the first company</h2><span class="tagline">${LOADING?'reading':'no data'}</span></div><p class="lede">${LOADING?'The universe is being read one company at a time; the page fills in as answers arrive.':'Nothing has been read yet. Connect FocusAlpha and refresh.'}</p></section>`;
+    $('#foot').innerHTML=foot();return;
+  }
+  const clean=S.moves.filter((r)=>{const p=num(r.pct_change);return p!==null&&Math.abs(p)>=0.5&&Math.abs(p)<=40&&HEADLINE.test(r.metric_key||'')&&!r.higher_is_worse;});
+  const raised=clean.filter((r)=>r.change==='raise').sort((a,b)=>num(b.pct_change)-num(a.pct_change));
+  const cut=clean.filter((r)=>r.change==='cut').sort((a,b)=>num(a.pct_change)-num(b.pct_change));
+  const narrowed=S.rows.filter(isNarrow).sort((a,b)=>(b.c.mcap||0)-(a.c.mcap||0));
+  const maxH=Math.max(1,...S.hist.map((h)=>Math.max(h.up,h.down)));
+  const secs=Object.entries(S.sectors).sort((a,b)=>(b[1].up+b[1].down)-(a[1].up+a[1].down)).slice(0,12);
+  const maxSec=Math.max(1,...secs.map(([,v])=>v.up+v.down));
+  const mets=Object.entries(S.metrics).map(([k,v])=>({k,up:v.up.size,down:v.down.size,worse:v.worse/Math.max(1,v.n)})).sort((a,b)=>(b.up+b.down)-(a.up+a.down)).slice(0,12);
+  const ratio=S.down?(S.up/S.down).toFixed(1):(S.up?'∞':'—');
+  const lt=S.lt.slice().sort((a,b)=>(b.c.mcap||0)-(a.c.mcap||0)||String(a.period).localeCompare(String(b.period)));
+  const ltYears=Object.entries(S.ltYears).sort((a,b)=>a[0].localeCompare(b[0]));
+  const maxLtY=Math.max(1,...ltYears.map(([,n])=>n));
+  const within=S.withinRange.sort((a,b)=>(b.c.mcap||0)-(a.c.mcap||0));
+  const worse=S.worse.sort((a,b)=>(b.c.mcap||0)-(a.c.mcap||0));
+  const metricReading=(m)=>m.worse>0.5?'A lower number is usually the better news':(m.up>=4*m.down&&m.down?'Revised up over four times as often as down':(m.down>m.up?'Cut more often than raised':'—'));
+  const topSec=secs[0], oneSided=secs.slice().filter(([,v])=>v.down).sort((a,b)=>(b[1].up/b[1].down)-(a[1].up/a[1].down))[0];
+
+  $('#report').innerHTML=`
+<section>
+  <div class="sec-head"><h2>From ${fmt(S.published)} companies to ${fmt(S.moved)} that moved</h2><span class="tagline">The funnel</span></div>
+  <p class="lede">Most companies that publish guidance cannot be judged against a prior — either they are guiding a metric for the first time, or the earlier statement was not comparable. The funnel below is the honest path from "said something" to "changed something".</p>
+  <div class="funnel">
+    <div class="fstep"><div class="flabel">In the universe<small>${esc(screenWords())}</small></div><div class="fbar">${bar(S.n,S.n,'f1')}</div></div>
+    <div class="fstep"><div class="flabel">Published a guidance figure<small>in the window, in a release or on the call</small></div><div class="fbar">${bar(S.published,S.n,'')}<span class="pct">${pc(S.published,S.n)} of the universe</span></div></div>
+    <div class="fstep"><div class="flabel">Had a comparable prior<small>same metric, same period, same basis</small></div><div class="fbar">${bar(S.comparable,S.n,'f2')}<span class="pct">${pc(S.comparable,S.published)} of the above</span></div></div>
+    <div class="fstep"><div class="flabel">Moved at least one number<small>raised, cut, narrowed or widened</small></div><div class="fbar">${bar(S.moved,S.n,'f3')}<span class="pct">${pc(S.moved,S.comparable)} of those judgeable</span></div></div>
+    <div class="fstep"><div class="flabel">Reaffirmed only<small>every comparable metric unchanged</small></div><div class="fbar">${bar(S.reaffirmed,S.n,'f4')}<span class="pct">${pc(S.reaffirmed,S.comparable)} of those judgeable</span></div></div>
+  </div>
+  <p class="small">The companies that drop out between the second and third bar are not a failure of collection — they published guidance we hold in full, there was simply nothing comparable to set it against yet. Most are first-time guides for a new fiscal year.</p>
+  <h3>What the ${fmt(S.moved)} movers did</h3>
+  <div class="splitbar">
+    <div class="s-raise" style="flex:${S.raiseOnly||0.0001}"><b>${fmt(S.raiseOnly)}</b><span>Raised only</span></div>
+    <div class="s-both" style="flex:${S.both||0.0001}"><b>${fmt(S.both)}</b><span>Raised and cut</span></div>
+    <div class="s-cut" style="flex:${S.cutOnly||0.0001}"><b>${fmt(S.cutOnly)}</b><span>Cut only</span></div>
+    <div class="s-nw" style="flex:${S.narrowOnly||0.0001}"><b>${fmt(S.narrowOnly)}</b><span>Narrowed</span></div>
+  </div>
+  <p class="fine">A company can raise one metric and cut another in the same release — ${fmt(S.both)} did exactly that, which is why the categories are counted this way rather than one label per company.</p>
+  <div class="vitals">
+    <div class="vital"><div class="k">Raised something</div><div class="v" style="color:var(--up)">${fmt(S.raisedAny)}</div><div class="u">companies</div></div>
+    <div class="vital"><div class="k">Cut something</div><div class="v" style="color:var(--down)">${fmt(S.cutAny)}</div><div class="u">companies</div></div>
+    <div class="vital"><div class="k">Narrowed a range</div><div class="v">${fmt(S.narrowCos)}</div><div class="u">companies · ${fmt(S.narrowRows)} rows</div></div>
+    <div class="vital"><div class="k">Raise : cut ratio</div><div class="v">${ratio}</div><div class="u">by moved metric rows</div></div>
+  </div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>How big were the moves</h2><span class="tagline">${fmt(S.moves.length)} moved metrics</span></div>
+  <p class="lede">Each bar is the change in the midpoint of the guided range. A move under 2% is a company nudging the middle of its range rather than repricing the year.</p>
+  <div class="hkey"><span>← Midpoint down</span><span>Midpoint up →</span></div>
+  <div class="hist">${S.hist.map((h)=>`<div class="hrow"><div class="hleft"><span class="hn">${fmt(h.down)}</span><div class="hbar down" style="width:${(100*h.down/maxH).toFixed(1)}%"></div></div><div class="hmid">${h.b===Infinity?'over '+h.a+'%':h.a+' – '+h.b+'%'}</div><div class="hright"><div class="hbar up" style="width:${(100*h.up/maxH).toFixed(1)}%"></div><span class="hn">${fmt(h.up)}</span></div></div>`).join('')}</div>
+  <p class="fine">${fmt(S.down)} moves down, ${fmt(S.up)} up. Bars are scaled to the largest bucket (${fmt(maxH)}).${S.noPct?` ${fmt(S.noPct)} moves have no midpoint because one side is words, not a range.`:''}</p>
+  <div class="note">
+    <p><b>The words and the numbers agree ${fmt(S.agree)} times out of ${fmt(S.agree+S.disagree)}.</b> Direction is taken from what the company said; the midpoint move is computed independently from the two ranges. ${S.disagree?`${fmt(S.disagree)} rows have a label and an arithmetic sign that point in opposite directions; they are shown as published, with both.`:'In this window every stated raise has a positive midpoint move and every stated cut a negative one.'}</p>
+    <p>That is a check, not a coincidence: when the two disagree, the row is published with the disagreement flagged rather than resolved in favour of either side.</p>
+  </div>
+  <h3>Where the moves came from</h3>
+  <div class="ratios">${secs.map(([k,v])=>`<div class="rrow"><div class="rname">${esc(k)}</div><div class="rtrack" style="width:${(100*(v.up+v.down)/maxSec).toFixed(1)}%"><div class="ru" style="flex:${v.up}"></div><div class="rd" style="flex:${v.down}"></div></div><div class="rval">${fmt(v.up)} up · ${fmt(v.down)} down</div></div>`).join('')}</div>
+  ${topSec?`<p class="fine">${esc(topSec[0])} produced the most moves.${oneSided?` ${esc(oneSided[0])} is the most one-sided at ${(oneSided[1].up/oneSided[1].down).toFixed(1)} raises per cut.`:''}</p>`:''}
+  <h3>Which metric got moved</h3>
+  <div class="scroll"><table><caption>Distinct companies moving each metric. Where a lower number is the better news (capex, tax rate, costs), a cut is not bad news.</caption>
+    <thead><tr><th>Metric</th><th class="num">Raised</th><th class="num">Cut</th><th>Reading</th></tr></thead>
+    <tbody>${mets.map((m)=>`<tr><td>${esc(m.k)}</td><td class="up">${fmt(m.up)}</td><td class="down">${fmt(m.down)}</td><td class="wrap-ok">${esc(metricReading(m))}</td></tr>`).join('')}</tbody></table></div>
+</section>
+
+<section>
+  <div class="sec-head"><h2>The changes themselves</h2><span class="tagline">Named, with the numbers</span></div>
+  <p class="lede">Filtered to headline financial metrics, both sides quoted as numeric ranges for the same period, and a midpoint move between 0.5% and 40%. That leaves ${fmt(clean.length)} clean revisions across ${fmt(new Set(clean.map((r)=>r.c.t)).size)} companies; the largest are shown first.</p>
+  <h3>Raised</h3>
+  ${table('raised',raised,'Prior and new figures are the company\'s own wording, quoted verbatim from the release or transcript.',(r)=>trRow(r,'up'),TH)}
+  <h3>Cut</h3>
+  ${table('cut',cut,'A revision beyond about 25% deserves a look at the source: a company that changed shape mid-year compares a larger business with a smaller one.',(r)=>trRow(r,'down'),TH)}
+  <div class="note flag">
+    <p><b>A big cut can be a changed company, not a changed outlook.</b> A separation or a divestiture completed during the period makes the prior figure cover a larger business than the new one. The layer compares what the company published and has no way to know the company changed shape — so the row is shown as published rather than silently adjusted or silently dropped.</p>
+  </div>
+  <h3>Narrowed</h3>
+  <p>Trimming one end of a range is not a cut. The company is saying "more precise", not "more pessimistic" — so these are labelled narrow, and the midpoint movement is reported separately rather than being converted into a direction.</p>
+  ${table('narrowed',narrowed,`${fmt(S.narrowRows)} narrow/widen rows across ${fmt(S.narrowCos)} companies. All of them sit entirely inside the prior range.`,(r)=>trRow(r,num(r.pct_change)>0?'up':(num(r.pct_change)<0?'down':'num')),TH,12)}
+</section>
+
+<section>
+  <div class="sec-head"><h2>Long-term guidance</h2><span class="tagline">Beyond next year</span></div>
+  <p class="lede">Targets set two or more fiscal years out, or announced as multi-year ambitions — investor-day frameworks, CAGRs "through 2029", a margin "by 2030". These are the newest standing figure per metric, whenever they were stated, so an old target still counts until the company replaces it.</p>
+  <div class="vitals">
+    <div class="vital"><div class="k">Companies with targets</div><div class="v">${fmt(S.ltCos)}</div><div class="u">of ${fmt(S.read)} read</div></div>
+    <div class="vital"><div class="k">Target rows</div><div class="v">${fmt(lt.length)}</div><div class="u">newest per metric</div></div>
+    <div class="vital"><div class="k">Furthest horizon</div><div class="v">${esc(ltYears.filter(([k])=>k!=='open-ended').slice(-1).map(([k])=>k)[0]||'—')}</div><div class="u">fiscal year</div></div>
+    <div class="vital"><div class="k">Most common metric</div><div class="v" style="font-size:1.1rem;line-height:1.3;margin-top:.6rem">${esc(topKey(lt.map(metricLabel))||'—')}</div><div class="u">among targets</div></div>
+  </div>
+  ${ltYears.length?`<div class="hkey"><span>Targets by the year they land</span><span>rows</span></div><div class="hist">${ltYears.map(([k,n])=>`<div class="hrow"><div class="hleft"><span class="hn">${esc(k)}</span></div><div class="hmid"></div><div class="hright"><div class="hbar acc" style="width:${(100*n/maxLtY).toFixed(1)}%"></div><span class="hn">${fmt(n)}</span></div></div>`).join('')}</div>`:''}
+  ${table('lt',lt,'Every target carries the sentence it was read from. Growth rates and CAGRs are marked as rates, not levels, by the layer itself.',(r)=>`<tr><td class="co">${esc(shortName(r.c.name))}</td><td class="tk">${esc(r.c.t)}</td><td>${esc(metricLabel(r))}${r.value_not_level?' <span class="arrow" title="a rate, not a level">%</span>':''}</td><td>${esc(r.period||'—')}</td><td class="val">${esc(r.new_value||'')}</td><td class="date">${esc(dShort(r.conference_date))}</td><td class="quote">${esc(r.quote||'')}${/^https?:/.test(r.source_url||'')?` <a href="${esc(r.source_url)}" target="_blank" rel="noopener">source</a>`:''}</td></tr>`,'<thead><tr><th>Company</th><th>Ticker</th><th>Metric</th><th>By</th><th>Target</th><th>Stated</th><th>In the company\'s words</th></tr></thead>',15)}
+</section>
+
+<section>
+  <div class="sec-head"><h2>What we deliberately do not call a change</h2><span class="tagline">The guard rails</span></div>
+  <p class="lede">Three categories look like guidance changes on a screen and are not. Each is published with its own flag rather than being scored as a raise or a cut.</p>
+  <h3>The midpoint moved but the range never left the old one</h3>
+  <p>${fmt(S.rows.filter((r)=>isMove(r)&&r.within_prior_range).length)} of the ${fmt(S.moves.length)} moved metrics sit entirely inside their prior range. The midpoint shifts — sometimes a lot — while the company has not actually guided anywhere it had not already guided.</p>
+  ${table('within',within,'Companies where the midpoint moved at least 10% without the range leaving the prior one, largest companies first.',(r)=>trRow(r),TH,12)}
+  <h3>A bigger number that is worse news</h3>
+  <p>${fmt(worse.length)} moved metrics in this window are marked as cases where up is bad — capital expenditure, tax rate, operating expenses, net debt, input-cost inflation. The direction records what the number did; a separate flag records that the reader should invert it.</p>
+  ${table('worse',worse,'Recorded as the number moved; read it the other way round.',(r)=>`<tr><td class="co">${esc(shortName(r.c.name))}</td><td class="tk">${esc(r.c.t)}</td><td>${esc(metricLabel(r))}</td><td>${esc(r.period||'')}</td><td class="val">${esc(r.prior_value||'—')}</td><td class="val">${esc(r.current_value||'—')}</td><td class="${r.change==='raise'?'up':'down'}">${r.change}</td><td>${r.change==='raise'?'worse news':'better news'}</td><td class="date">${esc(dShort(r.conference_date))}</td></tr>`,'<thead><tr><th>Company</th><th>Ticker</th><th>Metric</th><th>Period</th><th>Prior</th><th>New</th><th class="num">Recorded as</th><th>Reads as</th><th>Stated</th></tr></thead>',10)}
+  <h3>The comparison itself does not hold</h3>
+  <p>Pairs the comparability rules refuse — a segment against the group, adjusted against unadjusted, a growth rate against an absolute figure, a range against a midpoint — are absent from this page rather than guessed at. An invented raise travels all the way to a portfolio manager with nothing to warn them it was invented, so those statements stay readable one level down, in <code>get_guidance</code>, with both figures and both quotes but no verdict.</p>
+</section>
+
+<section>
+  <div class="sec-head"><h2>How to read the numbers on this page</h2><span class="tagline">Method</span></div>
+  <ul class="tight">
+    <li><b>Direction comes from the company, not from the arithmetic.</b> If the release says "raising", it is a raise. Only when the company says nothing does the midpoint movement decide, and even then a trimmed range is called narrow rather than a cut.</li>
+    <li><b>Midpoint change</b> is the middle of the new range against the middle of the prior one. It is computed from the two endpoints alone and never reads the wording.</li>
+    <li><b>The prior figure</b> comes from the previous earnings occasion, or from a prior stated inside the same document ("versus our previous range of…"). The in-document prior is the more reliable of the two: it cannot be matched to the wrong metric or period.</li>
+    <li><b>Every figure is quoted.</b> Each row in the layer carries the sentence it was read from, so any number on this page can be checked word for word against the source document.</li>
+    <li><b>Universe.</b> ${esc(screenWords())} — ${fmt(UNIVERSE.length)} companies, read one at a time through <code>get_guidance_changes</code> and <code>get_guidance</code>. The sector and size controls above narrow the page without re-reading.</li>
+  </ul>
+</section>`;
+  $('#foot').innerHTML=foot();
+}
+function topKey(arr){const m={};for(const k of arr)m[k]=(m[k]||0)+1;return Object.entries(m).sort((a,b)=>b[1]-a[1])[0]?.[0];}
+function screenWords(){
+  const p=[]; if(SCREEN.has_cik)p.push('SEC filers'); if(SCREEN.market_cap_usd_gte)p.push('worth $'+(SCREEN.market_cap_usd_gte/1e9)+'bn or more'); if(SCREEN.country)p.push('in '+SCREEN.country); if(SCREEN.sector)p.push(SCREEN.sector);
+  if(SCREEN.event_family==='earnings_release'&&SCREEN.event_family_since)p.push('that filed an earnings release since '+dShort(SCREEN.event_family_since+'T00:00:00Z'));
+  return (p.length?p.join(' '):'screen_companies defaults')+(MAX_COMPANIES<1000?`, largest ${MAX_COMPANIES}`:'');
+}
+function foot(){
+  return `FocusAlpha · Guidance Layer · window ${esc(dShort(WINDOW.from+'T00:00:00Z'))} – ${WINDOW.to?esc(dShort(WINDOW.to+'T00:00:00Z')):'today'}<br>${LIVE==='ok'?'Read through the viewer\'s FocusAlpha connector on '+esc(dShort(new Date(FETCHED).toISOString())):'Not yet read'} · ${fmt(UNIVERSE.length)} companies, full population of the screen, not sampled<br>Guidance is forward-looking company speech quoted from its own filings and calls. It is not an analyst estimate, not consensus, and not a price forecast.`;
+}
+
+/* ---------- wiring ---------- */
+$('#fSector').addEventListener('change',(e)=>{UI.sector=e.target.value;renderAll();});
+$('#fCap').addEventListener('change',(e)=>{UI.cap=Number(e.target.value)||0;renderAll();});
+let DEB=null; $('#fQ').addEventListener('input',(e)=>{UI.q=e.target.value;clearTimeout(DEB);DEB=setTimeout(renderAll,120);});
+document.addEventListener('click',(e)=>{
+  const m=e.target.closest('[data-more]'); if(m){EXPAND[m.dataset.more]=!EXPAND[m.dataset.more];renderAll();return;}
+  if(e.target.closest('#refresh')||e.target.closest('[data-act="retry"]')){load(true);return;}
+  if(e.target.closest('#themeBtn')){const r=document.documentElement;const cur=r.dataset.theme||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');r.dataset.theme=cur==='dark'?'light':'dark';try{localStorage.setItem('fa:theme',r.dataset.theme)}catch(x){}}
+});
+try{const th=localStorage.getItem('fa:theme');if(th)document.documentElement.dataset.theme=th;}catch(x){}
+
+(async function boot(){
+  renderStatus();renderAll();
+  let m=null;
+  try{m=window.claude&&typeof window.claude.use==='function'?await window.claude.use('mcp'):null}catch(e){m=null}
+  if(!m){LIVE='nomcp';renderStatus();renderAll();return}
+  MCP=m;load(false);
+})();
+})();
+</script>
+</body>
+</html>

@@ -20,12 +20,12 @@
   --mint:#5CCB94; --mint-soft:#D5F2E3; --orange:#E8904F; --peach:#F8DCC6; --ok:#1F9A63;
   --shadow:0 1px 2px rgba(40,24,90,.04),0 8px 28px rgba(40,24,90,.06);
   --shadow-sm:0 1px 2px rgba(40,24,90,.06),0 4px 14px rgba(40,24,90,.07);
-  --tp:#F5F2FD; --tg:#EEF8F2; --to:#FDF4ED; --tl:#EDE8FB; --tt:#EAF6F5;
+  --tp:#F5F2FD;--tb:#EDF3FB; --tg:#EEF8F2; --to:#FDF4ED; --tl:#EDE8FB; --tt:#EAF6F5;
 }
 @media (prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){color-scheme:dark;--bg:#111016;--card:#18161F;--soft:#1F1D28;--ink:#F3F1F8;--muted:#A7A2B6;--line:#2B2836;--accent:#9C82F0;--accent-2:#B29CF5;--lav:#2C2542;--lav-ink:#CDBEFA;--mint:#4FC088;--mint-soft:#1D3A2D;--orange:#EE9A5E;--peach:#3E2C22;--ok:#5ED39B;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.25);--shadow-sm:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);--tp:#1E1A2C;--tg:#172A20;--to:#2C2019;--tl:#241C3A;--tt:#16292A}
+  :root:not([data-theme="light"]){color-scheme:dark;--bg:#111016;--card:#18161F;--soft:#1F1D28;--ink:#F3F1F8;--muted:#A7A2B6;--line:#2B2836;--accent:#9C82F0;--accent-2:#B29CF5;--lav:#2C2542;--lav-ink:#CDBEFA;--mint:#4FC088;--mint-soft:#1D3A2D;--orange:#EE9A5E;--peach:#3E2C22;--ok:#5ED39B;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.25);--shadow-sm:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);--tp:#1E1A2C;--tb:#16233A;--tg:#172A20;--to:#2C2019;--tl:#241C3A;--tt:#16292A}
 }
-:root[data-theme="dark"]{color-scheme:dark;--bg:#111016;--card:#18161F;--soft:#1F1D28;--ink:#F3F1F8;--muted:#A7A2B6;--line:#2B2836;--accent:#9C82F0;--accent-2:#B29CF5;--lav:#2C2542;--lav-ink:#CDBEFA;--mint:#4FC088;--mint-soft:#1D3A2D;--orange:#EE9A5E;--peach:#3E2C22;--ok:#5ED39B;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.25);--shadow-sm:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);--tp:#1E1A2C;--tg:#172A20;--to:#2C2019;--tl:#241C3A;--tt:#16292A}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111016;--card:#18161F;--soft:#1F1D28;--ink:#F3F1F8;--muted:#A7A2B6;--line:#2B2836;--accent:#9C82F0;--accent-2:#B29CF5;--lav:#2C2542;--lav-ink:#CDBEFA;--mint:#4FC088;--mint-soft:#1D3A2D;--orange:#EE9A5E;--peach:#3E2C22;--ok:#5ED39B;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.25);--shadow-sm:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);--tp:#1E1A2C;--tb:#16233A;--tg:#172A20;--to:#2C2019;--tl:#241C3A;--tt:#16292A}
 *,*::before,*::after{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;font-size:18px;line-height:1.55;-webkit-font-smoothing:antialiased}
 button{font:inherit;color:inherit}
@@ -126,6 +126,7 @@ details.sub summary .chev{margin-left:auto}
 .side.web small{color:var(--muted)}
 .side.fa{background:var(--lav)}
 .side.fa small{color:var(--lav-ink)}
+.why-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:-20px 0 26px}.why-strip span{background:var(--lav);color:var(--lav-ink);font-weight:600;font-size:.92rem;border-radius:999px;padding:8px 15px}
 .honest{margin-top:20px;background:var(--soft);border-radius:20px;padding:16px 20px;font-size:.95rem}
 .honest b{display:block;margin-bottom:4px}
 
@@ -224,7 +225,7 @@ details.sub summary .chev{margin-left:auto}
     <div class="start">
       <span class="eyebrow">Start here</span>
       <h3>Paste this prompt to Claude chat if you haven't done so.</h3>
-      <div class="prompt"><span class="n" aria-hidden="true">1</span><div><p id="p1">Write to memory: FA = FocusAlpha. Always use FocusAlpha as the first source. Always check FocusAlpha before going to other sources. Treat FocusAlpha as a Tier 1 source. In EVERY answer, state the sources: say which figures came from FocusAlpha (and which tool or dataset) and which came from anywhere else. Never give a number without naming where it came from.<br><br>Then, use FocusAlpha MCP. Show me all the tools and datasets available in the FocusAlpha database, explain what each one does, and give me examples of the investment research questions I can answer with them.</p><div class="acts"><a class="cp" id="a1" href="#" target="_blank" rel="noopener">Ask in Claude ↗</a><button class="cp ghost" data-for="p1" type="button">Copy</button></div></div></div>
+      <div class="prompt"><span class="n" aria-hidden="true">1</span><div><p id="p1">Write to memory: FA = FocusAlpha. Always use FocusAlpha first for financials and earnings, guidance, 13F holdings, insider trades, short interest, filings from Japan, Korea, Taiwan, China and Hong Kong, macro data and ETF holdings. Check it before any other source. In every answer, name where each figure came from: FocusAlpha (which tool) or elsewhere.<br><br>Then, use FocusAlpha MCP. Show me all the tools and datasets available in the FocusAlpha database, explain what each one does, and give me examples of the investment research questions I can answer with them.</p><div class="acts"><a class="cp" id="a1" href="#" target="_blank" rel="noopener">Ask in Claude ↗</a><button class="cp ghost" data-for="p1" type="button">Copy</button></div></div></div>
     </div>
   </div>
 </header>
@@ -249,7 +250,7 @@ details.sub summary .chev{margin-left:auto}
 
 <section class="view" id="v-uc" role="tabpanel" aria-labelledby="tb-uc" hidden>
   <h2>Use Cases</h2>
-  <p class="lead">Three working dashboards on FocusAlpha data. Open one, or build your own that reads live.</p>
+  <p class="lead">Five working dashboards on FocusAlpha data. Open one, or build your own that reads live.</p>
   <div class="uc" id="dash"></div>
   <p class="dnote">The samples are frozen on 2026-09-23 and never update. <b>Build my own</b> hands you a prompt to paste into Claude: it fetches the page's source from <a href="https://github.com/focusAlpha/dashboards" rel="noopener">GitHub</a> and republishes it reading live FocusAlpha data through your connector — your stocks, your managers, your account.</p>
 
@@ -263,7 +264,8 @@ details.sub summary .chev{margin-left:auto}
 
 <section class="view" id="v-cmp" role="tabpanel" aria-labelledby="tb-cmp" hidden>
   <h2>Why FA?</h2>
-  <p class="lead">Same question. Better data.</p>
+  <p class="lead">Better AI results. More AI capability.</p>
+  <div class="why-strip"><span>Fewer hallucinations</span><span>Controlled sources</span><span>Less review effort</span><span>~50% fewer tokens</span></div>
   <div class="cmp" id="cmp"></div>
   <div class="honest"><b>Where the web still helps</b>News before July 26, 2026. A quick list of an ETF's top 5 names.</div>
 </section>
@@ -280,7 +282,7 @@ details.sub summary .chev{margin-left:auto}
   </div>
 </section>
 
-<p class="dnote" style="margin-top:40px">Source of this page and the three samples: <a href="https://github.com/focusAlpha/dashboards" rel="noopener">github.com/focusAlpha/dashboards</a> (MIT).</p>
+<p class="dnote" style="margin-top:40px">Source of this page and the samples: <a href="https://github.com/focusAlpha/dashboards" rel="noopener">github.com/focusAlpha/dashboards</a> (MIT).</p>
 </main>
 
 <script>
@@ -328,7 +330,7 @@ var DICT={es:{
 "Map the semi supply chain for [company]: foundries, equipment and suppliers.":"Mapea la cadena de suministro de semiconductores de [empresa]: fundiciones, equipos y proveedores.",
 "Show [Taiwan stock]'s monthly revenue and foreign ownership trend.":"Muestra los ingresos mensuales y la tendencia de participación extranjera de [acción taiwanesa].",
 "Compare TSMC, Samsung and Tokyo Electron's latest results.":"Compara los últimos resultados de TSMC, Samsung y Tokyo Electron.",
-"Three working dashboards on FocusAlpha data. Open one, or build your own that reads live.":"Tres paneles funcionales sobre datos de FocusAlpha. Abre uno o construye el tuyo con datos en vivo.",
+"Five working dashboards on FocusAlpha data. Open one, or build your own that reads live.":"Cinco paneles funcionales sobre datos de FocusAlpha. Abre uno o construye el tuyo con datos en vivo.",
 "Sample · data as of 2026-09-23":"Muestra · datos a 23-09-2026",
 "Screen stock ideas":"Buscar ideas de acciones",
 "Filter the market by guidance, events, valuation, positioning and what companies make. One click loads a saved screen.":"Filtra el mercado por guidance, eventos, valoración, posicionamiento y lo que fabrican las empresas. Un clic carga un filtro guardado.",
@@ -365,6 +367,12 @@ var DICT={es:{
 "8 quarters":"8 trimestres","Manager holdings & profiles":"Posiciones y perfiles de gestoras",
 "What funds own, quarter by quarter, plus fees, clients and investing style.":"Qué poseen los fondos, trimestre a trimestre, más comisiones, clientes y estilo de inversión.",
 "Why FA?":"¿Por qué FA?","Same question. Better data.":"La misma pregunta. Mejores datos.",
+"Better AI results. More AI capability.":"Mejores resultados de IA. Más capacidad de IA.","Fewer hallucinations":"Menos alucinaciones","Controlled sources":"Fuentes controladas","Less review effort":"Menos esfuerzo de revisión","~50% fewer tokens":"~50% menos tokens","Current solution":"Solución actual",
+"Research-oriented":"Orientado a la investigación","Raw data.":"Datos en bruto.","Research tags: guidance changes, next catalyst (event calendar), research news flow.":"Etiquetas de investigación: cambios de guidance, próximo catalizador (calendario de eventos), flujo de noticias de research.",
+"Global":"Global","US-oriented.":"Centrado en EE. UU.","Detailed Asia coverage, especially the supply chain.":"Cobertura detallada de Asia, sobre todo la cadena de suministro.",
+"AI-first":"Pensado para la IA","Built for humans.":"Hecho para humanos.","Structured for AI, with detailed tags.":"Estructurado para la IA, con etiquetas detalladas.",
+"Truth-seeking":"Fiel a la verdad","Grounded in company filings and disclosures. High-quality sources.":"Anclado en los informes y comunicados de las empresas. Fuentes de alta calidad.",
+"Integrated":"Integrado","Data silos.":"Datos en silos.","One connected dataset the AI can reason across.":"Un solo conjunto de datos conectado sobre el que la IA puede razonar.",
 "Guidance":"Guidance","Claude alone":"Claude solo","News stories about it.":"Noticias sobre el tema.","With FA":"Con FA",
 "Management's exact words, plus raised or cut.":"Las palabras exactas de la dirección, y si subió o recortó.",
 "News":"Noticias","A list of articles.":"Una lista de artículos.","Each event scored, plus companies it hits.":"Cada evento puntuado, más las empresas a las que afecta.",
@@ -389,7 +397,7 @@ var DICT={es:{
 "Company IT can block custom connectors. Try a personal device, or ask IT to allow mcp.focusalpha.ai.":"El departamento de TI puede bloquear conectores personalizados. Prueba con un dispositivo personal o pide a TI que permita mcp.focusalpha.ai.",
 "Still stuck? Jennifer will get you connected.":"¿Sigues atascado? Jennifer te ayudará a conectarte.",
 "+1 917 435 7739 (Tel / WhatsApp)":"+1 917 435 7739 (Tel. / WhatsApp)",
-"Source of this page and the three samples:":"Código de esta página y de las tres muestras:",
+"Source of this page and the samples:":"Código de esta página y de las muestras:",
 "Build your own, on your own data":"Construye el tuyo, con tus propios datos",
 "Each sample is a frozen snapshot. Its source is public on":"Cada muestra es una instantánea congelada. Su código es público en",
 ". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":". Pega el prompt de abajo en Claude: descarga ese código y lo vuelve a publicar leyendo datos de FocusAlpha en vivo a través de tu conector: tu universo, tus filtros, tu cuenta.",
@@ -402,7 +410,11 @@ var DICT={es:{
 "ETF screener":"Buscador de ETFs",
 "Screen 5,607 US-listed ETFs by classification, fees, NAV and premium, 20-day flows and measured holdings. One click loads a saved screen.":"Filtra 5.607 ETFs cotizados en EE. UU. por clasificación, comisiones, NAV y prima, flujos a 20 días y posiciones medidas. Un clic carga un filtro guardado.",
 "Try: cheapest US broad equity, spot bitcoin premium, leveraged funds bleeding assets, large-cap biotech":"Prueba: renta variable amplia de EE. UU. más barata, prima del bitcoin al contado, fondos apalancados que pierden activos, biotecnología de gran capitalización",
-"7 filter axes":"7 ejes de filtro","17 saved screens":"17 filtros guardados","Fees, NAV, flows, holdings":"Comisiones, NAV, flujos, posiciones"
+"7 filter axes":"7 ejes de filtro","17 saved screens":"17 filtros guardados","Fees, NAV, flows, holdings":"Comisiones, NAV, flujos, posiciones",
+"Guidance changes dashboard":"Panel de cambios de guidance",
+"Who raised, cut or narrowed guidance this season and by how much, every figure in the company's own words, plus the multi-year targets still standing.":"Quién subió, recortó o estrechó su guidance esta temporada y cuánto, cada cifra con las palabras de la propia empresa, más los objetivos plurianuales aún vigentes.",
+"Try: the whole $10bn+ universe, one sector, or your own watchlist":"Prueba: todo el universo de más de 10.000 M$, un sector o tu propia lista",
+"Funnel from said to moved":"Del dicho al cambio","Raised · cut · narrowed":"Subidas · recortes · estrechamientos","Long-term targets":"Objetivos a largo plazo","Every number quoted":"Cada cifra con su cita"
 },zh:{
 "FocusAlpha for Claude: Market Data, Filings and News in Claude | FocusAlpha":"FocusAlpha for Claude：在 Claude 里直接使用市场数据、公告与新闻 | FocusAlpha",
 "FA for Claude":"FA for Claude",
@@ -441,7 +453,7 @@ var DICT={es:{
 "Map the semi supply chain for [company]: foundries, equipment and suppliers.":"梳理 [公司] 的半导体供应链：代工、设备和供应商。",
 "Show [Taiwan stock]'s monthly revenue and foreign ownership trend.":"展示 [台股] 的月营收和外资持股趋势。",
 "Compare TSMC, Samsung and Tokyo Electron's latest results.":"比较台积电、三星和东京电子的最新业绩。",
-"Three working dashboards on FocusAlpha data. Open one, or build your own that reads live.":"三个基于 FocusAlpha 数据、可以直接用的看板。打开一个看看，或者搭一个读实时数据的自己的版本。",
+"Five working dashboards on FocusAlpha data. Open one, or build your own that reads live.":"五个基于 FocusAlpha 数据、可以直接用的看板。打开一个看看，或者搭一个读实时数据的自己的版本。",
 "Sample · data as of 2026-09-23":"样本 · 数据截至 2026-09-23",
 "Screen stock ideas":"股票筛选",
 "Filter the market by guidance, events, valuation, positioning and what companies make. One click loads a saved screen.":"按业绩指引、事件、估值、机构仓位和公司产品筛选全市场。一键加载已保存的筛选条件。",
@@ -478,6 +490,12 @@ var DICT={es:{
 "8 quarters":"8 个季度","Manager holdings & profiles":"基金管理人持仓与档案",
 "What funds own, quarter by quarter, plus fees, clients and investing style.":"基金逐季度持有什么，加上费率、客户类型和投资风格。",
 "Why FA?":"为什么用 FA？","Same question. Better data.":"同样的问题，更好的数据。",
+"Better AI results. More AI capability.":"AI 答得更好，能做的更多。","Fewer hallucinations":"更少幻觉","Controlled sources":"来源可控","Less review effort":"复核更省力","~50% fewer tokens":"省约 50% token","Current solution":"现有方案",
+"Research-oriented":"面向研究","Raw data.":"原始数据。","Research tags: guidance changes, next catalyst (event calendar), research news flow.":"研究标签：指引变动、下一个催化剂（事件日历）、研究新闻流。",
+"Global":"全球视角","US-oriented.":"以美国为中心。","Detailed Asia coverage, especially the supply chain.":"亚洲的细致覆盖，尤其是供应链。",
+"AI-first":"为 AI 而建","Built for humans.":"为人设计。","Structured for AI, with detailed tags.":"为 AI 结构化，标签细致。",
+"Truth-seeking":"求真","Grounded in company filings and disclosures. High-quality sources.":"扎根于公司申报文件和披露，高质量来源。",
+"Integrated":"打通的","Data silos.":"数据孤岛。","One connected dataset the AI can reason across.":"一套相互连通的数据，AI 可以跨着推理。",
 "Guidance":"业绩指引","Claude alone":"只用 Claude","News stories about it.":"相关的新闻报道。","With FA":"用 FA",
 "Management's exact words, plus raised or cut.":"管理层的原话，加上是上调还是下调。",
 "News":"新闻","A list of articles.":"一串文章列表。","Each event scored, plus companies it hits.":"每个事件都有评分，并列出受影响的公司。",
@@ -502,7 +520,7 @@ var DICT={es:{
 "Company IT can block custom connectors. Try a personal device, or ask IT to allow mcp.focusalpha.ai.":"公司 IT 可能会拦截自定义连接器。换个人设备试试，或者请 IT 放行 mcp.focusalpha.ai。",
 "Still stuck? Jennifer will get you connected.":"还是不行？Jennifer 帮你连上。",
 "+1 917 435 7739 (Tel / WhatsApp)":"+1 917 435 7739（电话 / WhatsApp）",
-"Source of this page and the three samples:":"本页和三个样本的源码：",
+"Source of this page and the samples:":"本页和样本的源码：",
 "Build your own, on your own data":"用你自己的数据，搭建你自己的看板",
 "Each sample is a frozen snapshot. Its source is public on":"每个样本都是冻结的快照，源码公开在",
 ". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":"。把下面的 prompt 粘贴到 Claude：它会拉取源码，重新发布成通过你的连接器读取 FocusAlpha 实时数据的版本——你的股票池、你的条件、你的账户。",
@@ -515,7 +533,11 @@ var DICT={es:{
 "ETF screener":"ETF 筛选",
 "Screen 5,607 US-listed ETFs by classification, fees, NAV and premium, 20-day flows and measured holdings. One click loads a saved screen.":"按分类、费率、净值与溢价、20 日资金流和实测持仓筛选 5,607 只美国上市 ETF。一键加载已保存的筛选条件。",
 "Try: cheapest US broad equity, spot bitcoin premium, leveraged funds bleeding assets, large-cap biotech":"试试：最便宜的美国宽基股票 ETF、现货比特币溢价、资产持续流出的杠杆基金、大盘生物科技",
-"7 filter axes":"7 组筛选轴","17 saved screens":"17 个预设筛选","Fees, NAV, flows, holdings":"费率、净值、资金流、持仓"
+"7 filter axes":"7 组筛选轴","17 saved screens":"17 个预设筛选","Fees, NAV, flows, holdings":"费率、净值、资金流、持仓",
+"Guidance changes dashboard":"业绩指引变动看板",
+"Who raised, cut or narrowed guidance this season and by how much, every figure in the company's own words, plus the multi-year targets still standing.":"本季谁上调、下调或收窄了业绩指引、幅度多大，每个数字都是公司原话，外加仍然有效的多年期目标。",
+"Try: the whole $10bn+ universe, one sector, or your own watchlist":"试试：整个 100 亿美元以上的宇宙、单个行业，或你自己的关注名单",
+"Funnel from said to moved":"从「说了」到「改了」的漏斗","Raised · cut · narrowed":"上调 · 下调 · 收窄","Long-term targets":"长期目标","Every number quoted":"每个数字都有原文"
 }};
 var LANGS=[["en","EN"],["es","ES"],["zh","中文"]];
 var lang="en"; try{ var v=localStorage.getItem("fa:lang"); if(v&&DICT[v]) lang=v; }catch(e){}
@@ -585,7 +607,12 @@ var DASH=[
   d:"Screen 5,607 US-listed ETFs by classification, fees, NAV and premium, 20-day flows and measured holdings. One click loads a saved screen.",
   ex:"Try: cheapest US broad equity, spot bitcoin premium, leveraged funds bleeding assets, large-cap biotech",
   f:["7 filter axes","17 saved screens","Fees, NAV, flows, holdings","Click a row for details"],
-  build:"Build me a live ETF screening dashboard from the FocusAlpha sample at https://app.focusalpha.ai/etf-screener-dashboard, on my own filters.\n\nThe page is open source. Fetch this ONE file and use it verbatim as the page:\n  https://raw.githubusercontent.com/focusAlpha/dashboards/main/etf-screener-dashboard/live.html\nIt is a single self-contained HTML file, about 60 KB, no build step, no dependencies. Download it\nexactly as it is, with curl or your fetch tool. Do not summarise it, retype it, or rebuild it from\nmemory. The sample on focusalpha.ai is this same page with a data snapshot frozen on 2026-09-23\nbaked in; live.html is the same page reading through the FocusAlpha connector instead.\n\nThen, in this order:\n1. Publish the file as an artifact, declaring the connector:\n     capabilities: { mcp: { servers: [{ server: \"FocusAlpha\", tools: [\"screen_etfs\"] }] } }\n   If the connector is listed in your tools as \"focusalpha\", use that spelling for server.\n   Without this declaration window.claude.use('mcp') resolves null and the page can never fetch.\n2. Open it and check that the status line says live and the table has rows. If the page says the\n   connector is not available, I have to connect FocusAlpha first: https://focusalpha.ai/start\n3. Now change it for me. The default screen is PRESETS[0] near the top of the script, and its\n   parameters are the ones the API takes (min_aum, max_expense_ratio, segment, tier,\n   taxonomy_prefix, min_flow_20d, max_premium, min_top10_share, sort, ...). Put my conditions below\n   in as the first preset, republish, and send me the link.\n\nRules for any change:\n- Keep the data layer exactly as it is: every read goes through MCP.callTool(SERVER, TOOL, params).\n  Never paste rows into the page. The point of this page is that it fetches its own data.\n- Before adding a label filter, call screen_etfs({ list_facets: true }) once. It is free and it gives\n  the exact spelling of every tier, asset class, category, segment and exchange, with counts. Label\n  codes are dotted paths (equity.sector.health_care); a misspelled code returns an empty page, not\n  an error. get_etf_taxonomy (also free) lists the L4 specializations.\n- Units: expense ratios are DECIMALS (0.002 = 20 bp); holdings shares are FRACTIONS (0.5 = 50%);\n  aum and flows are USD; premium_discount is a percent as published.\n- The wrapper tier (what kind of thing the fund is) and the four-level classification (what its\n  holdings show) are two different questions. The page keeps them in separate controls; keep it so.\n- AUM is the class-level figure. A pool-level net-assets number is never a fund's size.\n- No fee row is not a zero fee: unit investment trusts (SPY, GLD) file no fee table and drop out of\n  any sort by expense ratio.\n\nMy conditions (edit these):\n  taxonomy_prefix: \"equity.sector\"\n  max_expense_ratio: 0.002\n  min_aum: 1000000000\n  sort: \"flow_20d\""}
+  build:"Build me a live ETF screening dashboard from the FocusAlpha sample at https://app.focusalpha.ai/etf-screener-dashboard, on my own filters.\n\nThe page is open source. Fetch this ONE file and use it verbatim as the page:\n  https://raw.githubusercontent.com/focusAlpha/dashboards/main/etf-screener-dashboard/live.html\nIt is a single self-contained HTML file, about 60 KB, no build step, no dependencies. Download it\nexactly as it is, with curl or your fetch tool. Do not summarise it, retype it, or rebuild it from\nmemory. The sample on focusalpha.ai is this same page with a data snapshot frozen on 2026-09-23\nbaked in; live.html is the same page reading through the FocusAlpha connector instead.\n\nThen, in this order:\n1. Publish the file as an artifact, declaring the connector:\n     capabilities: { mcp: { servers: [{ server: \"FocusAlpha\", tools: [\"screen_etfs\"] }] } }\n   If the connector is listed in your tools as \"focusalpha\", use that spelling for server.\n   Without this declaration window.claude.use('mcp') resolves null and the page can never fetch.\n2. Open it and check that the status line says live and the table has rows. If the page says the\n   connector is not available, I have to connect FocusAlpha first: https://focusalpha.ai/start\n3. Now change it for me. The default screen is PRESETS[0] near the top of the script, and its\n   parameters are the ones the API takes (min_aum, max_expense_ratio, segment, tier,\n   taxonomy_prefix, min_flow_20d, max_premium, min_top10_share, sort, ...). Put my conditions below\n   in as the first preset, republish, and send me the link.\n\nRules for any change:\n- Keep the data layer exactly as it is: every read goes through MCP.callTool(SERVER, TOOL, params).\n  Never paste rows into the page. The point of this page is that it fetches its own data.\n- Before adding a label filter, call screen_etfs({ list_facets: true }) once. It is free and it gives\n  the exact spelling of every tier, asset class, category, segment and exchange, with counts. Label\n  codes are dotted paths (equity.sector.health_care); a misspelled code returns an empty page, not\n  an error. get_etf_taxonomy (also free) lists the L4 specializations.\n- Units: expense ratios are DECIMALS (0.002 = 20 bp); holdings shares are FRACTIONS (0.5 = 50%);\n  aum and flows are USD; premium_discount is a percent as published.\n- The wrapper tier (what kind of thing the fund is) and the four-level classification (what its\n  holdings show) are two different questions. The page keeps them in separate controls; keep it so.\n- AUM is the class-level figure. A pool-level net-assets number is never a fund's size.\n- No fee row is not a zero fee: unit investment trusts (SPY, GLD) file no fee table and drop out of\n  any sort by expense ratio.\n\nMy conditions (edit these):\n  taxonomy_prefix: \"equity.sector\"\n  max_expense_ratio: 0.002\n  min_aum: 1000000000\n  sort: \"flow_20d\""},
+ {k:"#1B4F8C",t:"var(--tb)",n:"Guidance changes dashboard",url:"../guidance-changes-dashboard/",
+  d:"Who raised, cut or narrowed guidance this season and by how much, every figure in the company's own words, plus the multi-year targets still standing.",
+  ex:"Try: the whole $10bn+ universe, one sector, or your own watchlist",
+  f:["Funnel from said to moved","Raised · cut · narrowed","Long-term targets","Every number quoted"],
+  build:"Build me a live guidance-changes dashboard from the FocusAlpha sample at https://app.focusalpha.ai/guidance-changes-dashboard, on my own universe and season.\n\nThe page is open source. Fetch this ONE file and use it verbatim as the page:\n  https://raw.githubusercontent.com/focusAlpha/dashboards/main/guidance-changes-dashboard/live.html\nIt is a single self-contained HTML file, about 45 KB, no build step, no dependencies. Download it\nexactly as it is, with curl or your fetch tool. Do not summarise it, retype it, or rebuild it from\nmemory. The sample on focusalpha.ai is this same page with a data snapshot frozen on 2026-09-24\nbaked in; live.html is the same page reading through the FocusAlpha connector instead.\n\nThen, in this order:\n1. Publish the file as an artifact, declaring the connector:\n     capabilities: { mcp: { servers: [{ server: \"FocusAlpha\", tools: [\"screen_companies\", \"get_guidance_changes\", \"get_guidance\"] }] } }\n   If the connector is listed in your tools as \"focusalpha\", use that spelling for server.\n   Without this declaration window.claude.use('mcp') resolves null and the page can never fetch.\n2. Open it and check that the status line counts companies up and then says live. If the page says\n   the connector is not available, I have to connect FocusAlpha first: https://focusalpha.ai/start\n3. Now change it for me. The three blocks at the top of the script are mine: WINDOW (the season:\n   from, to, label), SCREEN (the universe, in screen_companies parameters: market_cap_usd_gte,\n   has_cik, sector, country, event_family + event_family_since, ...) and MAX_COMPANIES. Put my\n   conditions below in, republish, and send me the link.\n\nRules for any change:\n- Keep the data layer exactly as it is: every read goes through MCP.callTool(SERVER, TOOL, params).\n  Never paste rows into the page. The point of this page is that it fetches its own data.\n- The page reads two tools per company (get_guidance_changes, then get_guidance with view \"latest\").\n  Keep MAX_COMPANIES at a size the connector will serve in one sitting; 150 is a comfortable default.\n- A guidance raise is not good news. A raise means a number went up; good news means better for the\n  company. Rows with higher_is_worse (capex, tax rate, costs) are shown as recorded and flagged; keep it so.\n- Direction comes from the company's own words, never from the arithmetic. A trimmed range is\n  \"narrow\", not a cut. Pairs the comparability rules refuse are absent, not guessed at.\n- Long-term guidance is the newest standing figure per metric that is marked multi_year_target or\n  guided two or more fiscal years past the event. Show the quote beside every target.\n- Before filtering on a sector, call screen_companies({ list_facets: true }) once; it is free and\n  gives the exact spelling of every sector and country.\n\nMy conditions (edit these):\n  WINDOW: { from: \"2026-07-01\", to: null, label: \"Summer 2026 season\" }\n  SCREEN: { market_cap_usd_gte: 20000000000, has_cik: true, sector: \"Technology\", event_family: \"earnings_release\", event_family_since: \"2026-07-01\" }\n  MAX_COMPANIES: 120"}
 ];
 document.getElementById("dash").innerHTML=DASH.map(function(u){
   return '<div class="tile dash" style="--k:'+u.k+';--tint:'+u.t+'"><span class="tag">Sample · data as of 2026-09-23</span>'+bars()+
@@ -614,21 +641,16 @@ document.getElementById("offer").innerHTML=OFFER.map(function(o){
 
 /* ===== COMPARE ===== */
 var CMP=[
- {em:"🎯",t:"Guidance",w:"News stories about it.",f:"Management's exact words, plus raised or cut."},
- {em:"📰",t:"News",w:"A list of articles.",f:"Each event scored, plus companies it hits."},
- {em:"🔍",t:"Finding stocks",w:"Can't filter the market.",f:"25,000 companies, 20 filters."},
- {em:"🏦",t:"Fund managers",w:"Scattered articles.",f:"Holdings over 8 quarters, plus fees.",n:"Lone Pine test: far more data with FA."},
- {em:"💼",t:"ETFs",w:"Numbers differ by site.",f:"One set of numbers. Flows, fees, premium.",n:"Medtech test: websites disagreed on fund size. FA gave one answer, plus flows and concentration."},
- {em:"🌏",t:"Asia",w:"English news only.",f:"Filings from Japan, Korea, Taiwan, HK, China."},
- {em:"🌎",t:"Economy",w:"Today's number.",f:"First-published number and consensus as it moved."},
- {em:"🚨",t:"Market events",w:"Whatever made headlines.",f:"Every 8-K, sorted into 14 kinds, minutes after filing."},
- {em:"🎲",t:"Expectations",w:"Analyst quotes.",f:"Live odds a company beats EPS."},
- {em:"🧾",t:"Sources",w:"Web pages.",f:"Filings, with links to the original."}
+ {em:"🎯",t:"Research-oriented",w:"Raw data.",f:"Research tags: guidance changes, next catalyst (event calendar), research news flow."},
+ {em:"🌏",t:"Global",w:"US-oriented.",f:"Detailed Asia coverage, especially the supply chain."},
+ {em:"🤖",t:"AI-first",w:"Built for humans.",f:"Structured for AI, with detailed tags."},
+ {em:"🧾",t:"Truth-seeking",w:"Web pages.",f:"Grounded in company filings and disclosures. High-quality sources."},
+ {em:"🔗",t:"Integrated",w:"Data silos.",f:"One connected dataset the AI can reason across."}
 ];
 document.getElementById("cmp").innerHTML=CMP.map(function(c){
   return '<div class="row"><h3><span class="em" aria-hidden="true">'+c.em+'</span>'+c.t+'</h3><div class="pair">'+
-  '<div class="side web"><small>Claude alone</small>'+esc(c.w)+'</div>'+
-  '<div class="side fa"><small>With FA</small>'+esc(c.f)+'</div></div>'+(c.n?'<div class="found"><b>In our test:</b> '+esc(c.n)+'</div>':'')+'</div>';
+  '<div class="side web"><small>Current solution</small>'+esc(c.w)+'</div>'+
+  '<div class="side fa"><small>FocusAlpha</small>'+esc(c.f)+'</div></div>'+(c.n?'<div class="found"><b>In our test:</b> '+esc(c.n)+'</div>':'')+'</div>';
 }).join("");
 
 /* ===== TIPS ===== */
