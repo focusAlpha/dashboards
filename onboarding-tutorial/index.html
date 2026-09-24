@@ -224,7 +224,7 @@ details.sub summary .chev{margin-left:auto}
     <div class="start">
       <span class="eyebrow">Start here</span>
       <h3>Paste this prompt to Claude chat if you haven't done so.</h3>
-      <div class="prompt"><span class="n" aria-hidden="true">1</span><div><p id="p1">Write to memory: FA = FocusAlpha. Always use FocusAlpha as the first source. Always check FocusAlpha before going to other sources. Treat FocusAlpha as a Tier 1 source, and explicitly state in the final answer when FocusAlpha was used.<br><br>Then, use FocusAlpha MCP. Show me all the tools and datasets available in the FocusAlpha database, explain what each one does, and give me examples of the investment research questions I can answer with them.</p><div class="acts"><a class="cp" id="a1" href="#" target="_blank" rel="noopener">Ask in Claude ↗</a><button class="cp ghost" data-for="p1" type="button">Copy</button></div></div></div>
+      <div class="prompt"><span class="n" aria-hidden="true">1</span><div><p id="p1">Write to memory: FA = FocusAlpha. Always use FocusAlpha as the first source. Always check FocusAlpha before going to other sources. Treat FocusAlpha as a Tier 1 source. In EVERY answer, state the sources: say which figures came from FocusAlpha (and which tool or dataset) and which came from anywhere else. Never give a number without naming where it came from.<br><br>Then, use FocusAlpha MCP. Show me all the tools and datasets available in the FocusAlpha database, explain what each one does, and give me examples of the investment research questions I can answer with them.</p><div class="acts"><a class="cp" id="a1" href="#" target="_blank" rel="noopener">Ask in Claude ↗</a><button class="cp ghost" data-for="p1" type="button">Copy</button></div></div></div>
     </div>
   </div>
 </header>
@@ -284,9 +284,257 @@ details.sub summary .chev{margin-left:auto}
 </main>
 
 <script>
-var PRE="Use FA: ";
-function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
-function link(q,raw){var t=raw?q:PRE+q;return 'https://claude.ai/new?q='+encodeURIComponent(t)}
+/* Language layer for the FA-for-Claude page. English is the page; es and zh are
+   looked up by the exact English fragment (a text node, a data string, a
+   placeholder). Anything not in the table stays English: the memory prompt and
+   the three Build-my-own prompts are instructions to Claude and are kept in
+   English on purpose. Choice persists in localStorage "fa:lang". */
+(function(){
+var DICT={es:{
+"FocusAlpha for Claude: Market Data, Filings and News in Claude | FocusAlpha":"FocusAlpha para Claude: datos de mercado, informes y noticias en Claude | FocusAlpha",
+"FA for Claude":"FA para Claude",
+"Real market data. Plain questions. Filings, financials, prices and news, straight into Claude.":"Datos de mercado reales. Preguntas sencillas. Informes regulatorios, estados financieros, precios y noticias, directamente en Claude.",
+"Real-time · global":"Tiempo real · global",
+"Start here":"Empieza aquí",
+"Paste this prompt to Claude chat if you haven't done so.":"Pega este prompt en el chat de Claude si aún no lo has hecho.",
+"Ask in Claude ↗":"Preguntar en Claude ↗",
+"Copy":"Copiar","Copied":"Copiado","Press ⌘C":"Pulsa ⌘C",
+"Quick Ask":"Preguntas rápidas","What we offer":"Qué ofrecemos","Use Cases":"Casos de uso","Why FA":"Por qué FA","Tips":"Consejos",
+"Sample questions. Tap one, it opens in Claude. Swap in any company.":"Preguntas de ejemplo. Toca una y se abre en Claude. Cambia la empresa por la que quieras.",
+"Use FA: ":"Usa FA: ",
+"Research a stock":"Investigar una acción",
+"Fundamentals, guidance, filings and ownership in one sourced answer.":"Fundamentales, guidance, informes regulatorios y accionariado en una sola respuesta con fuentes.",
+"What's the story on [stock]?":"¿Cuál es la historia de [acción]?",
+"Ask":"Preguntar",
+"Did [stock] raise or cut guidance? Show the quote.":"¿[acción] subió o recortó su guidance? Muestra la cita.",
+"What has [stock] said about [topic] on recent calls?":"¿Qué ha dicho [acción] sobre [tema] en sus últimas conferencias de resultados?",
+"Screen for ideas":"Buscar ideas",
+"Filter 23,000+ companies, ETFs and managers by what matters.":"Filtra más de 23.000 empresas, ETFs y gestoras por lo que importa.",
+"Mid-cap US stocks with a PE under 15 and a dividend over 3%.":"Acciones estadounidenses de mediana capitalización con PER inferior a 15 y dividendo superior al 3%.",
+"Companies where insiders are net buyers this quarter.":"Empresas donde los directivos son compradores netos este trimestre.",
+"[theme] ETFs with low fees and rising inflows.":"ETFs de [tema] con comisiones bajas y entradas crecientes.",
+"Monitor a stock":"Seguir una acción",
+"Every event scored, with the companies it hits.":"Cada evento puntuado, con las empresas a las que afecta.",
+"What moved [stock] in the last two weeks?":"¿Qué movió a [acción] en las últimas dos semanas?",
+"Show only negative [stock] news from this month.":"Muestra solo las noticias negativas de [acción] de este mes.",
+"Which other companies does [stock]'s latest news hit?":"¿A qué otras empresas afecta la última noticia de [acción]?",
+"Research a fund or ETF":"Investigar un fondo o ETF",
+"Holdings, flows, fees and overlap, from the filings.":"Posiciones, flujos, comisiones y solapamiento, a partir de los informes regulatorios.",
+"Top holdings of [ETF], and how concentrated is it?":"Principales posiciones de [ETF], ¿y qué tan concentrado está?",
+"Do [ETF A] and [ETF B] overlap?":"¿Se solapan [ETF A] y [ETF B]?",
+"What did [manager] buy and sell last quarter?":"¿Qué compró y vendió [gestora] el trimestre pasado?",
+"Global semi supply chain":"Cadena de suministro global de semiconductores",
+"Japan, Korea, Taiwan and the chain between them, researched as one.":"Japón, Corea, Taiwán y la cadena que los une, investigados como un todo.",
+"Map the semi supply chain for [company]: foundries, equipment and suppliers.":"Mapea la cadena de suministro de semiconductores de [empresa]: fundiciones, equipos y proveedores.",
+"Show [Taiwan stock]'s monthly revenue and foreign ownership trend.":"Muestra los ingresos mensuales y la tendencia de participación extranjera de [acción taiwanesa].",
+"Compare TSMC, Samsung and Tokyo Electron's latest results.":"Compara los últimos resultados de TSMC, Samsung y Tokyo Electron.",
+"Three working dashboards on FocusAlpha data. Open one, or build your own that reads live.":"Tres paneles funcionales sobre datos de FocusAlpha. Abre uno o construye el tuyo con datos en vivo.",
+"Sample · data as of 2026-09-23":"Muestra · datos a 23-09-2026",
+"Screen stock ideas":"Buscar ideas de acciones",
+"Filter the market by guidance, events, valuation, positioning and what companies make. One click loads a saved screen.":"Filtra el mercado por guidance, eventos, valoración, posicionamiento y lo que fabrican las empresas. Un clic carga un filtro guardado.",
+"10 filter groups":"10 grupos de filtros","18 saved screens":"18 filtros guardados",
+"US + Japan, Korea, Taiwan, HK, China":"EE. UU. + Japón, Corea, Taiwán, Hong Kong, China",
+"Click a row for details":"Haz clic en una fila para ver el detalle",
+"Try: guidance raisers, insider buying into shorts, memory makers, Taiwan foreign-held growth":"Prueba: subidas de guidance, compras de directivos frente a cortos, fabricantes de memoria, crecimiento taiwanés en manos extranjeras",
+"Open the sample ↗":"Abrir la muestra ↗","Build my own →":"Construir el mío →",
+"Stock monitor dashboard":"Panel de seguimiento de acciones",
+"Events, news and prices for a watchlist, scored for impact and direction as they land.":"Eventos, noticias y precios de una lista de seguimiento, puntuados por impacto y dirección a medida que llegan.",
+"Impact-scored events":"Eventos puntuados por impacto","Bullish / bearish":"Alcista / bajista","3-month price":"Precio a 3 meses","Filter by region and type":"Filtrar por región y tipo",
+"Example: semiconductors across the US, Taiwan, Korea and Japan":"Ejemplo: semiconductores en EE. UU., Taiwán, Corea y Japón",
+"Manager due diligence dashboard":"Panel de due diligence de gestoras",
+"What a fund holds, what it says it does, what it charges, and how its filed book performed.":"Qué tiene un fondo, qué dice que hace, qué cobra y cómo rindió su cartera declarada.",
+"13F holdings, 8 quarters":"Posiciones 13F, 8 trimestres","Form ADV fees and style":"Comisiones y estilo del Form ADV","Stated style vs holdings":"Estilo declarado vs. posiciones","Replicating portfolio vs S&P 500":"Cartera replicada vs. S&P 500",
+"Example: Lone Pine Capital against five Tiger-lineage peers":"Ejemplo: Lone Pine Capital frente a cinco pares del linaje Tiger",
+"The samples are frozen on 2026-09-23 and never update.":"Las muestras están congeladas a 23-09-2026 y no se actualizan.",
+"Build my own":"Construir el mío",
+"hands you a prompt to paste into Claude: it fetches the page's source from":"te da un prompt para pegar en Claude: descarga el código de la página desde",
+"and republishes it reading live FocusAlpha data through your connector — your stocks, your managers, your account.":"y lo vuelve a publicar leyendo datos de FocusAlpha en vivo a través de tu conector: tus acciones, tus gestoras, tu cuenta.",
+"Institutional-grade data, integrated at your fingertips.":"Datos de calidad institucional, integrados al alcance de tu mano.",
+"Real-time":"Tiempo real","Live events & news":"Eventos y noticias en vivo",
+"Every filing and market-moving story, scored minutes after it lands, with the companies it hits.":"Cada informe regulatorio y cada noticia que mueve el mercado, puntuados minutos después de publicarse, con las empresas a las que afectan.",
+"US · Asia":"EE. UU. · Asia","Global guidance changes":"Cambios de guidance globales",
+"What management expects, in its own words, and whether it raised or cut.":"Lo que espera la dirección, en sus propias palabras, y si subió o recortó.",
+"Aggregated":"Agregado","Research, newsletters & podcasts":"Research, newsletters y podcasts",
+"Research notes, newsletters and podcasts, pulled together and searchable by company or topic.":"Notas de research, newsletters y podcasts, reunidos y buscables por empresa o tema.",
+"Global":"Global","Financials of 23,000+ companies":"Estados financieros de más de 23.000 empresas",
+"Income, balance sheet, cash flow and segments, as filed, in GAAP or IFRS.":"Cuenta de resultados, balance, flujo de caja y segmentos, tal como se presentaron, en GAAP o IFRS.",
+"Searchable":"Buscable","Management transcripts":"Transcripciones de la dirección",
+"Earnings calls and filings, searchable by topic across quarters.":"Conferencias de resultados e informes, buscables por tema a lo largo de los trimestres.",
+"Holdings · flows · fees":"Posiciones · flujos · comisiones","ETF deep scan":"Análisis profundo de ETFs",
+"Holdings as filed, daily flows, premium or discount, overlap and concentration.":"Posiciones declaradas, flujos diarios, prima o descuento, solapamiento y concentración.",
+"8 quarters":"8 trimestres","Manager holdings & profiles":"Posiciones y perfiles de gestoras",
+"What funds own, quarter by quarter, plus fees, clients and investing style.":"Qué poseen los fondos, trimestre a trimestre, más comisiones, clientes y estilo de inversión.",
+"Why FA?":"¿Por qué FA?","Same question. Better data.":"La misma pregunta. Mejores datos.",
+"Guidance":"Guidance","Claude alone":"Claude solo","News stories about it.":"Noticias sobre el tema.","With FA":"Con FA",
+"Management's exact words, plus raised or cut.":"Las palabras exactas de la dirección, y si subió o recortó.",
+"News":"Noticias","A list of articles.":"Una lista de artículos.","Each event scored, plus companies it hits.":"Cada evento puntuado, más las empresas a las que afecta.",
+"Finding stocks":"Encontrar acciones","Can't filter the market.":"No puede filtrar el mercado.","25,000 companies, 20 filters.":"25.000 empresas, 20 filtros.",
+"Fund managers":"Gestoras de fondos","Scattered articles.":"Artículos dispersos.","Holdings over 8 quarters, plus fees.":"Posiciones a lo largo de 8 trimestres, más comisiones.",
+"In our test:":"En nuestra prueba:","Lone Pine test: far more data with FA.":"Prueba con Lone Pine: muchos más datos con FA.",
+"ETFs":"ETFs","Numbers differ by site.":"Las cifras cambian según el sitio.","One set of numbers. Flows, fees, premium.":"Un solo conjunto de cifras. Flujos, comisiones, prima.",
+"Medtech test: websites disagreed on fund size. FA gave one answer, plus flows and concentration.":"Prueba con medtech: los sitios web no coincidían en el tamaño del fondo. FA dio una sola respuesta, más flujos y concentración.",
+"Asia":"Asia","English news only.":"Solo noticias en inglés.","Filings from Japan, Korea, Taiwan, HK, China.":"Informes regulatorios de Japón, Corea, Taiwán, Hong Kong y China.",
+"Economy":"Economía","Today's number.":"La cifra de hoy.","First-published number and consensus as it moved.":"La cifra publicada originalmente y el consenso a medida que cambiaba.",
+"Market events":"Eventos de mercado","Whatever made headlines.":"Lo que salió en los titulares.","Every 8-K, sorted into 14 kinds, minutes after filing.":"Cada 8-K, clasificado en 14 tipos, minutos después de presentarse.",
+"Expectations":"Expectativas","Analyst quotes.":"Citas de analistas.","Live odds a company beats EPS.":"Probabilidad en vivo de que una empresa supere el BPA.",
+"Sources":"Fuentes","Web pages.":"Páginas web.","Filings, with links to the original.":"Informes regulatorios, con enlaces al original.",
+"Where the web still helps":"Donde la web todavía ayuda",
+"News before July 26, 2026. A quick list of an ETF's top 5 names.":"Noticias anteriores al 26 de julio de 2026. Una lista rápida de las 5 principales posiciones de un ETF.",
+"Things we learned the hard way.":"Lo que aprendimos a base de golpes.",
+"Say \"Use FA\"":"Di «Usa FA»","Otherwise Claude searches the web. Every question here already says it.":"Si no, Claude busca en la web. Todas las preguntas de aquí ya lo dicen.",
+"Push back":"Insiste","If Claude says FA doesn't have something, reply: \"FA does have this, check its tools.\"":"Si Claude dice que FA no tiene algo, responde: «FA sí lo tiene, revisa sus herramientas».",
+"Ask for sources":"Pide las fuentes","Add \"list the sources you used\" at the end.":"Añade «enumera las fuentes que usaste» al final.",
+"Ask for tables":"Pide tablas","Tables beat busy charts. For price plus events, ask for a table next to the chart.":"Las tablas superan a los gráficos recargados. Para precio más eventos, pide una tabla junto al gráfico.",
+"Having trouble?":"¿Problemas?","On a work computer?":"¿En un ordenador del trabajo?",
+"Company IT can block custom connectors. Try a personal device, or ask IT to allow mcp.focusalpha.ai.":"El departamento de TI puede bloquear conectores personalizados. Prueba con un dispositivo personal o pide a TI que permita mcp.focusalpha.ai.",
+"Still stuck? Jennifer will get you connected.":"¿Sigues atascado? Jennifer te ayudará a conectarte.",
+"+1 917 435 7739 (Tel / WhatsApp)":"+1 917 435 7739 (Tel. / WhatsApp)",
+"Source of this page and the three samples:":"Código de esta página y de las tres muestras:",
+"Build your own, on your own data":"Construye el tuyo, con tus propios datos",
+"Each sample is a frozen snapshot. Its source is public on":"Cada muestra es una instantánea congelada. Su código es público en",
+". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":". Pega el prompt de abajo en Claude: descarga ese código y lo vuelve a publicar leyendo datos de FocusAlpha en vivo a través de tu conector: tu universo, tus filtros, tu cuenta.",
+"Connect":"Conecta","in your preferred AI, if you haven’t already":"en tu IA preferida, si aún no lo has hecho","Connect →":"Conectar →",
+"the prompt below and paste it into a new conversation":"el prompt de abajo y pégalo en una conversación nueva",
+"Edit the conditions at the bottom — that last block is yours to change":"Edita las condiciones al final: ese último bloque es tuyo para cambiarlo",
+"Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions":"Claude descarga el código de la página desde GitHub, lo publica con tu conector y aplica tus condiciones",
+"Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.":"Claude lee FocusAlpha con el acceso de tu propio conector. Cada cifra procede de informes públicos o datos de mercado, y nada de esto es asesoramiento de inversión.",
+"Sections":"Secciones","Close":"Cerrar","Language":"Idioma"
+},zh:{
+"FocusAlpha for Claude: Market Data, Filings and News in Claude | FocusAlpha":"FocusAlpha for Claude：在 Claude 里直接使用市场数据、公告与新闻 | FocusAlpha",
+"FA for Claude":"FA for Claude",
+"Real market data. Plain questions. Filings, financials, prices and news, straight into Claude.":"真实的市场数据，直白的提问。公告、财务、价格和新闻，直接进 Claude。",
+"Real-time · global":"实时 · 全球",
+"Start here":"从这里开始",
+"Paste this prompt to Claude chat if you haven't done so.":"如果还没做过，先把这段 prompt 粘贴到 Claude 对话里。",
+"Ask in Claude ↗":"在 Claude 里提问 ↗",
+"Copy":"复制","Copied":"已复制","Press ⌘C":"请按 ⌘C",
+"Quick Ask":"快速提问","What we offer":"我们提供什么","Use Cases":"使用案例","Why FA":"为什么用 FA","Tips":"小贴士",
+"Sample questions. Tap one, it opens in Claude. Swap in any company.":"示例问题。点一下就在 Claude 里打开，公司可以随意替换。",
+"Use FA: ":"用 FA：",
+"Research a stock":"研究一只股票",
+"Fundamentals, guidance, filings and ownership in one sourced answer.":"基本面、业绩指引、公告和持股，一次给出带来源的答案。",
+"What's the story on [stock]?":"[股票] 最近是什么情况？",
+"Ask":"提问",
+"Did [stock] raise or cut guidance? Show the quote.":"[股票] 上调还是下调了指引？给出原文。",
+"What has [stock] said about [topic] on recent calls?":"[股票] 在最近的业绩会上对 [话题] 说了什么？",
+"Screen for ideas":"筛选投资想法",
+"Filter 23,000+ companies, ETFs and managers by what matters.":"按你关心的条件筛选 23,000 多家公司、ETF 和基金管理人。",
+"Mid-cap US stocks with a PE under 15 and a dividend over 3%.":"市盈率低于 15、股息率高于 3% 的美国中盘股。",
+"Companies where insiders are net buyers this quarter.":"本季度内部人净买入的公司。",
+"[theme] ETFs with low fees and rising inflows.":"费率低、资金持续流入的 [主题] ETF。",
+"Monitor a stock":"跟踪一只股票",
+"Every event scored, with the companies it hits.":"每个事件都有评分，并列出受影响的公司。",
+"What moved [stock] in the last two weeks?":"过去两周是什么在推动 [股票]？",
+"Show only negative [stock] news from this month.":"只看本月 [股票] 的负面新闻。",
+"Which other companies does [stock]'s latest news hit?":"[股票] 的最新新闻还波及哪些公司？",
+"Research a fund or ETF":"研究一只基金或 ETF",
+"Holdings, flows, fees and overlap, from the filings.":"持仓、资金流、费率和重叠度，全部来自申报文件。",
+"Top holdings of [ETF], and how concentrated is it?":"[ETF] 的前十大持仓是什么，集中度多高？",
+"Do [ETF A] and [ETF B] overlap?":"[ETF A] 和 [ETF B] 有重叠吗？",
+"What did [manager] buy and sell last quarter?":"[基金管理人] 上季度买了什么、卖了什么？",
+"Global semi supply chain":"全球半导体供应链",
+"Japan, Korea, Taiwan and the chain between them, researched as one.":"日本、韩国、台湾以及它们之间的产业链，当作一个整体来研究。",
+"Map the semi supply chain for [company]: foundries, equipment and suppliers.":"梳理 [公司] 的半导体供应链：代工、设备和供应商。",
+"Show [Taiwan stock]'s monthly revenue and foreign ownership trend.":"展示 [台股] 的月营收和外资持股趋势。",
+"Compare TSMC, Samsung and Tokyo Electron's latest results.":"比较台积电、三星和东京电子的最新业绩。",
+"Three working dashboards on FocusAlpha data. Open one, or build your own that reads live.":"三个基于 FocusAlpha 数据、可以直接用的看板。打开一个看看，或者搭一个读实时数据的自己的版本。",
+"Sample · data as of 2026-09-23":"样本 · 数据截至 2026-09-23",
+"Screen stock ideas":"股票筛选",
+"Filter the market by guidance, events, valuation, positioning and what companies make. One click loads a saved screen.":"按业绩指引、事件、估值、机构仓位和公司产品筛选全市场。一键加载已保存的筛选条件。",
+"10 filter groups":"10 组筛选条件","18 saved screens":"18 个预设筛选",
+"US + Japan, Korea, Taiwan, HK, China":"美国 + 日本、韩国、台湾、香港、中国内地",
+"Click a row for details":"点击任一行看详情",
+"Try: guidance raisers, insider buying into shorts, memory makers, Taiwan foreign-held growth":"试试：上调指引的公司、空头重仓却有内部人买入、存储芯片厂商、外资持股的台湾成长股",
+"Open the sample ↗":"打开样本 ↗","Build my own →":"搭建我自己的 →",
+"Stock monitor dashboard":"股票监控看板",
+"Events, news and prices for a watchlist, scored for impact and direction as they land.":"关注名单的事件、新闻和价格，每条一到就按影响力和方向打分。",
+"Impact-scored events":"按影响力打分的事件","Bullish / bearish":"利多 / 利空","3-month price":"3 个月价格","Filter by region and type":"按地区和类型筛选",
+"Example: semiconductors across the US, Taiwan, Korea and Japan":"示例：美国、台湾、韩国和日本的半导体公司",
+"Manager due diligence dashboard":"基金管理人尽调看板",
+"What a fund holds, what it says it does, what it charges, and how its filed book performed.":"基金持有什么、自称在做什么、收多少费用，以及申报持仓的实际表现。",
+"13F holdings, 8 quarters":"13F 持仓，8 个季度","Form ADV fees and style":"Form ADV 费率与风格","Stated style vs holdings":"自称风格 vs 实际持仓","Replicating portfolio vs S&P 500":"复制组合 vs 标普 500",
+"Example: Lone Pine Capital against five Tiger-lineage peers":"示例：Lone Pine Capital 对比五家老虎系同行",
+"The samples are frozen on 2026-09-23 and never update.":"样本数据冻结于 2026-09-23，不会更新。",
+"Build my own":"搭建我自己的",
+"hands you a prompt to paste into Claude: it fetches the page's source from":"会给你一段 prompt，粘贴到 Claude 里：它会从",
+"and republishes it reading live FocusAlpha data through your connector — your stocks, your managers, your account.":"拉取页面源码，重新发布成通过你的连接器读取 FocusAlpha 实时数据的版本——你的股票、你的基金、你的账户。",
+"Institutional-grade data, integrated at your fingertips.":"机构级数据，整合到你的指尖。",
+"Real-time":"实时","Live events & news":"实时事件与新闻",
+"Every filing and market-moving story, scored minutes after it lands, with the companies it hits.":"每份公告、每条影响市场的新闻，发布几分钟内完成评分，并列出受影响的公司。",
+"US · Asia":"美国 · 亚洲","Global guidance changes":"全球业绩指引变化",
+"What management expects, in its own words, and whether it raised or cut.":"管理层的预期原话，以及是上调还是下调。",
+"Aggregated":"聚合","Research, newsletters & podcasts":"研报、通讯与播客",
+"Research notes, newsletters and podcasts, pulled together and searchable by company or topic.":"研报、投资通讯和播客汇总在一起，可按公司或话题搜索。",
+"Global":"全球","Financials of 23,000+ companies":"23,000 多家公司的财务数据",
+"Income, balance sheet, cash flow and segments, as filed, in GAAP or IFRS.":"利润表、资产负债表、现金流量表和分部数据，按申报原样，GAAP 或 IFRS。",
+"Searchable":"可搜索","Management transcripts":"管理层发言记录",
+"Earnings calls and filings, searchable by topic across quarters.":"业绩会记录和公告，可跨季度按话题搜索。",
+"Holdings · flows · fees":"持仓 · 资金流 · 费率","ETF deep scan":"ETF 深度扫描",
+"Holdings as filed, daily flows, premium or discount, overlap and concentration.":"申报持仓、每日资金流、溢价或折价、重叠度和集中度。",
+"8 quarters":"8 个季度","Manager holdings & profiles":"基金管理人持仓与档案",
+"What funds own, quarter by quarter, plus fees, clients and investing style.":"基金逐季度持有什么，加上费率、客户类型和投资风格。",
+"Why FA?":"为什么用 FA？","Same question. Better data.":"同样的问题，更好的数据。",
+"Guidance":"业绩指引","Claude alone":"只用 Claude","News stories about it.":"相关的新闻报道。","With FA":"用 FA",
+"Management's exact words, plus raised or cut.":"管理层的原话，加上是上调还是下调。",
+"News":"新闻","A list of articles.":"一串文章列表。","Each event scored, plus companies it hits.":"每个事件都有评分，并列出受影响的公司。",
+"Finding stocks":"找股票","Can't filter the market.":"没法筛选全市场。","25,000 companies, 20 filters.":"25,000 家公司，20 个筛选条件。",
+"Fund managers":"基金管理人","Scattered articles.":"零散的文章。","Holdings over 8 quarters, plus fees.":"8 个季度的持仓，加上费率。",
+"In our test:":"我们的实测：","Lone Pine test: far more data with FA.":"Lone Pine 实测：用 FA 拿到的数据多得多。",
+"ETFs":"ETF","Numbers differ by site.":"各网站的数字不一样。","One set of numbers. Flows, fees, premium.":"一套数字：资金流、费率、溢价。",
+"Medtech test: websites disagreed on fund size. FA gave one answer, plus flows and concentration.":"医疗科技 ETF 实测：各网站的基金规模互相矛盾。FA 只给一个答案，还带资金流和集中度。",
+"Asia":"亚洲","English news only.":"只有英文新闻。","Filings from Japan, Korea, Taiwan, HK, China.":"来自日本、韩国、台湾、香港、中国内地的公告。",
+"Economy":"宏观经济","Today's number.":"今天的数字。","First-published number and consensus as it moved.":"首次公布的数字，以及一路变化的市场预期。",
+"Market events":"市场事件","Whatever made headlines.":"上了头条的那些。","Every 8-K, sorted into 14 kinds, minutes after filing.":"每份 8-K，分成 14 类，申报后几分钟内到位。",
+"Expectations":"市场预期","Analyst quotes.":"分析师的说法。","Live odds a company beats EPS.":"公司 EPS 超预期的实时概率。",
+"Sources":"来源","Web pages.":"网页。","Filings, with links to the original.":"申报文件，附原文链接。",
+"Where the web still helps":"网络搜索仍然有用的地方",
+"News before July 26, 2026. A quick list of an ETF's top 5 names.":"2026 年 7 月 26 日之前的新闻。快速看一个 ETF 的前 5 大持仓。",
+"Things we learned the hard way.":"我们踩过坑才学到的。",
+"Say \"Use FA\"":"说「用 FA」","Otherwise Claude searches the web. Every question here already says it.":"不然 Claude 会去搜网页。这里的每个问题都已经带上了。",
+"Push back":"要坚持","If Claude says FA doesn't have something, reply: \"FA does have this, check its tools.\"":"如果 Claude 说 FA 没有某项数据，回它：「FA 有，去查它的工具。」",
+"Ask for sources":"要来源","Add \"list the sources you used\" at the end.":"在最后加一句「列出你用到的来源」。",
+"Ask for tables":"要表格","Tables beat busy charts. For price plus events, ask for a table next to the chart.":"表格比花哨的图表好用。要看价格加事件，就让它在图表旁边加一张表。",
+"Having trouble?":"遇到问题？","On a work computer?":"在公司电脑上？",
+"Company IT can block custom connectors. Try a personal device, or ask IT to allow mcp.focusalpha.ai.":"公司 IT 可能会拦截自定义连接器。换个人设备试试，或者请 IT 放行 mcp.focusalpha.ai。",
+"Still stuck? Jennifer will get you connected.":"还是不行？Jennifer 帮你连上。",
+"+1 917 435 7739 (Tel / WhatsApp)":"+1 917 435 7739（电话 / WhatsApp）",
+"Source of this page and the three samples:":"本页和三个样本的源码：",
+"Build your own, on your own data":"用你自己的数据，搭建你自己的看板",
+"Each sample is a frozen snapshot. Its source is public on":"每个样本都是冻结的快照，源码公开在",
+". Paste the prompt below into Claude: it fetches that source and republishes it reading live FocusAlpha data through your connector — your universe, your filters, your account.":"。把下面的 prompt 粘贴到 Claude：它会拉取源码，重新发布成通过你的连接器读取 FocusAlpha 实时数据的版本——你的股票池、你的条件、你的账户。",
+"Connect":"连接","in your preferred AI, if you haven’t already":"到你常用的 AI，如果还没连的话","Connect →":"去连接 →",
+"the prompt below and paste it into a new conversation":"下面的 prompt，粘贴到一个新对话里",
+"Edit the conditions at the bottom — that last block is yours to change":"修改末尾的条件——最后那一块是留给你改的",
+"Claude fetches the page's source from GitHub, publishes it with your connector, and applies your conditions":"Claude 从 GitHub 拉取页面源码，用你的连接器发布，再套上你的条件",
+"Claude reads FocusAlpha with your own connector access. Every figure is public filing or market data, and none of it is investment advice.":"Claude 通过你自己的连接器读取 FocusAlpha。所有数字都来自公开申报或市场数据，都不构成投资建议。",
+"Sections":"栏目","Close":"关闭","Language":"语言"
+}};
+var LANGS=[["en","EN"],["es","ES"],["zh","中文"]];
+var lang="en"; try{ var v=localStorage.getItem("fa:lang"); if(v&&DICT[v]) lang=v; }catch(e){}
+function T(s){ if(lang==="en"||typeof s!=="string") return s; var d=DICT[lang]; if(d[s]!==undefined) return d[s]; var k=s.trim(); return d[k]!==undefined ? s.replace(k,d[k]) : s; }
+function walk(root){
+  var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT), n, list=[];
+  while((n=w.nextNode())) list.push(n);
+  list.forEach(function(n){ var p=n.parentNode; if(!p||/^(SCRIPT|STYLE|PRE|CODE)$/.test(p.tagName)) return; if(p.closest&&p.closest("#p1,#faPrompt,.fa-lang")) return; var v=T(n.nodeValue); if(v!==n.nodeValue) n.nodeValue=v; });
+  var els=root.querySelectorAll?root.querySelectorAll("[placeholder],[title],[aria-label]"):[];
+  for(var i=0;i<els.length;i++) ["placeholder","title","aria-label"].forEach(function(a){ var v=els[i].getAttribute(a); if(v){ var t=T(v); if(t!==v) els[i].setAttribute(a,t); } });
+}
+function switcher(){
+  var box=document.createElement("div"); box.className="fa-lang"; box.setAttribute("role","group"); box.setAttribute("aria-label","Language");
+  LANGS.forEach(function(l){ var b=document.createElement("button"); b.type="button"; b.textContent=l[1]; b.lang=l[0]; if(l[0]===lang) b.setAttribute("aria-pressed","true");
+    b.addEventListener("click",function(){ if(l[0]===lang) return; try{localStorage.setItem("fa:lang",l[0])}catch(e){} location.reload(); }); box.appendChild(b); });
+  var st=document.createElement("style"); st.textContent=".fa-lang{position:fixed;top:14px;right:14px;z-index:60;display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:var(--card,#fff);border:1px solid var(--line,#ECEAF2);box-shadow:0 1px 2px rgba(40,24,90,.06),0 4px 14px rgba(40,24,90,.07)}.fa-lang button{border:0;background:transparent;border-radius:999px;padding:5px 11px;font:600 12.5px/1 inherit;font-family:inherit;color:var(--muted,#6E6A7C);cursor:pointer}.fa-lang button[aria-pressed=true]{background:var(--accent,#5B3BB0);color:#fff}.fa-lang button:hover:not([aria-pressed=true]){background:var(--lav,#E6DEFA);color:var(--lav-ink,#4A2F94)}@media (max-width:540px){.fa-lang{top:10px;right:10px}.fa-lang button{padding:5px 9px;font-size:12px}}";
+  document.head.appendChild(st); document.body.appendChild(box);
+}
+window.FA_T=T; window.FA_LANG=lang;
+window.FA_I18N={apply:function(){ if(lang!=="en"){ document.documentElement.lang=lang; walk(document.body); } switcher(); }};
+})();
+
+</script>
+<script>
+var PRE=FA_T("Use FA: ");
+function esc(s){return FA_T(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function link(q,raw){q=FA_T(q);var t=raw?q:PRE+q;return 'https://claude.ai/new?q='+encodeURIComponent(t)}
 function qrow(q){return '<a class="q" href="'+link(q)+'" target="_blank" rel="noopener"><span>'+esc(q)+'</span><em>Ask</em></a>'}
 function stepli(x){return '<li><span>'+esc(x)+'</span><a class="cp" href="'+link(x)+'" target="_blank" rel="noopener">Ask</a></li>'}
 function bars(){return '<div class="bars" aria-hidden="true"><i></i><i></i><i></i></div>'}
@@ -575,17 +823,18 @@ My conditions (edit these):
   });
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!scrim.hidden)close()});
   document.getElementById('faCopy').addEventListener('click',function(){
-    var b=this,t=document.getElementById('faPrompt').textContent;
-    function done(){b.textContent='Copied';b.classList.add('done');setTimeout(function(){b.textContent='Copy';b.classList.remove('done')},1600)}
+    var b=this,t=document.getElementById('faPrompt').textContent,label=b.textContent,T=window.FA_T||function(x){return x};
+    function done(){b.textContent=T('Copied');b.classList.add('done');setTimeout(function(){b.textContent=label;b.classList.remove('done')},1600)}
     // A sandboxed or insecure context refuses the clipboard API; select the text
     // instead of failing silently, so the button always leads somewhere.
     if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done,select)}else select();
     function select(){
       var r=document.createRange();r.selectNodeContents(document.getElementById('faPrompt'));
-      var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Press ⌘C';
+      var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent=T('Press ⌘C');
     }
   });
 })();
 </script>
 
+<script>FA_I18N.apply();</script>
 </body></html>
