@@ -298,7 +298,8 @@ function metricLabel(r){
 }
 const RANGE={moved_above:'clears prior',shifted_up:'shifted up',narrowed_up:'narrowed up',widened_up:'widened up',moved_below:'below prior',shifted_down:'shifted down',narrowed_down:'narrowed down',widened_down:'widened down',narrowed:'narrowed',widened:'widened',unchanged:'unchanged'};
 const rangeWord=(r)=>RANGE[r.range_move]||String(r.range_move||'').replace(/_/g,' ')||'—';
-const shortName=(s)=>String(s||'').replace(/,?\s+(Inc\.?|Incorporated|Corp\.?|Corporation|plc|PLC|Ltd\.?|Limited|N\.V\.|S\.A\.|SE|AG|Co\.?|Company|Companies|Holdings?|Group)\s*$/,'').replace(/,?\s+(Inc\.?|Corp\.?|Company)\s*$/,'').replace(/^The\s+(?=\S+$)/,'');
+const SUFFIX=/,?\s+(Inc\.?|Incorporated|Corp\.?|Corporation|plc|PLC|Ltd\.?|Limited|N\.V\.|S\.A\.|SE|AG|Co\.?|Company|Companies|Holdings?|Group)\s*$/;
+const shortName=(s)=>{ s=String(s||''); for(let i=0;i<3;i++){ const n=s.replace(SUFFIX,''); if(n===s)break; s=n; } return s.replace(/^The\s+(?=\S+$)/,''); };
 const inWindow=(iso)=>{const d=day(iso);return !!d&&d>=WINDOW.from&&(!WINDOW.to||d<=WINDOW.to);};
 const isMove=(r)=>r.change==='raise'||r.change==='cut';
 const isNarrow=(r)=>r.change==='narrow'||r.change==='widen';
