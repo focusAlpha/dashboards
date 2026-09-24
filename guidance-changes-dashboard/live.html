@@ -421,7 +421,6 @@ function renderAll(){
   const ltYears=Object.entries(S.ltYears).sort((a,b)=>a[0].localeCompare(b[0]));
   const maxLtY=Math.max(1,...ltYears.map(([,n])=>n));
   const within=S.withinRange.sort((a,b)=>(b.c.mcap||0)-(a.c.mcap||0));
-  const worse=S.worse.sort((a,b)=>(b.c.mcap||0)-(a.c.mcap||0));
   const metricReading=(m)=>m.worse>0.5?'A lower number is usually the better news':(m.up>=4*m.down&&m.down?'Revised up over four times as often as down':(m.down>m.up?'Cut more often than raised':'—'));
   const topSec=secs[0], oneSided=secs.slice().filter(([,v])=>v.down).sort((a,b)=>(b[1].up/b[1].down)-(a[1].up/a[1].down))[0];
 
@@ -502,13 +501,10 @@ function renderAll(){
 
 <section>
   <div class="sec-head"><h2>What we deliberately do not call a change</h2><span class="tagline">The guard rails</span></div>
-  <p class="lede">Three categories look like guidance changes on a screen and are not. Each is published with its own flag rather than being scored as a raise or a cut.</p>
+  <p class="lede">Two categories look like guidance changes on a screen and are not. Each is published with its own flag rather than being scored as a raise or a cut.</p>
   <h3>The midpoint moved but the range never left the old one</h3>
   <p>${fmt(S.rows.filter((r)=>isMove(r)&&r.within_prior_range).length)} of the ${fmt(S.moves.length)} moved metrics sit entirely inside their prior range. The midpoint shifts — sometimes a lot — while the company has not actually guided anywhere it had not already guided.</p>
   ${table('within',within,'Companies where the midpoint moved at least 10% without the range leaving the prior one, largest companies first.',(r)=>trRow(r),TH,12)}
-  <h3>A bigger number that is worse news</h3>
-  <p>${fmt(worse.length)} moved metrics in this window are marked as cases where up is bad — capital expenditure, tax rate, operating expenses, net debt, input-cost inflation. The direction records what the number did; a separate flag records that the reader should invert it.</p>
-  ${table('worse',worse,'Recorded as the number moved; read it the other way round.',(r)=>`<tr><td class="co">${esc(shortName(r.c.name))}</td><td class="tk">${esc(r.c.t)}</td><td>${esc(metricLabel(r))}</td><td>${esc(r.period||'')}</td><td class="val">${esc(r.prior_value||'—')}</td><td class="val">${esc(r.current_value||'—')}</td><td class="${r.change==='raise'?'up':'down'}">${r.change}</td><td>${r.change==='raise'?'worse news':'better news'}</td><td class="date">${esc(dShort(r.conference_date))}</td></tr>`,'<thead><tr><th>Company</th><th>Ticker</th><th>Metric</th><th>Period</th><th>Prior</th><th>New</th><th class="num">Recorded as</th><th>Reads as</th><th>Stated</th></tr></thead>',10)}
   <h3>The comparison itself does not hold</h3>
   <p>Pairs the comparability rules refuse — a segment against the group, adjusted against unadjusted, a growth rate against an absolute figure, a range against a midpoint — are absent from this page rather than guessed at. An invented raise travels all the way to a portfolio manager with nothing to warn them it was invented, so those statements stay readable one level down, in <code>get_guidance</code>, with both figures and both quotes but no verdict.</p>
 </section>

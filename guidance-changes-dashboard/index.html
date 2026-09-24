@@ -479,7 +479,6 @@ function renderAll(){
   const ltYears=Object.entries(S.ltYears).sort((a,b)=>a[0].localeCompare(b[0]));
   const maxLtY=Math.max(1,...ltYears.map(([,n])=>n));
   const within=S.withinRange.sort((a,b)=>(b.c.mcap||0)-(a.c.mcap||0));
-  const worse=S.worse.sort((a,b)=>(b.c.mcap||0)-(a.c.mcap||0));
   const metricReading=(m)=>m.worse>0.5?'A lower number is usually the better news':(m.up>=4*m.down&&m.down?'Revised up over four times as often as down':(m.down>m.up?'Cut more often than raised':'—'));
   const topSec=secs[0], oneSided=secs.slice().filter(([,v])=>v.down).sort((a,b)=>(b[1].up/b[1].down)-(a[1].up/a[1].down))[0];
 
@@ -560,13 +559,10 @@ function renderAll(){
 
 <section>
   <div class="sec-head"><h2>What we deliberately do not call a change</h2><span class="tagline">The guard rails</span></div>
-  <p class="lede">Three categories look like guidance changes on a screen and are not. Each is published with its own flag rather than being scored as a raise or a cut.</p>
+  <p class="lede">Two categories look like guidance changes on a screen and are not. Each is published with its own flag rather than being scored as a raise or a cut.</p>
   <h3>The midpoint moved but the range never left the old one</h3>
   <p>${fmt(S.rows.filter((r)=>isMove(r)&&r.within_prior_range).length)} of the ${fmt(S.moves.length)} moved metrics sit entirely inside their prior range. The midpoint shifts — sometimes a lot — while the company has not actually guided anywhere it had not already guided.</p>
   ${table('within',within,'Companies where the midpoint moved at least 10% without the range leaving the prior one, largest companies first.',(r)=>trRow(r),TH,12)}
-  <h3>A bigger number that is worse news</h3>
-  <p>${fmt(worse.length)} moved metrics in this window are marked as cases where up is bad — capital expenditure, tax rate, operating expenses, net debt, input-cost inflation. The direction records what the number did; a separate flag records that the reader should invert it.</p>
-  ${table('worse',worse,'Recorded as the number moved; read it the other way round.',(r)=>`<tr><td class="co">${esc(shortName(r.c.name))}</td><td class="tk">${esc(r.c.t)}</td><td>${esc(metricLabel(r))}</td><td>${esc(r.period||'')}</td><td class="val">${esc(r.prior_value||'—')}</td><td class="val">${esc(r.current_value||'—')}</td><td class="${r.change==='raise'?'up':'down'}">${r.change}</td><td>${r.change==='raise'?'worse news':'better news'}</td><td class="date">${esc(dShort(r.conference_date))}</td></tr>`,'<thead><tr><th>Company</th><th>Ticker</th><th>Metric</th><th>Period</th><th>Prior</th><th>New</th><th class="num">Recorded as</th><th>Reads as</th><th>Stated</th></tr></thead>',10)}
   <h3>The comparison itself does not hold</h3>
   <p>Pairs the comparability rules refuse — a segment against the group, adjusted against unadjusted, a growth rate against an absolute figure, a range against a midpoint — are absent from this page rather than guessed at. An invented raise travels all the way to a portfolio manager with nothing to warn them it was invented, so those statements stay readable one level down, in <code>get_guidance</code>, with both figures and both quotes but no verdict.</p>
 </section>
@@ -868,7 +864,7 @@ var es={
 "Every target carries the sentence it was read from. Growth rates and CAGRs are marked as rates, not levels, by the layer itself.":"Cada objetivo lleva la frase de la que se leyó. Las tasas de crecimiento y los CAGR los marca la propia capa como tasas, no como niveles.",
 "By":"Para","Target":"Objetivo","In the company's words":"En palabras de la empresa","source":"fuente","a rate, not a level":"una tasa, no un nivel",
 "What we deliberately do not call a change":"Lo que deliberadamente no llamamos cambio","The guard rails":"Las barreras",
-"Three categories look like guidance changes on a screen and are not. Each is published with its own flag rather than being scored as a raise or a cut.":"Tres categorías parecen cambios de guidance en pantalla y no lo son. Cada una se publica con su propia marca en lugar de puntuarse como subida o recorte.",
+"Two categories look like guidance changes on a screen and are not. Each is published with its own flag rather than being scored as a raise or a cut.":"Dos categorías parecen cambios de guidance en pantalla y no lo son. Cada una se publica con su propia marca en lugar de puntuarse como subida o recorte.",
 "The midpoint moved but the range never left the old one":"El punto medio se movió pero el rango nunca salió del anterior",
 "Companies where the midpoint moved at least 10% without the range leaving the prior one, largest companies first.":"Empresas donde el punto medio se movió al menos un 10% sin que el rango saliera del anterior, las mayores primero.",
 "A bigger number that is worse news":"Un número mayor que es peor noticia",
@@ -932,7 +928,7 @@ var zh={
 "Every target carries the sentence it was read from. Growth rates and CAGRs are marked as rates, not levels, by the layer itself.":"每个目标都带着它出自的那句话。增速和复合增速由数据层自己标为比率，不是水平值。",
 "By":"到","Target":"目标","In the company's words":"公司原话","source":"原文","a rate, not a level":"比率，不是水平值",
 "What we deliberately do not call a change":"我们刻意不算作变动的","The guard rails":"护栏",
-"Three categories look like guidance changes on a screen and are not. Each is published with its own flag rather than being scored as a raise or a cut.":"有三类在屏幕上看着像指引变动，其实不是。每一类都带着自己的标记发布，而不是记成上调或下调。",
+"Two categories look like guidance changes on a screen and are not. Each is published with its own flag rather than being scored as a raise or a cut.":"有两类在屏幕上看着像指引变动，其实不是。每一类都带着自己的标记发布，而不是记成上调或下调。",
 "The midpoint moved but the range never left the old one":"中值动了，但区间没有离开旧区间",
 "Companies where the midpoint moved at least 10% without the range leaving the prior one, largest companies first.":"中值至少移动 10% 但区间没有离开上次区间的公司，按市值从大到小。",
 "A bigger number that is worse news":"数字更大却是坏消息",
