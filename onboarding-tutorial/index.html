@@ -126,7 +126,7 @@ details.sub summary .chev{margin-left:auto}
 .side.web small{color:var(--muted)}
 .side.fa{background:var(--lav)}
 .side.fa small{color:var(--lav-ink)}
-.why-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:-20px 0 26px}.why-strip span{background:var(--lav);color:var(--lav-ink);font-weight:600;font-size:.92rem;border-radius:999px;padding:8px 15px}
+.why-strip{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:-20px 0 26px}.why-strip span{background:var(--lav);color:var(--lav-ink);font-weight:600;font-size:.92rem;border-radius:999px;padding:8px 15px}.cmp .em svg{width:20px;height:20px;color:var(--lav-ink)}
 .honest{margin-top:20px;background:var(--soft);border-radius:20px;padding:16px 20px;font-size:.95rem}
 .honest b{display:block;margin-bottom:4px}
 
@@ -368,7 +368,7 @@ var DICT={es:{
 "Why FA?":"¿Por qué FA?","Same question. Better data.":"La misma pregunta. Mejores datos.",
 "Better AI results. More AI capability.":"Mejores resultados de IA. Más capacidad de IA.","Fewer hallucinations":"Menos alucinaciones","Controlled sources":"Fuentes controladas","Less review effort":"Menos esfuerzo de revisión","~50% fewer tokens":"~50% menos tokens","Current solution":"Solución actual",
 "Research-oriented":"Orientado a la investigación","Raw data.":"Datos en bruto.","Research tags: guidance changes, next catalyst (event calendar), research news flow.":"Etiquetas de investigación: cambios de guidance, próximo catalizador (calendario de eventos), flujo de noticias de research.",
-"Global":"Global","US-oriented.":"Centrado en EE. UU.","Detailed Asia coverage, especially the supply chain.":"Cobertura detallada de Asia, sobre todo la cadena de suministro.",
+"Asia + US":"Asia + EE. UU.","US-oriented.":"Centrado en EE. UU.","Detailed Asia coverage, especially the supply chain.":"Cobertura detallada de Asia, sobre todo la cadena de suministro.",
 "AI-first":"Pensado para la IA","Built for humans.":"Hecho para humanos.","Structured for AI, with detailed tags.":"Estructurado para la IA, con etiquetas detalladas.",
 "Truth-seeking":"Fiel a la verdad","Grounded in company filings and disclosures. High-quality sources.":"Anclado en los informes y comunicados de las empresas. Fuentes de alta calidad.",
 "Integrated":"Integrado","Data silos.":"Datos en silos.","One connected dataset the AI can reason across.":"Un solo conjunto de datos conectado sobre el que la IA puede razonar.",
@@ -497,7 +497,7 @@ var DICT={es:{
 "Why FA?":"为什么用 FA？","Same question. Better data.":"同样的问题，更好的数据。",
 "Better AI results. More AI capability.":"AI 答得更好，能做的更多。","Fewer hallucinations":"更少幻觉","Controlled sources":"来源可控","Less review effort":"复核更省力","~50% fewer tokens":"省约 50% token","Current solution":"现有方案",
 "Research-oriented":"面向研究","Raw data.":"原始数据。","Research tags: guidance changes, next catalyst (event calendar), research news flow.":"研究标签：指引变动、下一个催化剂（事件日历）、研究新闻流。",
-"Global":"全球视角","US-oriented.":"以美国为中心。","Detailed Asia coverage, especially the supply chain.":"亚洲的细致覆盖，尤其是供应链。",
+"Asia + US":"亚洲 + 美国","US-oriented.":"以美国为中心。","Detailed Asia coverage, especially the supply chain.":"亚洲的细致覆盖，尤其是供应链。",
 "AI-first":"为 AI 而建","Built for humans.":"为人设计。","Structured for AI, with detailed tags.":"为 AI 结构化，标签细致。",
 "Truth-seeking":"求真","Grounded in company filings and disclosures. High-quality sources.":"扎根于公司申报文件和披露，高质量来源。",
 "Integrated":"打通的","Data silos.":"数据孤岛。","One connected dataset the AI can reason across.":"一套相互连通的数据，AI 可以跨着推理。",
@@ -652,11 +652,11 @@ document.getElementById("offer").innerHTML=OFFER.map(function(o){
 
 /* ===== COMPARE ===== */
 var CMP=[
- {em:"🎯",t:"Research-oriented",w:"Raw data.",f:"Research tags: guidance changes, next catalyst (event calendar), research news flow."},
- {em:"🌏",t:"Global",w:"US-oriented.",f:"Detailed Asia coverage, especially the supply chain."},
- {em:"🤖",t:"AI-first",w:"Built for humans.",f:"Structured for AI, with detailed tags."},
- {em:"🧾",t:"Truth-seeking",w:"Web pages.",f:"Grounded in company filings and disclosures. High-quality sources."},
- {em:"🔗",t:"Integrated",w:"Data silos.",f:"One connected dataset the AI can reason across."}
+ {em:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/><path d=\"M12 1v3M12 20v3M1 12h3M20 12h3\"/></svg>",t:"Research-oriented",w:"Raw data.",f:"Research tags: guidance changes, next catalyst (event calendar), research news flow."},
+ {em:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"9\"/><ellipse cx=\"12\" cy=\"12\" rx=\"4\" ry=\"9\"/><path d=\"M3 12h18\"/></svg>",t:"Asia + US",w:"US-oriented.",f:"Detailed Asia coverage, especially the supply chain."},
+ {em:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"6\" y=\"6\" width=\"12\" height=\"12\" rx=\"1.5\"/><rect x=\"10\" y=\"10\" width=\"4\" height=\"4\"/><path d=\"M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3\"/></svg>",t:"AI-first",w:"Built for humans.",f:"Structured for AI, with detailed tags."},
+ {em:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7 3h7l4 4v14H7z\"/><path d=\"M14 3v4h4\"/><path d=\"M9 14l2.5 2.5 4-5\"/></svg>",t:"Truth-seeking",w:"Web pages.",f:"Grounded in company filings and disclosures. High-quality sources."},
+ {em:"<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M10 14a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1.5 1.5\"/><path d=\"M14 10a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1.5-1.5\"/></svg>",t:"Integrated",w:"Data silos.",f:"One connected dataset the AI can reason across."}
 ];
 document.getElementById("cmp").innerHTML=CMP.map(function(c){
   return '<div class="row"><h3><span class="em" aria-hidden="true">'+c.em+'</span>'+c.t+'</h3><div class="pair">'+
