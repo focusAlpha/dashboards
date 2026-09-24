@@ -1025,7 +1025,7 @@ function observe(){
 function switcher(){
   var box=document.createElement("div"); box.className="fa-lang"; box.setAttribute("role","group"); box.setAttribute("aria-label",T("Language"));
   LANGS.forEach(function(l){ var b=document.createElement("button"); b.type="button"; b.textContent=l[1]; b.lang=l[0]; if(l[0]===lang) b.setAttribute("aria-pressed","true");
-    b.addEventListener("click",function(){ if(l[0]===lang) return; try{localStorage.setItem("fa:lang",l[0])}catch(e){} location.reload(); }); box.appendChild(b); });
+    b.addEventListener("click",function(){ if(l[0]===lang) return; try{localStorage.setItem("fa:lang",l[0])}catch(e){} try{ var u=new URL(location.href); u.searchParams.set("lang",l[0]); location.replace(u.href); }catch(e){ location.reload(); } }); box.appendChild(b); });
   var st=document.createElement("style"); st.textContent=".fa-lang{display:inline-flex;gap:2px;padding:2px;border-radius:999px;border:1px solid var(--line,#DCDFE6);background:var(--surface2,var(--surface,var(--card,#fff)));margin-right:8px;flex:none;vertical-align:middle}.fa-lang button{border:0;background:transparent;border-radius:999px;padding:4px 8px;font:600 11px/1 inherit;font-family:inherit;color:var(--muted,#5B6472);cursor:pointer;letter-spacing:.02em}.fa-lang button[aria-pressed=true]{background:#4F2FB0;color:#fff}.fa-lang button:hover:not([aria-pressed=true]){background:rgba(79,47,176,.10);color:#4F2FB0}";
   document.head.appendChild(st);
   var gh=document.querySelector(".fa-gh"); if(gh&&gh.parentNode) gh.parentNode.insertBefore(box,gh); else document.body.appendChild(box);

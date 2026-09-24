@@ -519,6 +519,7 @@ var DICT={es:{
 }};
 var LANGS=[["en","EN"],["es","ES"],["zh","中文"]];
 var lang="en"; try{ var v=localStorage.getItem("fa:lang"); if(v&&DICT[v]) lang=v; }catch(e){}
+try{ var q=new URLSearchParams(location.search).get("lang"); if(q&&(q==="en"||DICT[q])){ lang=q; localStorage.setItem("fa:lang",q); } }catch(e){}
 function T(s){ if(lang==="en"||typeof s!=="string") return s; var d=DICT[lang]; if(d[s]!==undefined) return d[s]; var k=s.trim(); return d[k]!==undefined ? s.replace(k,d[k]) : s; }
 function walk(root){
   var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT), n, list=[];
@@ -530,7 +531,7 @@ function walk(root){
 function switcher(){
   var box=document.createElement("div"); box.className="fa-lang"; box.setAttribute("role","group"); box.setAttribute("aria-label","Language");
   LANGS.forEach(function(l){ var b=document.createElement("button"); b.type="button"; b.textContent=l[1]; b.lang=l[0]; if(l[0]===lang) b.setAttribute("aria-pressed","true");
-    b.addEventListener("click",function(){ if(l[0]===lang) return; try{localStorage.setItem("fa:lang",l[0])}catch(e){} location.reload(); }); box.appendChild(b); });
+    b.addEventListener("click",function(){ if(l[0]===lang) return; try{localStorage.setItem("fa:lang",l[0])}catch(e){} try{ var u=new URL(location.href); u.searchParams.set("lang",l[0]); location.replace(u.href); }catch(e){ location.reload(); } }); box.appendChild(b); });
   var st=document.createElement("style"); st.textContent=".fa-lang{position:absolute;top:22px;right:20px;z-index:6;display:inline-flex;gap:2px;padding:3px;border-radius:999px;background:var(--card,#fff);border:1px solid var(--line,#ECEAF2);box-shadow:0 1px 2px rgba(40,24,90,.06),0 4px 14px rgba(40,24,90,.07)}.fa-lang button{border:0;background:transparent;border-radius:999px;padding:5px 11px;font:600 12.5px/1 inherit;font-family:inherit;color:var(--muted,#6E6A7C);cursor:pointer}.fa-lang button[aria-pressed=true]{background:var(--accent,#5B3BB0);color:#fff}.fa-lang button:hover:not([aria-pressed=true]){background:var(--lav,#E6DEFA);color:var(--lav-ink,#4A2F94)}@media (max-width:540px){.fa-lang{top:12px;right:12px}.fa-lang button{padding:5px 9px;font-size:12px}}";
   document.head.appendChild(st); var hd=document.querySelector("header.wrap"); if(hd){ hd.style.position="relative"; hd.appendChild(box); } else document.body.appendChild(box);
 }
