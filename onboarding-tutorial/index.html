@@ -388,6 +388,7 @@ var DICT={es:{
 "Where the web still helps":"Donde la web todavía ayuda",
 "News before July 26, 2026. A quick list of an ETF's top 5 names.":"Noticias anteriores al 26 de julio de 2026. Una lista rápida de las 5 principales posiciones de un ETF.",
 "Things we learned the hard way.":"Lo que aprendimos a base de golpes.",
+"Next catalyst calendar":"Calendario de próximos catalizadores","Upcoming":"Próximos","Earnings dates, investor days, shareholder meetings, IPOs, splits and macro releases ahead, with when each was announced.":"Fechas de resultados, días del inversor, juntas de accionistas, OPV, splits y publicaciones macro por venir, con cuándo se anunció cada uno.","What is on [stock]'s calendar for the next month?":"¿Qué hay en el calendario de [acción] para el próximo mes?",
 "Build a monitor":"Construye un monitor","Ask: \"Build me a monitor for [stocks] as an artifact: events, news and prices, scored.\" The Use Cases tab has a ready prompt.":"Pide: \"Constrúyeme un monitor para [acciones] como artifact: eventos, noticias y precios, puntuados.\" La pestaña Casos tiene un prompt listo.",
 "Build a screening tool":"Construye un buscador","Ask for a screener as an artifact with saved screens you can rerun in one click. Start from the Screen stock ideas card.":"Pide un buscador como artifact con filtros guardados que puedas relanzar con un clic. Empieza por la tarjeta Buscar ideas de acciones.",
 "Build a dashboard":"Construye un panel","Any table Claude gives you can become a page: say \"make this a live artifact reading FocusAlpha\". Build my own on any sample does it for you.":"Cualquier tabla que te dé Claude puede ser una página: di \"convierte esto en un artifact en vivo que lea FocusAlpha\". Construir el mío en cualquier muestra lo hace por ti.",
@@ -516,6 +517,7 @@ var DICT={es:{
 "Where the web still helps":"网络搜索仍然有用的地方",
 "News before July 26, 2026. A quick list of an ETF's top 5 names.":"2026 年 7 月 26 日之前的新闻。快速看一个 ETF 的前 5 大持仓。",
 "Things we learned the hard way.":"我们踩过坑才学到的。",
+"Next catalyst calendar":"下一个催化剂日历","Upcoming":"即将到来","Earnings dates, investor days, shareholder meetings, IPOs, splits and macro releases ahead, with when each was announced.":"接下来的财报日、投资者日、股东大会、IPO、拆股和宏观数据发布，以及每一项是什么时候宣布的。","What is on [stock]'s calendar for the next month?":"[股票] 下个月的日程上有什么？",
 "Build a monitor":"搭一个监控","Ask: \"Build me a monitor for [stocks] as an artifact: events, news and prices, scored.\" The Use Cases tab has a ready prompt.":"这样问：「给我做一个 [股票] 的监控 artifact：事件、新闻和价格，带打分。」使用案例 tab 里有现成的 prompt。",
 "Build a screening tool":"搭一个筛选工具","Ask for a screener as an artifact with saved screens you can rerun in one click. Start from the Screen stock ideas card.":"让它做一个筛选器 artifact，带可以一键重跑的预设筛选。从「股票筛选」那张卡开始。",
 "Build a dashboard":"搭一个看板","Any table Claude gives you can become a page: say \"make this a live artifact reading FocusAlpha\". Build my own on any sample does it for you.":"Claude 给你的任何表格都能变成页面：说「把它做成读 FocusAlpha 实时数据的 artifact」。任何样本上的 Build my own 都替你做好了。",
@@ -636,6 +638,7 @@ document.addEventListener("click",function(e){var b=e.target.closest("[data-prom
 /* ===== WHAT WE OFFER ===== */
 var OFFER=[
  {k:"#D9722F",t:"var(--to)",n:"Live events &amp; news",tag:"Real-time",dot:true,wide:true,d:"Every filing and market-moving story, scored minutes after it lands, with the companies it hits.",q:"What moved [stock] in the last two weeks?"},
+ {k:"#1B4F8C",t:"var(--tb)",n:"Next catalyst calendar",tag:"Upcoming",wide:true,d:"Earnings dates, investor days, shareholder meetings, IPOs, splits and macro releases ahead, with when each was announced.",q:"What is on [stock]'s calendar for the next month?"},
  {k:"#5B3BB0",t:"var(--tp)",n:"Global guidance changes",tag:"US · Asia",d:"What management expects, in its own words, and whether it raised or cut.",q:"Which companies raised guidance in the last 90 days?"},
  {k:"#8A63D2",t:"var(--tl)",n:"Research, newsletters &amp; podcasts",tag:"Aggregated",d:"Research notes, newsletters and podcasts, pulled together and searchable by company or topic.",q:"What are newsletters and podcasts saying about [stock]?"},
  {k:"#1F9A63",t:"var(--tg)",n:"Financials of 23,000+ companies",tag:"Global",d:"Income, balance sheet, cash flow and segments, as filed, in GAAP or IFRS.",q:"Split [stock]'s revenue by segment for the last 8 quarters."},
