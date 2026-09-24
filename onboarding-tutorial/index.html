@@ -388,6 +388,11 @@ var DICT={es:{
 "Where the web still helps":"Donde la web todavía ayuda",
 "News before July 26, 2026. A quick list of an ETF's top 5 names.":"Noticias anteriores al 26 de julio de 2026. Una lista rápida de las 5 principales posiciones de un ETF.",
 "Things we learned the hard way.":"Lo que aprendimos a base de golpes.",
+"Build a monitor":"Construye un monitor","Ask: \"Build me a monitor for [stocks] as an artifact: events, news and prices, scored.\" The Use Cases tab has a ready prompt.":"Pide: \"Constrúyeme un monitor para [acciones] como artifact: eventos, noticias y precios, puntuados.\" La pestaña Casos tiene un prompt listo.",
+"Build a screening tool":"Construye un buscador","Ask for a screener as an artifact with saved screens you can rerun in one click. Start from the Screen stock ideas card.":"Pide un buscador como artifact con filtros guardados que puedas relanzar con un clic. Empieza por la tarjeta Buscar ideas de acciones.",
+"Build a dashboard":"Construye un panel","Any table Claude gives you can become a page: say \"make this a live artifact reading FocusAlpha\". Build my own on any sample does it for you.":"Cualquier tabla que te dé Claude puede ser una página: di \"convierte esto en un artifact en vivo que lea FocusAlpha\". Construir el mío en cualquier muestra lo hace por ti.",
+"Rerun, don't rebuild":"Relanza, no reconstruyas","An artifact that reads FocusAlpha live fetches fresh data every time you open it. Keep the link, not the numbers.":"Un artifact que lee FocusAlpha en vivo trae datos frescos cada vez que lo abres. Guarda el enlace, no los números.",
+"Set it up once":"Configúralo una vez","Write the memory line (Quick Ask, step 1) once; every later chat starts with FocusAlpha.":"Escribe la línea de memoria (Preguntas, paso 1) una vez; cada chat posterior empieza con FocusAlpha.",
 "Say \"Use FA\"":"Di «Usa FA»","Otherwise Claude searches the web. Every question here already says it.":"Si no, Claude busca en la web. Todas las preguntas de aquí ya lo dicen.",
 "Push back":"Insiste","If Claude says FA doesn't have something, reply: \"FA does have this, check its tools.\"":"Si Claude dice que FA no tiene algo, responde: «FA sí lo tiene, revisa sus herramientas».",
 "Ask for sources":"Pide las fuentes","Add \"list the sources you used\" at the end.":"Añade «enumera las fuentes que usaste» al final.",
@@ -511,6 +516,11 @@ var DICT={es:{
 "Where the web still helps":"网络搜索仍然有用的地方",
 "News before July 26, 2026. A quick list of an ETF's top 5 names.":"2026 年 7 月 26 日之前的新闻。快速看一个 ETF 的前 5 大持仓。",
 "Things we learned the hard way.":"我们踩过坑才学到的。",
+"Build a monitor":"搭一个监控","Ask: \"Build me a monitor for [stocks] as an artifact: events, news and prices, scored.\" The Use Cases tab has a ready prompt.":"这样问：「给我做一个 [股票] 的监控 artifact：事件、新闻和价格，带打分。」使用案例 tab 里有现成的 prompt。",
+"Build a screening tool":"搭一个筛选工具","Ask for a screener as an artifact with saved screens you can rerun in one click. Start from the Screen stock ideas card.":"让它做一个筛选器 artifact，带可以一键重跑的预设筛选。从「股票筛选」那张卡开始。",
+"Build a dashboard":"搭一个看板","Any table Claude gives you can become a page: say \"make this a live artifact reading FocusAlpha\". Build my own on any sample does it for you.":"Claude 给你的任何表格都能变成页面：说「把它做成读 FocusAlpha 实时数据的 artifact」。任何样本上的 Build my own 都替你做好了。",
+"Rerun, don't rebuild":"重跑，不重建","An artifact that reads FocusAlpha live fetches fresh data every time you open it. Keep the link, not the numbers.":"实时读 FocusAlpha 的 artifact 每次打开都会取新数据。留链接，不用留数字。",
+"Set it up once":"只设一次","Write the memory line (Quick Ask, step 1) once; every later chat starts with FocusAlpha.":"把 memory 那句（快速提问第 1 步）写一次，之后每个对话都先用 FocusAlpha。",
 "Say \"Use FA\"":"说「用 FA」","Otherwise Claude searches the web. Every question here already says it.":"不然 Claude 会去搜网页。这里的每个问题都已经带上了。",
 "Push back":"要坚持","If Claude says FA doesn't have something, reply: \"FA does have this, check its tools.\"":"如果 Claude 说 FA 没有某项数据，回它：「FA 有，去查它的工具。」",
 "Ask for sources":"要来源","Add \"list the sources you used\" at the end.":"在最后加一句「列出你用到的来源」。",
@@ -656,7 +666,12 @@ var TIPS=[
  {em:"🎯",t:"Say \"Use FA\"",p:"Otherwise Claude searches the web. Every question here already says it."},
  {em:"🔁",t:"Push back",p:"If Claude says FA doesn't have something, reply: \"FA does have this, check its tools.\""},
  {em:"🧾",t:"Ask for sources",p:"Add \"list the sources you used\" at the end."},
- {em:"📋",t:"Ask for tables",p:"Tables beat busy charts. For price plus events, ask for a table next to the chart."}
+ {em:"📋",t:"Ask for tables",p:"Tables beat busy charts. For price plus events, ask for a table next to the chart."},
+ {em:"📡",t:"Build a monitor",p:"Ask: "Build me a monitor for [stocks] as an artifact: events, news and prices, scored." The Use Cases tab has a ready prompt."},
+ {em:"🔍",t:"Build a screening tool",p:"Ask for a screener as an artifact with saved screens you can rerun in one click. Start from the Screen stock ideas card."},
+ {em:"📊",t:"Build a dashboard",p:"Any table Claude gives you can become a page: say "make this a live artifact reading FocusAlpha". Build my own on any sample does it for you."},
+ {em:"🔁",t:"Rerun, don't rebuild",p:"An artifact that reads FocusAlpha live fetches fresh data every time you open it. Keep the link, not the numbers."},
+ {em:"🧠",t:"Set it up once",p:"Write the memory line (Quick Ask, step 1) once; every later chat starts with FocusAlpha."}
 ];
 document.getElementById("tips").innerHTML=TIPS.map(function(t){return '<div class="tp"><span class="em" aria-hidden="true">'+t.em+'</span><div><b>'+t.t+'</b><p>'+t.p+'</p></div></div>'}).join("");
 
